@@ -1,0 +1,105 @@
+#download-manager {
+    position: fixed;
+    display: flex;
+    bottom: 0;
+    width: 100%;
+    height: 49px;
+    background: #EFF1F2;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    -webkit-user-select: none;
+    cursor: default;
+    border-top: 1px solid #dedede;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex: 1;
+}
+
+#download-manager::-webkit-scrollbar { width: 0 !important; height: 1px !important; }
+
+.download-item {
+    height: 100%;
+    display: inline-flex;
+    flex-direction: row;
+    border-right: 1px solid #dedede;
+}
+
+.download-content {
+	position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: transparent;
+    transition: background 0.2s ease-in-out;
+    padding-right: 68px;
+    padding-left: 20px;
+}
+
+.download-content:hover {
+	background: #DAD9DA;
+}
+
+.download-title {
+    display: block;
+    font-size: 12px;
+}
+
+.download-details {
+    display: block;
+    font-size: 10px;
+}
+
+.download-actions {
+	width: 0px;
+	position: relative;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    height: 24px;
+    margin-top: 14px;
+    left: -58px;
+}
+
+#download-controls{
+	display: flex;
+    align-items: center;
+    width: 49px;
+    height: 49px;
+    position: fixed;
+    right: 0;
+    background: #EFF1F2;
+}
+
+.action{
+	border-radius: 50%;
+	background: transparent;
+	transition: background 0.2s ease-in-out;
+}
+
+.action:hover{
+	background: #DAD9DA;
+}
+
+.download-folder::before {
+    height: 24px;
+    width: 24px;
+    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="16" viewBox="-4 0 30 18" version="1.1"> <path fill="#5a5a5a" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/> </svg>');
+    display: block;
+}
+
+.download-close::before, .close-download::before {
+    height: 24px;
+    width: 24px;
+    content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><path stroke='#5a5a5a' stroke-linecap='round' stroke-width='1.125' d='M4 4 L10 10 M10 4 L4 10'></path></svg>");
+    display: block;
+}
+
+.close-download{
+	position: absolute;
+	right: 0;
+	margin-right: 13px;
+}
+
+.download-item.last{
+	flex: 0 0 48px;
+	border: none;
+}

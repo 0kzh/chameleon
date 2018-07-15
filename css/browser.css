@@ -1,0 +1,366 @@
+html{
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+button,
+input {
+  outline: none;
+}
+
+#tab-bar{
+  width: 100%;
+  display: flex;
+  border-bottom: 1px solid #DAD9DA;
+}
+
+#ripple-container{
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+#controls {
+  z-index: 999;
+  font-size: 10px;
+  height: 3.8em;
+  overflow: hidden;
+  border-bottom: 1px solid #DAD9DA;
+}
+
+#controls button,
+#controls input {
+  font-size: 14px;
+}
+
+button,
+input[type="submit"],
+button[disabled]:hover {
+  border: none;
+  background: transparent;
+}
+
+/* These glyphs are on the small side, make them look more natural when
+compared to the back/forward buttons */
+#controls #home,
+#controls #terminate {
+  font-size: 24px;
+}
+
+#controls #reload {
+  font-size: 20px;
+}
+
+#controls #zoom,
+#controls #find {
+  font-size: 18px;
+}
+
+#navbarIcon {
+  position: relative;
+  z-index: 999;
+  float: left;
+  height: 100%;
+  opacity: 0;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /*border-left: 1px solid #DAD9DA;*/
+}
+
+#navbarIcon svg{
+  display: block;
+  /*border-left: 1px solid #BCC4C8;*/
+  padding-left: 16px;
+}
+
+#back, #refresh, #bookmark, #settings, #add-tab{
+  padding: 0 16px 0 16px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#add-tab{
+  flex: auto;
+  font-size: 10px;
+  height: 2.8em;
+  background-color: #efefef;
+  /*border-bottom-left-radius: 5px;*/
+  padding: 0 12px 0 12px;
+  /*border-left: 1px solid #DAD9DA;*/
+  /*border-right: 1px solid #DAD9DA;*/
+}
+
+#add-tab:hover{
+  background-color: #dedede;
+}
+
+#add-tab.no-border{
+  border-left: 1px solid #DAD9DA;
+}
+
+#controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
+  height: 16px;
+  width: 16px;
+  fill: #86949B;
+}
+
+#bookmark svg {
+  height: 16px;
+  width: 16px;
+  fill: #FFCB4B;
+  border-left: 1px solid #BCC4C8;
+  margin-left: -13px;
+  padding-left: 16px;
+  position: relative;
+}
+
+#bookmark{
+  padding-left: 0px;
+}
+
+#location {
+  position: relative;
+  z-index: 999;
+  padding: 0;
+  float: left;
+  width: 100%;
+  height: 100%;
+  border: none;
+  -webkit-user-select: none;
+  will-change: display;
+  color: #535F66;
+  margin-top: auto;
+  margin-bottom: auto;
+  background: none !important;
+}
+
+#location:hover {
+  cursor: text;
+}
+#location:disabled:hover {
+  cursor: default;
+}
+
+#controls {
+  display: -webkit-flex;
+  -webit-flex-direction: column;
+}
+
+#controls #location-form {
+  position: relative;
+  display: inline-block;
+  width: calc(100% - 50px);
+  background: none;
+  float: right;
+  height: 100%;
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+#refresh:hover, #back.hover-style:hover{
+  background-color: #EFF1F2;
+}
+
+#zoom-box,
+#find-box {
+  background-color: #eee;
+  border: solid 1px #ccc;
+  border-top: solid 1px #eee;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+  padding: 2px;
+
+  position: fixed;
+  top: 36px;
+  height: 25px;
+
+  display: none;
+}
+
+#zoom-box #zoom-form,
+#find-box #find-form {
+  -webkit-flex: 1;
+  display: -webkit-flex;
+  -webit-flex-direction: row;
+}
+
+#zoom-box input,
+#zoom-box button,
+#find-box button {
+  border-radius: 2px;
+}
+
+#zoom-box #zoom-text,
+#find-box #find-text {
+  border: solid 1px #ccc;
+  margin-right: 0px;
+  padding: 2px;
+  -webkit-box-sizing: border-box;
+  -webkit-flex: 1;
+}
+
+#zoom-box {
+  left: 5px;
+  width: 125px;
+  z-index: 1;
+}
+
+#zoom-box input[type="submit"] {
+  font-size: 14px;
+  margin: 2px 0px;
+  padding: 0 2px 3px 2px;
+  width: 22px;
+}
+
+#zoom-box button {
+  font-size: 12px;
+  margin: 2px 0px;
+  padding: 0px 1px 0px 0px;
+  width: 20px;
+}
+
+#find-box {
+  right: 5px;
+  width: 280px;
+  z-index: 2;
+}
+
+#find-box #find-text {
+  border-right-style: none;
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+#find-box #find-results {
+  color: #888;
+  background-color: #fff;
+  border: solid 1px #ccc;
+  border-left-style: none;
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+  margin: 2px 0px;
+  padding: 3px 4px 2px 0;
+  text-align: center;
+}
+
+#find-box #match-case {
+  margin: 2px 0px;
+  font-size: 10px;
+  width: 28px;
+}
+
+#find-box #find-backward,
+#find-box #find-forward {
+  font-size: 14px;
+  width: 24px;
+}
+
+#sad-webview,
+webview {
+  position: absolute;
+}
+
+webview.hidden {
+  display: flex !important;
+  visibility: hidden;
+  z-index: -1;
+}
+
+/* The reload button turns into a spinning trobber */
+.loading #reload {
+  -webkit-animation: spinner-animation .5s infinite linear;
+  -webkit-transform-origin: 50% 55.5%;
+}
+
+@-webkit-keyframes spinner-animation {
+  0% { -webkit-transform: rotate(0deg); }
+  100% {-webkit-transform: rotate(360deg); }
+}
+
+/* Due to http://crbug.com/156219 we can't use display: none */
+#sad-webview,
+.exited webview {
+  visibility: hidden;
+  visibility: hidden;
+}
+
+.exited #sad-webview {
+  visibility: visible;
+  background: #343f51;
+  text-align: center;
+  color: #fff;
+}
+
+#sad-webview h2 {
+  font-size: 14px;
+}
+
+#sad-webview p {
+  font-size: 11px;
+}
+
+#sad-webview-icon {
+  font-size: 96px;
+  margin-bottom: 10px;
+}
+
+/* Variant of the crashed page when the process is intentionally killed (in that
+case we use a different background color and label). */
+.exited #sad-webview #killed-label {
+  display: none;
+}
+
+.killed #sad-webview {
+  background: #393058;
+}
+
+.killed #sad-webview #killed-label {
+  display: block;
+}
+
+.killed #sad-webview #crashed-label {
+  display: none;
+}
+
+.ripple{
+  overflow:hidden;
+  transition: border 0.2s ease-in-out;
+  /*border-right: 1px solid #DAD9DA;*/
+}
+
+.ripple-effect{
+  position: absolute;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  background: #EFF1F2;
+  animation: ripple-animation 1s;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+}
+
+@keyframes ripple-animation {
+    from {
+      transform: scale(1);
+      opacity: 1.0;
+    }
+    to {
+      transform: scale(100);
+      opacity: 1.0;
+    }
+}
+
+#location {
+  display: inline-block;
+}

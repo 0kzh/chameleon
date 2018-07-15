@@ -1,0 +1,114 @@
+.titlebar {
+	padding: 0 3px;
+  	width: 86px;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+}
+
+.titlebar.webkit-draggable {
+	-webkit-app-region: drag;
+}
+
+.titlebar-stoplight {
+	float: left;
+	text-align: left;
+}
+
+.titlebar:after,
+.titlebar-stoplight:after {
+	content: ' ';
+	display: table;
+	clear: both;
+}
+
+.titlebar-stoplight:hover svg,
+.titlebar-stoplight:hover svg.fullscreen-svg,
+.titlebar-stoplight:hover svg.maximize-svg {
+	opacity: 1;
+}
+
+.titlebar.alt svg.fullscreen-svg {
+	display: none;
+}
+
+.titlebar.alt svg.maximize-svg {
+	display: block;
+}
+
+.titlebar-close,
+.titlebar-minimize,
+.titlebar-fullscreen {
+	float: left;
+	width: 10px;
+	height: 10px;
+	margin: 6px 5px;
+	line-height: 0;
+}
+
+.titlebar.webkit-draggable .titlebar-close,
+.titlebar.webkit-draggable .titlebar-minimize,
+.titlebar.webkit-draggable .titlebar-fullscreen {
+	-webkit-app-region: no-drag;
+}
+
+.titlebar-close {
+	margin-left: 6px;
+}
+
+.titlebar-close:hover .close {
+	fill: #bf4943;
+}
+
+.titlebar-close svg {
+	width: 10px;
+	height: 10px;
+	margin-top: 2px;
+	margin-left: 2px;
+}
+
+.close{
+	fill: #ff5f57;
+}
+
+.titlebar-minimize:hover .minimize {
+	fill: #bf9123;
+}
+
+.titlebar-minimize svg {
+	width: 12px;
+	height: 12px;
+	margin-top: 1px;
+	margin-left: 1px;
+}
+
+.minimize{
+	fill: #ffbd2e;
+}
+
+.titlebar-fullscreen:hover .unmaximize, .titlebar-fullscreen:hover .maximize {
+	fill: #1f9a31;
+}
+
+.titlebar-fullscreen svg.fullscreen-svg {
+	width: 12px;
+	height: 12px;
+	margin-top: 1.6px;
+	margin-left: 1.6px;
+	display: none;
+}
+
+.unmaximize{
+	fill: #28c940;
+}
+
+.titlebar-fullscreen svg.maximize-svg {
+	width: 12px;
+	height: 12px;
+	margin-top: 1px;
+	margin-left: 1px;
+}
+
+.maximize{
+	fill: #28c940;
+}

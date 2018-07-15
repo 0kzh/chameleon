@@ -1,0 +1,39 @@
+<!doctype html>
+
+<head>
+  <link rel="stylesheet" href="vendor/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div class="settings-pane">
+    <form class="settings">
+      <div class="settings-left">
+        <ul class="list-group settings">
+          <li class="list-group-item active">General</li>
+          <li class="list-group-item">Appearance</li>
+          <li class="list-group-item">Search Engine</li>
+          <li class="list-group-item">Security & Privacy</li>
+          <li class="list-group-item">Plugins</li>
+          <li class="list-group-item">About</li>
+        </ul>
+      </div>
+      <div class="card settings-content">
+        <div class="card-body">
+          <h3 class="card-title">General Settings</h3>
+          <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <h5>Theme</h5>
+            <label class="btn btn-light active">
+              <input type="radio" name="theme" autocomplete="off" checked> Light
+            </label>
+            <label class="btn btn-light">
+              <input type="radio" name="theme" autocomplete="off"> Dark
+            </label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script src="vendor/jquery-3.3.1.min.js"></script>
+  <script src="vendor/bootstrap.min.js"></script>
+</body>
