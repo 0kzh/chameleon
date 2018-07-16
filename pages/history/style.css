@@ -15,3 +15,27 @@
 .search {
 	top: 10px;
 }
+
+.entry div {
+	display: inline-block;
+}
+
+.delete {
+	vertical-align: bottom;
+	float: right;
+	line-height: 200%;
+}
+
+.timestamp {
+	min-width: 96px;
+}
+
+.entry a {
+  color: black;
+  text-decoration: none; /* no underline */
+}
+
+.site {
+	font-size: 12px;
+	color: #757575;
+}
