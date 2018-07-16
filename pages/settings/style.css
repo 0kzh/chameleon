@@ -4,7 +4,7 @@ body {
 }
 
 .spacer {
-  height: 1em;
+  height: 2em;
 }
 
 .settings-pane {
@@ -17,12 +17,22 @@ body {
 
 .settings .settings-left {
   margin-right: 20px;
-  display: inline-block;
   float: left;
 }
 
 .settings .settings-content {
-  display: inline-block;
-  padding: 30px;
+  width: 500px;
   padding-top: 0;
+}
+
+.settings-content h3 {
+  margin-bottom: 0;
+}
+
+.settings .list-group-item-action {
+  cursor: pointer;
+}
+
+.btn {
+  box-shadow: none !important;
 }

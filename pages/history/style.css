@@ -1,0 +1,17 @@
+.history-pane {
+	margin-top: 50px;
+}
+
+.left {
+	display: inline-block;
+	float: left;
+}
+
+.right {
+	display: inline-block;
+	float: right;
+}
+
+.search {
+	top: 10px;
+}

@@ -5,11 +5,18 @@
   "devDependencies": {
     "draggabilly": "^2.1.1",
     "electron": "1.8.4",
-    "electron-rebuild": "^1.7.3"
+    "electron-rebuild": "^1.7.3",
+    "gulp": "^3.9.1",
+    "vinyl-source-stream": "^2.0.0"
+  },
+  "scripts": {
+    "build": "browserify js/history-db.js pages/history/main.js -o pages/bundle.js"
   },
   "dependencies": {
+    "browserify": "^16.2.2",
     "dexie": "^2.0.4",
     "electron-dl": "^1.12.0",
+    "gulp-livereload": "^3.8.1",
     "unused-filename": "^1.0.0"
   }
 }

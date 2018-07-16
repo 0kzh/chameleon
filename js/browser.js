@@ -10,9 +10,8 @@ var winSize = { width: win.getSize()[0], height: win.getSize()[1] };
 const { width, height } = remote.screen.getPrimaryDisplay().workAreaSize;
 const dir = (settings.downloadDirectory != "") ? settings.downloadDirectory : app.getPath('downloads');
 const bufferPixels = 5;
-var snapped = false;
+var snapped = false;  
 var startTime = 0;
-
 const downloadItemTemplate = `<div class="download-item">
                                   <div class="download-content">
                                     <div class="download-icon"></div>
@@ -81,6 +80,7 @@ if (document.getElementById('download-manager').addEventListener) {
 
 document.querySelector('#location-form').onsubmit = function(e) {
   e.preventDefault();
+  //special redirects
   navigateTo(document.querySelector('#location').value);
 };
 
@@ -405,7 +405,18 @@ function navigateTo(url) {
     }
   }
 
-  if (url.includes("://")) {
+  if(url.startsWith("about://")) {
+    var target = url.split("about://")[1];
+    switch(target) {
+      case "settings":
+        webview.src = app.getAppPath() + "\\pages\\settings\\settings.html";
+        //inject loaded settings (JSON string) into the window as javascript
+        // webview.executeJavaScript("var settingsString = `" + JSON.stringify(settings) + "`; console.log(settingsString);");
+        webview.send("loadSettings", JSON.stringify(settings));
+      case "history":
+      webview.src = app.getAppPath() + "\\pages\\history\\history.html";
+    }
+  } else if (url.includes("://")) {
     webview.src = url;
   } else if (url.includes(".") && !pattern.test(url)) {
     webview.src = "http://" + url;
@@ -642,7 +653,7 @@ remote.getCurrentWebContents().session.on('will-download', (event, item, webCont
     //remove item from downloads bar
     downloadItem.remove();
     //hide downloads bar
-    if ($(".download-item").length == 0) {
+    if ($(".download-item").length == 1) {
       $("#download-manager").hide();
     }
   });

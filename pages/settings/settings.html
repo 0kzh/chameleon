@@ -1,0 +1,78 @@
+<!doctype html>
+
+<head>
+  <link rel="stylesheet" href="../vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css">
+  <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+  <div class="settings-pane">
+    <form class="settings">
+      <div class="settings-left">
+        <ul class="list-group settings">
+          <li class="list-group-item list-group-item-action active">General</li>
+          <li class="list-group-item list-group-item-action">Appearance</li>
+          <li class="list-group-item list-group-item-action">Search Engine</li>
+          <li class="list-group-item list-group-item-action">Security & Privacy</li>
+          <li class="list-group-item list-group-item-action">Plugins</li>
+          <li class="list-group-item list-group-item-action">About</li>
+        </ul>
+      </div>
+      <div class="card settings-content">
+        <div class="card-header"><h3>General Settings</h3></div>
+        <div class="card-body">
+          <div id="theme">
+            <h5>Theme</h5>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-outline-primary active">
+                <input type="radio" name="theme" value="false" autocomplete="off" checked> Light
+              </label>
+              <label class="btn btn-outline-dark">
+                <input type="radio" name="theme" value="true" autocomplete="off"> Dark
+              </label>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+
+          <div id="titlebar">
+            <h5>Titlebar Style</h5>
+            <div class="btn-group btn-group-toggle" data-toggle="buttons">
+              <label class="btn btn-outline-primary active">
+                <input type="radio" name="theme" value="auto" autocomplete="off" checked> Automatic
+              </label>
+              <label class="btn btn-outline-primary">
+                <input type="radio" name="theme" value="mac" autocomplete="off"> Mac
+              </label>
+              <label class="btn btn-outline-primary">
+                <input type="radio" name="theme" value="windows" autocomplete="off"> Windows
+              </label>
+            </div>
+          </div>
+          
+          <div class="spacer"></div>
+
+          <h5>Downloads location</h5>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="C:\Users\Kelvin Zhang\Downloads">
+            <div class="input-group-append">
+              <span class="glyphicon glyphicon-print"></span>
+              <button class="btn btn-outline-secondary" type="button"><i class="fas fa-folder-open"></i></button>
+            </div>
+          </div>
+            
+          <div class="spacer"></div>
+
+          <footer>
+            <button class="btn btn-primary" type="button">Save changes</button>
+            <button class="btn btn-secondary" type="button">Cancel changes</button>
+          </footer>
+        </div>
+      </div>
+    </form>
+  </div>
+  <script src="../vendor/jquery-3.3.1.min.js"></script>
+  <script src="main.js"></script>
+  <script src="../vendor/bootstrap.min.js"></script>
+</body>
