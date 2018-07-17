@@ -27,11 +27,6 @@ const downloadItemTemplate = `<div class="download-item">
 //load settings
 loadSettings();
 
-var db = new Dexie("history");
-db.version(1).stores({
-  sites: "++id,url,title,lastVisit,numVisits"
-});
-
 // db.sites.add({name: "Josephine", age: 21}).then(function() {
 //    return db.friends.where("age").below(25).toArray();
 // }).then(function (youngFriends) {
@@ -767,13 +762,15 @@ function handleLoadCommit(webview) {
   //check if exists; if true, get numVisits
   const protocol = require('url').parse(webview.getURL()).protocol;
   if (protocol == "https:" || protocol == "http:") {
+    var fav = "https://www.google.com/s2/favicons?domain=" + stripURL(webview.getURL());
     db.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
       if (site == null) {
         //doesn't exist, so add
-        db.sites.add({ url: webview.getURL(), title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
+        db.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
       } else {
         db.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
           url: webview.getURL(),
+          favicon: fav,
           title: webview.getTitle(),
           lastVisit: Date.now(),
           numVisits: site.numVisits + 1

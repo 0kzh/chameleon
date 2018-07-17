@@ -16,14 +16,13 @@
 	top: 10px;
 }
 
-.entry div {
-	display: inline-block;
+.entry {
+	margin-bottom: 10px;
+    margin-top: 10px;
 }
 
-.delete {
-	vertical-align: bottom;
-	float: right;
-	line-height: 200%;
+.entry div {
+	display: inline-block;
 }
 
 .timestamp {
@@ -33,6 +32,17 @@
 .entry a {
   color: black;
   text-decoration: none; /* no underline */
+}
+
+.entry .delete {
+	vertical-align: bottom;
+	float: right;
+	line-height: 200%;
+	color: #2D3237;
+}
+
+.entry .delete:hover {
+	color: black;
 }
 
 .site {

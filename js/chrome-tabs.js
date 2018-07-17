@@ -6,6 +6,7 @@ const fs = require('fs');
 const unusedFilename = require('unused-filename');
 var settings = remote.getGlobal("settings");
 var Dexie = require('dexie');
+const db = require(path.resolve(__dirname, './js/history-db.js'));
 
 const isNodeContext = typeof module !== 'undefined' && typeof module.exports !== 'undefined';
 if (isNodeContext) {

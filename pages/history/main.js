@@ -1,18 +1,20 @@
 var db = require('../../js/history-db.js');
+var $ = require('jquery');
+
 const entryTemplate = `
   <div class="entry">
     <div class="timestamp"></div>
 	<div class="favicon"><img src=""/></div>
 	<div class="title"><a href=""></a></div>
 	<div class="site"></div>
-	<a href="" class="fas fa-trash-alt delete"></a>
+	<a href="" class="far fa-minus-square delete"></a>
   </div>
 `;
 db.sites.reverse().each(site => {
   const div = document.createElement('div');
   div.innerHTML = entryTemplate;
   div.querySelector(".timestamp").innerHTML = formatTime(new Date(site.lastVisit));
-  // div.querySelector(".favicon img").setAttribute("src", site.);
+  div.querySelector(".favicon img").setAttribute("src", site.favicon);
   div.querySelector(".title a").innerHTML = site.title;
   div.querySelector(".title a").setAttribute("href", site.url);
   div.querySelector(".site").innerHTML = stripURL(site.url);
@@ -25,7 +27,7 @@ function formatTime(date) {
   var ampm = hours >= 12 ? 'pm' : 'am';
   hours = hours % 12;
   hours = hours ? hours : 12; // the hour '0' should be '12'
-  minutes = minutes < 10 ? '0'+minutes : minutes;
+  minutes = minutes < 10 ? '0' + minutes : minutes;
   var strTime = hours + ':' + minutes + ' ' + ampm;
   return strTime;
 }
@@ -76,3 +78,12 @@ function stripURL(url) {
   }
   return domain;
 }
+
+$(document).on("mouseenter mouseleave", ".delete", (event) => {
+  var element = $(event.target);
+  if (element.hasClass("fas")) {
+    element.removeClass("fas").addClass("far");
+  } else {
+    element.removeClass("far").addClass("fas");
+  }
+});
