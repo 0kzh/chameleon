@@ -409,7 +409,7 @@ function navigateTo(url) {
         // webview.executeJavaScript("var settingsString = `" + JSON.stringify(settings) + "`; console.log(settingsString);");
         webview.send("loadSettings", JSON.stringify(settings));
       case "history":
-      webview.src = app.getAppPath() + "\\pages\\history\\history.html";
+        webview.src = app.getAppPath() + "\\pages\\history\\history.html";
     }
   } else if (url.includes("://")) {
     webview.src = url;
@@ -551,6 +551,8 @@ ipcRenderer.on('shortcut', function(event, data) {
     }
   } else if (data.action == "printPage") {
     getCurrentWebview().print();
+  } else if (data.action == "viewHistory") {
+    navigateTo("file:///" + app.getAppPath() + "\\pages\\history\\history.html");
   }
 });
 

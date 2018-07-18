@@ -94,6 +94,11 @@ const template = [
         click: () => { mainWindow.webContents.send('shortcut' , {action:'reloadPage'}); }
       },
       {
+        label: 'History',
+        accelerator: 'CmdOrCtrl+H',
+        click: () => { mainWindow.webContents.send('shortcut' , {action:'viewHistory'}); }
+      },
+      {
         label: 'Toggle Developer Tools',
         accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
          click: () => { mainWindow.webContents.send('shortcut' , {action:'toggleDevTools'}); }
