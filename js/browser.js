@@ -553,6 +553,8 @@ ipcRenderer.on('shortcut', function(event, data) {
     getCurrentWebview().print();
   } else if (data.action == "viewHistory") {
     navigateTo("file:///" + app.getAppPath() + "\\pages\\history\\history.html");
+  } else if (data.action == "viewSettings") {
+    navigateTo("file:///" + app.getAppPath() + "\\pages\\settings\\settings.html");
   }
 });
 

@@ -192,7 +192,7 @@ compared to the back/forward buttons */
 #find-box #find-form {
   -webkit-flex: 1;
   display: -webkit-flex;
-  -webit-flex-direction: row;
+  -webkit-flex-direction: row;
 }
 
 #zoom-box input,

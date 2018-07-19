@@ -1,51 +1,86 @@
 .history-pane {
-	margin-top: 50px;
+  margin-top: 50px;
+  margin-bottom: 80px;
 }
 
 .left {
-	display: inline-block;
-	float: left;
+  display: inline-block;
+  float: left;
 }
 
 .right {
-	display: inline-block;
-	float: right;
+  display: inline-block;
+  float: right;
 }
 
 .search {
-	top: 10px;
+  top: 10px;
 }
 
 .entry {
-	margin-bottom: 10px;
-    margin-top: 10px;
-}
-
-.entry div {
-	display: inline-block;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  white-space: nowrap;
+  display: flex;
 }
 
 .timestamp {
-	min-width: 96px;
+  flex: 0 0 96px;
 }
 
 .entry a {
   color: black;
-  text-decoration: none; /* no underline */
+  text-decoration: none;
+  /* no underline */
+}
+
+.entry div {
+  margin-top: auto;
+  margin-bottom: auto;
 }
 
 .entry .delete {
-	vertical-align: bottom;
-	float: right;
-	line-height: 200%;
-	color: #2D3237;
+  margin-left: auto;
+  line-height: 200%;
+  color: #2D3237;
+  text-align: right;
+  cursor: pointer;
 }
 
 .entry .delete:hover {
-	color: black;
+  color: black;
+}
+
+.entry .favicon {
+  margin-right: 15px;
 }
 
 .site {
-	font-size: 12px;
-	color: #757575;
+  vertical-align: bottom;
+  font-size: 12px;
+  color: #757575;
+  margin-left: 8px;
+  margin-right: 50px;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.date:not(:first-of-type) { 
+  margin-top: 2rem;
+}
+
+@media only screen and (max-width: 500px) {
+	.site {
+		display: none;
+	}
+}
+
+@media only screen and (max-width: 370px) {
+	#clear-history {
+		display: block;
+		float: none;
+	}
 }

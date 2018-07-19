@@ -43,7 +43,12 @@ const template = [
         label: 'Print',
         accelerator: 'CmdOrCtrl+P',
         click: () => { mainWindow.webContents.send('shortcut', {action: 'printPage'}); }
-      }
+      },
+      {
+        label: 'Settings',
+        accelerator: 'CmdOrCtrl+,',
+        click: () => { mainWindow.webContents.send('shortcut' , {action:'viewSettings'}); }
+      },
     ]
   },
   {

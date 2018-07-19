@@ -1,6 +1,5 @@
 body {
   margin: 0;
-  background-color: #F8F8F8;
 }
 
 .spacer {
@@ -12,7 +11,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #F8F8F8;
 }
 
 .settings .settings-left {
