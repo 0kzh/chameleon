@@ -1,17 +1,7 @@
-const path = require('path');
-const { remote, ipcRenderer, shell } = require('electron');
-const app = require('electron').remote.app;
-const { dialog } = require('electron').remote;
-const fs = require('fs');
-const unusedFilename = require('unused-filename');
+const { remote } = window.require('electron');
 var settings = remote.getGlobal("settings");
-var Dexie = require('dexie');
-const db = require(path.resolve(__dirname, './js/history-db.js'));
-
-const isNodeContext = typeof module !== 'undefined' && typeof module.exports !== 'undefined';
-if (isNodeContext) {
-    Draggabilly = require('draggabilly');
-}
+const $ = require('jquery');
+Draggabilly = require('draggabilly');
 
 const tabTemplate = `
   <div class="chrome-tab">
@@ -149,9 +139,9 @@ class ChromeTabs {
 
     createNewWebView(url) {
         if (url) {
-            $('#tabs-content').append('<webview plugins ' + 'src=' + url + ' style="width:640px; height:480px" preload="./click.js"></webview>');
+            $('#tabs-content').append('<webview plugins ' + 'src=' + url + ' style="width:640px; height:480px" preload="./js/inject.js"></webview>');
         } else {
-            $('#tabs-content').append('<webview plugins src="about:blank" style="width:640px; height:480px; background: ' + (settings.darkMode ? "#424242" : "#ffffff") + '" preload="./click.js"></webview>');
+            $('#tabs-content').append('<webview plugins src="about:blank" style="width:640px; height:480px; background: ' + (settings.darkMode ? "#424242" : "#ffffff") + '" preload="./js/inject.js"></webview>');
         }
         return document.querySelector('#tabs-content').lastElementChild;
     }
@@ -367,8 +357,7 @@ class ChromeTabs {
     }
 }
 
-if (isNodeContext) {
-    module.exports = ChromeTabs;
-} else {
-    window.ChromeTabs = ChromeTabs;
+module.exports = {
+    ChromeTabs,
+    settings
 }

@@ -1,3 +1,13 @@
+const path = require('path');
+const { ChromeTabs, settings } = require('./chrome-tabs.js');
+const unusedFilename = require('unused-filename');
+const { remote, ipcRenderer, shell } = window.require('electron');
+const { dialog } = window.require('electron').remote;
+const app = window.require('electron').remote.app;
+const $ = require('jquery');
+const fs = require('fs');
+const db = require('./history-db.js');
+
 var isWin = process.platform === "win32";
 window.onresize = doLayout;
 var isLoading = false;
@@ -26,23 +36,6 @@ const downloadItemTemplate = `<div class="download-item">
 
 //load settings
 loadSettings();
-
-// db.sites.add({name: "Josephine", age: 21}).then(function() {
-//    return db.friends.where("age").below(25).toArray();
-// }).then(function (youngFriends) {
-//    alert ("My young friends: " + JSON.stringify(youngFriends));
-// }).catch(function (e) {
-//    alert ("Error: " + (e.stack || e));
-// });
-// var style = document.createElement("style");
-// var hoverColor = settings.darkMode ? "#EFF1F2" : "#282828";
-// var css = '#back:hover { background-color: ' + hover + ' }';
-// if (style.styleSheet) {
-//   style.styleSheet.cssText = css;
-// } else {
-//   style.appendChild(document.createTextNode(css));
-// }
-// style.id = "hover-style";
 
 chromeTabs.init(el, { tabOverlapDistance: 14, minWidth: 45, maxWidth: 248 });
 
@@ -171,6 +164,7 @@ $(".ripple").mousedown(function(e) {
       win.setPosition(event.screenX - offsets.x, event.screenY - offsets.y);
       if (!win.isMaximized()) {
         win.setSize(winSize.width, winSize.height);
+        win.setPosition(event.screenX - offsets.x, event.screenY - offsets.y);
         if (snapped) {
           snapped = false;
         }
@@ -534,13 +528,13 @@ ipcRenderer.on('shortcut', function(event, data) {
     getCurrentWebview().openDevTools();
   } else if (data.action == "savePage") {
     //if pdf, download
-    if (url.endsWith(".pdf")) {
+    if (getCurrentWebview().getURL().endsWith(".pdf")) {
       const url = getCurrentWebview().getURL().replace("chrome://pdf-viewer/index.html?src=", "");
       getCurrentWebview().getWebContents().downloadURL(url);
       return;
     }
 
-    var savePath = remote.dialog.showSaveDialog(remote.getCurrentWindow(), {});
+    var savePath = dialog.showSaveDialog(remote.getCurrentWindow(), {});
     if (savePath) {
       //null if cancelled
       if (!savePath.endsWith('.html')) {

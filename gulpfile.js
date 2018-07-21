@@ -5,8 +5,11 @@ var livereload = require('gulp-livereload');
 var gutil = require('gulp-util');
 
 var paths = [
+  'vendor/jquery.min.js',
+  'vendor/draggabilly.pkgd.min.js',
+  'js/chrome-tabs.js',
   'js/history-db.js',
-  'pages/history/main.js'
+  'js/browser.js'
 ];
 
 function handleError(err) {
@@ -15,7 +18,10 @@ function handleError(err) {
 }
 
 gulp.task('scripts', function() {
-  return browserify({ entries: paths })
+  return browserify({ 
+    entries: paths,
+    node: true
+  })
     .bundle()
     .on('error', gutil.log)
     .pipe(source('bundle.js'))

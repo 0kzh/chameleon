@@ -8,7 +8,7 @@
    },
    {  
       "url":"https?:\/\/(www.)?youtube.*",
-      "hidden":"ytd-masthead.shell, #drop-shadow, ytd-browse.ytd-page-manager.style-scope, #guide, #home-page-skeleton, #masthead-skeleton-icons, #related-skeleton, [id*='skeleton'], #guide-button, #contentContainer, [is-icon-button='']",
+      "hidden":"ytd-masthead.shell, #drop-shadow, ytd-browse.ytd-page-manager.style-scope, #guide, #home-page-skeleton, #masthead-skeleton-icons, #related-skeleton, [id*='skeleton'], #guide-button, #contentContainer, [is-icon-button=''], ytd-popup-container",
       "customCSS":"ytd-searchbox#search { width: 640px; position: absolute; left: calc(50% - 320px); margin: 0} #masthead-container.ytd-app::after { box-shadow: none !important } ytd-page-manager.ytd-app { margin-left: auto !important; margin-right: auto !important; width: 80%;}",
       "enabled":true,
       "id":2

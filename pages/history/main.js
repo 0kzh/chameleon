@@ -1,6 +1,3 @@
-var db = require('../../js/history-db.js');
-var $ = require('jquery');
-
 const entryTemplate = `
   <div class="entry">
     <div class="timestamp"></div>

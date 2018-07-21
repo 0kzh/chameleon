@@ -1,13 +1,8 @@
 const { ipcRenderer } = require('electron');
 var loaded = false;
-var settingsJSON;
 
 document.addEventListener('click', function(event) {
   ipcRenderer.sendToHost("click");
-});
-
-ipcRenderer.on('loadSettings', function(event, data) {
-  settingsJSON = JSON.parse(data);
 });
 
 //disable youtube autoplay
@@ -75,10 +70,3 @@ document.addEventListener("keydown", function(event) {
     }
   }
 }, true);
-
-if (typeof module !== 'undefined') {
-  module.exports = settingsJSON
-}
-// document.addEventListener('mouseenter', function(event) {
-//      ipcRenderer.sendToHost("mouseenter");
-// });
