@@ -1,7 +1,7 @@
 <!doctype html>
 
 <head>
-  <link rel="stylesheet" href="../vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="../../vendor/bootstrap.min.css">
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css">
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
@@ -25,11 +25,11 @@
           <div id="theme">
             <h5>Theme</h5>
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-              <label class="btn btn-outline-primary active">
-                <input type="radio" name="theme" value="false" autocomplete="off" checked> Light
+              <label class="btn btn-outline-primary">
+                <input type="radio" id="light" name="theme" value="light" autocomplete="off"> Light
               </label>
               <label class="btn btn-outline-dark">
-                <input type="radio" name="theme" value="true" autocomplete="off"> Dark
+                <input type="radio" id="dark" name="theme" value="dark" autocomplete="off"> Dark
               </label>
             </div>
           </div>
@@ -39,14 +39,14 @@
           <div id="titlebar">
             <h5>Titlebar Style</h5>
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-              <label class="btn btn-outline-primary active">
-                <input type="radio" name="theme" value="auto" autocomplete="off" checked> Automatic
+              <label class="btn btn-outline-primary">
+                <input type="radio" id="auto" name="titlebar" value="auto" autocomplete="off"> Automatic
               </label>
               <label class="btn btn-outline-primary">
-                <input type="radio" name="theme" value="mac" autocomplete="off"> Mac
+                <input type="radio" id="mac" name="titlebar" value="mac" autocomplete="off"> Mac
               </label>
               <label class="btn btn-outline-primary">
-                <input type="radio" name="theme" value="windows" autocomplete="off"> Windows
+                <input type="radio" id="window" name="titlebar" value="windows" autocomplete="off"> Windows
               </label>
             </div>
           </div>
@@ -55,24 +55,27 @@
 
           <h5>Downloads location</h5>
           <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="C:\Users\Kelvin Zhang\Downloads">
+            <input type="text" id="location" class="form-control">
             <div class="input-group-append">
               <span class="glyphicon glyphicon-print"></span>
-              <button class="btn btn-outline-secondary" type="button"><i class="fas fa-folder-open"></i></button>
+              <label class="btn btn-outline-secondary">
+                <i class="fas fa-folder-open"></i><input id="downloads-selector" type="file" webkitdirectory style="display: none;">
+              </label>
             </div>
           </div>
             
           <div class="spacer"></div>
 
           <footer>
-            <button class="btn btn-primary" type="button">Save changes</button>
-            <button class="btn btn-secondary" type="button">Cancel changes</button>
+            <button id="save" class="btn btn-primary" type="button">Save changes</button>
+            <button id="cancel" class="btn btn-secondary" type="button">Cancel changes</button>
           </footer>
         </div>
       </div>
     </form>
   </div>
-  <script src="../../js/jquery.min.js"></script>
+  <script src="../../vendor/dexie.js"></script>
+  <script src="../../vendor/jquery.min.js"></script>
   <script src="../../js/settings-db.js"></script>
   <script src="./main.js"></script>
   <script src="../../vendor/bootstrap.min.js"></script>

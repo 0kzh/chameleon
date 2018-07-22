@@ -34,3 +34,9 @@ body {
 .btn {
   box-shadow: none !important;
 }
+
+label {
+  height: 100%;
+  display: flex !important;
+  align-items: center;
+}

@@ -16,9 +16,18 @@ var settings = {
 	list: {},
 	onLoadCallbacks: [],
 	get: function(key, cb) {
-		db.settings.where('key').equals(key).first((item) => {
-			cb(item.value);
-		});
+		// load from cache if possible
+		if (settings.loaded) {
+			cb(settings.list[key]);
+		} else {
+			db.settings.where('key').equals(key).first((item) => {
+				if (item) {
+					cb(item.value);
+				} else {
+					cb(null);
+				}
+			});
+		}
 	},
 	set: function(key, value) {
 		db.settings.put({ key: key, value: value});

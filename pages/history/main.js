@@ -13,7 +13,7 @@ const dateTemplate = `
   <hr>
 `;
 
-db.sites.orderBy('lastVisit').reverse().toArray(displaySites);
+history.sites.orderBy('lastVisit').reverse().toArray(displaySites);
 
 function displaySites(sites) {
   document.querySelector(".card-body").innerHTML = '';
@@ -133,7 +133,7 @@ $(document).on("click", ".delete", event => {
   //get unique site id
   const id = parseInt(element.parent().attr("id"));
   //remove from database
-  db.sites.where('id').equals(id).delete().then(function(deleteCount) {
+  history.sites.where('id').equals(id).delete().then(function(deleteCount) {
     if (deleteCount === 1){
       //if item deleted, remove from screen
       element.parent().remove();
@@ -146,9 +146,9 @@ $(document).on("click", ".delete", event => {
 $("#clear-history").on("click", event => {
   const element = $(event.target);
   //empty database
-  db.sites.clear().then(function() {
+  history.sites.clear().then(function() {
     //if successful, re-render everything (should be empty)
-    db.sites.orderBy('lastVisit').reverse().toArray(displaySites);
+    history.sites.orderBy('lastVisit').reverse().toArray(displaySites);
   }).catch(function(error) {
     console.error("Error deleting site: " + error);
   });
@@ -157,7 +157,7 @@ $("#clear-history").on("click", event => {
 $(document).on("input propertychange paste", ".search", event => {
   const element = $(event.target);
   const value = element.val();
-  db.sites.orderBy('lastVisit').reverse().filter(site => {
+  history.sites.orderBy('lastVisit').reverse().filter(site => {
     return site.title.includes(value) || site.url.includes(value)
   }).toArray(displaySites);
 });

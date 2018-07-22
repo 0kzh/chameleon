@@ -21,7 +21,7 @@ var winSize = { width: win.getSize()[0], height: win.getSize()[1] };
 const { width, height } = remote.screen.getPrimaryDisplay().workAreaSize;
 var dir;
 const bufferPixels = 5;
-var snapped = false;  
+var snapped = false;
 var startTime = 0;
 const downloadItemTemplate = `<div class="download-item">
                                   <div class="download-content">
@@ -34,6 +34,11 @@ const downloadItemTemplate = `<div class="download-item">
                                     <div class="download-close action"></div>
                                   </div>
                               </div>`;
+const defaultSettings = {
+  theme: 'light',
+  controlsStyle: 'auto',
+  downloadsDirectory: app.getPath('downloads')
+};
 
 //load settings
 settings.onLoad(loadSettings);
@@ -49,10 +54,6 @@ chromeTabs.addTab({
 if ($(".download-item:not(.last)").length == 0) {
   $("#download-manager").hide();
 }
-
-settings.set('theme', 'dark');
-settings.set('controlsStyle', 'auto');
-settings.set('downloadsDirectory', '');
 
 function scrollHorizontally(e) {
   e = window.event || e;
@@ -84,6 +85,7 @@ document.addEventListener("tabAdd", function(e) {
 document.addEventListener("activeTabChange", function(e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
   $('.ripple-effect').remove();
+  $("#location").prop('disabled', true);
   //TODO: check if webContents ready; using empty catch is bad practice
   try {
     //if page loaded, set omnibar url
@@ -165,11 +167,14 @@ $(".ripple").mousedown(function(e) {
     }
     $(window).mousemove(function(event) {
       dragging = true;
+      win.setBounds({
+        width: winSize.width,
+        height: winSize.height,
+        x: event.screenX - offsets.x,
+        y: event.screenY - offsets.y
+      });
 
-      win.setPosition(event.screenX - offsets.x, event.screenY - offsets.y);
       if (!win.isMaximized()) {
-        win.setSize(winSize.width, winSize.height);
-        win.setPosition(event.screenX - offsets.x, event.screenY - offsets.y);
         if (snapped) {
           snapped = false;
         }
@@ -952,7 +957,14 @@ function closeBoxes() {
 }
 
 function loadSettings() {
+  //if required, set default settings
+  setDefaultSettings();
+
   settings.get('downloadsDirectory', (value) => {
+    if (value == '') {
+      //if not set, set to default downloads folder
+      settings.set('downloadsDirectory', app.getPath('downloads'));
+    }
     dir = (value != "") ? value : app.getPath('downloads');
   });
 
@@ -992,6 +1004,15 @@ function loadSettings() {
   });
 
   doLayout();
+}
+
+function setDefaultSettings() {
+  const length = Object.keys(settings.list).length;
+  if (length == 0) {
+    for (var key in defaultSettings) {
+      settings.set(key, defaultSettings[key]);
+    }
+  }
 }
 
 function setFavicon(webview, title, url) {
