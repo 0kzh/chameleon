@@ -1,12 +1,13 @@
 const path = require('path');
-const { ChromeTabs, settings } = require('./chrome-tabs.js');
+const { ChromeTabs } = require('./chrome-tabs.js');
+const history = require('./history-db.js');
+const settings = require('./settings-db.js');
 const unusedFilename = require('unused-filename');
 const { remote, ipcRenderer, shell } = window.require('electron');
 const { dialog } = window.require('electron').remote;
 const app = window.require('electron').remote.app;
 const $ = require('jquery');
 const fs = require('fs');
-const db = require('./history-db.js');
 
 var isWin = process.platform === "win32";
 window.onresize = doLayout;
@@ -18,7 +19,7 @@ var dragging = false;
 var offsets = { x: 0, y: 0 };
 var winSize = { width: win.getSize()[0], height: win.getSize()[1] };
 const { width, height } = remote.screen.getPrimaryDisplay().workAreaSize;
-const dir = (settings.downloadDirectory != "") ? settings.downloadDirectory : app.getPath('downloads');
+var dir;
 const bufferPixels = 5;
 var snapped = false;  
 var startTime = 0;
@@ -35,7 +36,7 @@ const downloadItemTemplate = `<div class="download-item">
                               </div>`;
 
 //load settings
-loadSettings();
+settings.onLoad(loadSettings);
 
 chromeTabs.init(el, { tabOverlapDistance: 14, minWidth: 45, maxWidth: 248 });
 
@@ -48,6 +49,10 @@ chromeTabs.addTab({
 if ($(".download-item:not(.last)").length == 0) {
   $("#download-manager").hide();
 }
+
+settings.set('theme', 'dark');
+settings.set('controlsStyle', 'auto');
+settings.set('downloadsDirectory', '');
 
 function scrollHorizontally(e) {
   e = window.event || e;
@@ -761,12 +766,12 @@ function handleLoadCommit(webview) {
   const protocol = require('url').parse(webview.getURL()).protocol;
   if (protocol == "https:" || protocol == "http:") {
     var fav = "https://www.google.com/s2/favicons?domain=" + stripURL(webview.getURL());
-    db.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
+    history.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
       if (site == null) {
         //doesn't exist, so add
-        db.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
+        history.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
       } else {
-        db.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
+        history.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
           url: webview.getURL(),
           favicon: fav,
           title: webview.getTitle(),
@@ -947,36 +952,45 @@ function closeBoxes() {
 }
 
 function loadSettings() {
-  if (settings.darkMode) {
-    $('head').append('<link rel="stylesheet" href="css/darkmode.css" type="text/css" />');
-    if (el.classList.contains('chrome-tabs-dark-theme')) {
-      document.documentElement.classList.remove('dark-theme')
-      el.classList.remove('chrome-tabs-dark-theme')
-    } else {
-      document.documentElement.classList.add('dark-theme')
-      el.classList.add('chrome-tabs-dark-theme')
-    }
-  }
+  settings.get('downloadsDirectory', (value) => {
+    dir = (value != "") ? value : app.getPath('downloads');
+  });
 
-  switch (settings.controlsStyle) {
-    case "mac":
-      $(".titlebar-windows").hide();
-      $(".titlebar-mac").show();
-      break;
-    case "windows":
-      $(".titlebar-windows").show();
-      $(".titlebar-mac").hide();
-      break;
-    case "auto":
-      if (isWin) {
-        $(".titlebar-windows").show();
-        $(".titlebar-mac").hide();
+  settings.get('theme', (value) => {
+    if (value == 'dark') {
+      $('head').append('<link rel="stylesheet" href="css/darkmode.css" type="text/css" />');
+      if (el.classList.contains('chrome-tabs-dark-theme')) {
+        document.documentElement.classList.remove('dark-theme') // TODO: does this ever trigger?
+        el.classList.remove('chrome-tabs-dark-theme')
       } else {
+        document.documentElement.classList.add('dark-theme')
+        el.classList.add('chrome-tabs-dark-theme')
+      }
+    }
+  });
+
+  settings.get('controlsStyle', (value) => {
+    switch(value) {
+      case "mac":
         $(".titlebar-windows").hide();
         $(".titlebar-mac").show();
-      }
-      break;
-  }
+        break;
+      case "windows":
+        $(".titlebar-windows").show();
+        $(".titlebar-mac").hide();
+        break;
+      case "auto":
+        if (isWin) {
+          $(".titlebar-windows").show();
+          $(".titlebar-mac").hide();
+        } else {
+          $(".titlebar-windows").hide();
+          $(".titlebar-mac").show();
+        }
+        break;
+    }
+  });
+
   doLayout();
 }
 
@@ -1014,7 +1028,6 @@ function extractHostname(url) {
 
 function stripURL(url) {
   if (url.startsWith("about:blank")) {
-    $(getCurrentWebview()).css('background', (settings.darkMode ? "#424242" : "#ffffff"));
     if ($(".ripple").find(".ripple-effect").length == 0) {
       $("#navbarIcon").html(svgSearch);
       return "Search or enter address";

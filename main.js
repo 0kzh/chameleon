@@ -1,4 +1,5 @@
 const fs = require('fs');
+// const { settings } = require('./js/settings-db.js');
 const { app, BrowserWindow } = require('electron');
 require('electron-dl')();
 
@@ -11,8 +12,9 @@ app.on('window-all-closed', function() {
 });
 
 app.on('ready', function() {
-    //load settings
-    loadSettings();
+    // settings.onLoad(() => {
+    //     mainWindow.show();
+    // });
     if (isWin) {
         mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     } else {
@@ -27,15 +29,8 @@ app.on('ready', function() {
     require('./menu.js')(mainWindow);
     mainWindow.openDevTools();
     // mainWindow.maximize();
+    mainWindow.show()
 });
-
-function loadSettings() {
-    let fileContents = fs.readFile("./settings.json", "utf8", (err, data) => {
-        if (err) throw err;
-        global.settings = JSON.parse(data);
-        mainWindow.show();
-    });
-}
 
 function onDownloadStarted(item){
     mainWindow.webContents.send('download' , {action: "start",

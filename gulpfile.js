@@ -9,6 +9,7 @@ var paths = [
   'vendor/draggabilly.pkgd.min.js',
   'js/chrome-tabs.js',
   'js/history-db.js',
+  'js/settings-db.js',
   'js/browser.js'
 ];
 

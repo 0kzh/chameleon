@@ -1,2 +1,1 @@
-const data = require('../../settings.json');
-console.log(data);
+console.log(settings)
