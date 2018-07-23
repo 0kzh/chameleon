@@ -381,4 +381,8 @@ case we use a different background color and label). */
   color: #535F66;
   user-select: none;
   display: none;
+  max-width: 40%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

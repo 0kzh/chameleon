@@ -1653,7 +1653,7 @@ var settings = {
 	},
 	load: function() {
 		db.settings.each((setting) => {
-			settings.list[settings.key] = setting.value;
+			settings.list[setting.key] = setting.value;
 		}).then(() => {
 			settings.loaded = true;
 			settings.onLoadCallbacks.forEach((item) => {
