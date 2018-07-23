@@ -368,3 +368,17 @@ case we use a different background color and label). */
 #location {
   display: inline-block;
 }
+
+#href-dest {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: #efefef;
+  border: 1px solid #dedede;
+  border-top-right-radius: 5px;
+  font-size: 12px;
+  padding: 2px 5px;
+  color: #535F66;
+  user-select: none;
+  display: none;
+}

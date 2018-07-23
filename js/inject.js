@@ -12,7 +12,7 @@ document.addEventListener("yt-navigate-finish", function() {
     console.log(autoplayButton.getAttribute("checked"));
     if (autoplayButton.getAttribute("checked") == "") {
       autoplayButton.click();
-    } else {}
+    }
   });
 
   waitForElementToDisplay("ytd-topbar-logo-renderer#logo", 1000, function() {
@@ -35,6 +35,29 @@ function waitForElementToDisplay(selector, time, callback) {
 
 document.addEventListener("DOMContentLoaded", function() {
   loaded = true;
+});
+
+document.addEventListener("mousemove", function(e) {
+  // console.log(e.target.contains())
+  var x = e.target;
+  var found = false;
+  if(x.hasAttribute("href")) {
+    found = true;
+  } else {
+    while (x = x.parentElement) {
+      if(x == null) break;
+      if(x.hasAttribute("href")) {
+        found = true;
+        break;
+      }
+    }
+  }
+
+  if(found) {
+    ipcRenderer.sendToHost("href-mouseover", x.getAttribute("href"));
+  } else {
+    ipcRenderer.sendToHost("href-mouseout");
+  }
 });
 
 

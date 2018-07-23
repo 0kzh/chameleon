@@ -279,6 +279,20 @@ function setupWebview(webviewId) {
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
+    } else if (e.channel == "href-mouseover") {
+      var url = e.args[0];
+      var webviewURL = webview.getURL().replace(/\/+$/, "");
+      if (url.startsWith("/")) {
+        url = webviewURL + url;
+      } else if (url.startsWith("#")) {
+        url = webviewURL + "/" + url;
+      }
+      url = processURL(url);
+      $("#href-dest").html(url);
+      $("#href-dest").show();
+    } else if (e.channel == "href-mouseout") {
+      $("#href-dest").html();
+      $("#href-dest").hide();
     }
   });
   // $("#location").on("blur", function(){
@@ -395,36 +409,7 @@ function navigateTo(url) {
   resetExitedState();
   //select current visible webview
   var webview = getCurrentWebview();
-  var pattern = new RegExp(/[`\^\{}|\\"<> ]/);
-  var ipAddress = new RegExp(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]{1,4})?$/);
-  if (ipAddress.test(url)) {
-    //if ip address, add port if necessary
-    if (!url.includes(":")) {
-      //add default port
-      webview.src += ":80";
-    }
-  }
-
-  if(url.startsWith("about://")) {
-    var target = url.split("about://")[1];
-    switch(target) {
-      case "settings":
-        webview.src = app.getAppPath() + "\\pages\\settings\\settings.html";
-        //inject loaded settings (JSON string) into the window as javascript
-        // webview.executeJavaScript("var settingsString = `" + JSON.stringify(settings) + "`; console.log(settingsString);");
-        webview.send("loadSettings", JSON.stringify(settings));
-      case "history":
-        webview.src = app.getAppPath() + "\\pages\\history\\history.html";
-    }
-  } else if (url.includes("://")) {
-    webview.src = url;
-  } else if (url.includes(".") && !pattern.test(url)) {
-    webview.src = "http://" + url;
-  } else if (url.startsWith("localhost")) {
-    webview.src = "http://" + url;
-  } else {
-    webview.src = "https://google.com/search?q=" + url;
-  }
+  webview.src = processURL(url);
 
   $('.ripple-effect').remove();
   // $("#location").css("-webkit-app-region", "drag");
@@ -434,6 +419,42 @@ function navigateTo(url) {
   // if ($("#add-tab").hasClass("no-border")) {
   //     $(".ripple").css("border-right", "1px solid transparent");
   // }
+}
+
+function processURL(url) {
+  var pattern = new RegExp(/[`\^\{}|\\"<> ]/);
+  var ipAddress = new RegExp(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]{1,4})?$/);
+  var processedURL;
+  if (ipAddress.test(url)) {
+    //if ip address, add port if necessary
+    if (!url.includes(":")) {
+      //add default port
+      processedURL += ":80";
+    }
+  }
+
+  if(url.startsWith("about://")) {
+    var target = url.split("about://")[1];
+    console.log(target);
+    switch(target) {
+      case "settings":
+        processedURL = app.getAppPath() + "\\pages\\settings\\settings.html";
+        break;
+      case "history":
+        processedURL = app.getAppPath() + "\\pages\\history\\history.html";
+        break;
+    }
+    // console.log(processedURL)
+  } else if (url.includes("://")) {
+    processedURL = url;
+  } else if (url.includes(".") && !pattern.test(url)) {
+    processedURL = "http://" + url;
+  } else if (url.startsWith("localhost")) {
+    processedURL = "http://" + url;
+  } else {
+    processedURL = "https://google.com/search?q=" + url;
+  }
+  return processedURL;
 }
 
 function doLayout() {
