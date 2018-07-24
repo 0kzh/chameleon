@@ -1,6 +1,6 @@
 const path = require('path');
 const { ChromeTabs } = require('./chrome-tabs.js');
-const history = require('./history-db.js');
+const db = require('./history-db.js');
 const settings = require('./settings-db.js');
 const unusedFilename = require('unused-filename');
 const { remote, ipcRenderer, shell } = window.require('electron');
@@ -792,12 +792,12 @@ function handleLoadCommit(webview) {
   const protocol = require('url').parse(webview.getURL()).protocol;
   if (protocol == "https:" || protocol == "http:") {
     var fav = "https://www.google.com/s2/favicons?domain=" + stripURL(webview.getURL());
-    history.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
+    db.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
       if (site == null) {
         //doesn't exist, so add
-        history.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
+        db.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
       } else {
-        history.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
+        db.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
           url: webview.getURL(),
           favicon: fav,
           title: webview.getTitle(),

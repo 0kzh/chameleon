@@ -2,15 +2,15 @@ if (typeof Dexie === 'undefined' && typeof require !== 'undefined') {
   var Dexie = require('dexie')
 }
 
-var history = new Dexie("history");
-history.version(1).stores({
+var db = new Dexie("history");
+db.version(1).stores({
   sites: "++id,url,favicon,title,lastVisit,numVisits"
 });
 
-history.open().catch (function (err) {
+db.open().catch (function (err) {
     console.error('Failed to open db: ' + (err.stack || err));
 });
 
 if (typeof module !== 'undefined') {
-  module.exports = history
+  module.exports = db
 }
