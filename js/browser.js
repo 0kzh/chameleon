@@ -165,6 +165,7 @@ $(".ripple").mousedown(function(e) {
       winSize.width = win.getSize()[0];
       winSize.height = win.getSize()[1];
     }
+
     $(window).mousemove(function(event) {
       dragging = true;
       win.setBounds({
@@ -183,31 +184,34 @@ $(".ripple").mousedown(function(e) {
         $(".icon-unmaximize").hide();
       }
     });
+
+    $(window).mouseup(function(event) {
+        $(window).unbind('mousemove');
+        $(window).unbind('mouseup');
+        dragging = false;
+
+        //implement custom window snapping
+        if (Math.abs(event.screenX - width) < bufferPixels) {
+          //right snap
+          win.setPosition(width / 2, 0);
+          win.setSize(width / 2, height);
+          snapped = true;
+        } else if (Math.abs(event.screenX - 0) < bufferPixels) {
+          //left snap
+          win.setPosition(0, 0);
+          win.setSize(width / 2, height);
+          snapped = true;
+        } else if (Math.abs(event.screenY - 0) < bufferPixels) {
+          //top snap
+          win.setPosition(0, 0);
+          win.setSize(width, height);
+          snapped = true;
+        }
+      });
   }
 });
 
-$(window).mouseup(function(event) {
-  $(window).unbind('mousemove');
-  dragging = false;
 
-  //implement custom window snapping
-  if (Math.abs(event.screenX - width) < bufferPixels) {
-    //right snap
-    win.setPosition(width / 2, 0);
-    win.setSize(width / 2, height);
-    snapped = true;
-  } else if (Math.abs(event.screenX - 0) < bufferPixels) {
-    //left snap
-    win.setPosition(0, 0);
-    win.setSize(width / 2, height);
-    snapped = true;
-  } else if (Math.abs(event.screenY - 0) < bufferPixels) {
-    //top snap
-    win.setPosition(0, 0);
-    win.setSize(width, height);
-    snapped = true;
-  }
-});
 
 $(".ripple").mouseup(function() {
   selectNavbar(true, event);

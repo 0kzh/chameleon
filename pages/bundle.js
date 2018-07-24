@@ -1,7 +1,7 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 const path = require('path');
 const { ChromeTabs } = require('./chrome-tabs.js');
-const history = require('./history-db.js');
+const db = require('./history-db.js');
 const settings = require('./settings-db.js');
 const unusedFilename = require('unused-filename');
 const { remote, ipcRenderer, shell } = window.require('electron');
@@ -166,6 +166,7 @@ $(".ripple").mousedown(function(e) {
       winSize.width = win.getSize()[0];
       winSize.height = win.getSize()[1];
     }
+
     $(window).mousemove(function(event) {
       dragging = true;
       win.setBounds({
@@ -184,31 +185,34 @@ $(".ripple").mousedown(function(e) {
         $(".icon-unmaximize").hide();
       }
     });
+
+    $(window).mouseup(function(event) {
+        $(window).unbind('mousemove');
+        $(window).unbind('mouseup');
+        dragging = false;
+
+        //implement custom window snapping
+        if (Math.abs(event.screenX - width) < bufferPixels) {
+          //right snap
+          win.setPosition(width / 2, 0);
+          win.setSize(width / 2, height);
+          snapped = true;
+        } else if (Math.abs(event.screenX - 0) < bufferPixels) {
+          //left snap
+          win.setPosition(0, 0);
+          win.setSize(width / 2, height);
+          snapped = true;
+        } else if (Math.abs(event.screenY - 0) < bufferPixels) {
+          //top snap
+          win.setPosition(0, 0);
+          win.setSize(width, height);
+          snapped = true;
+        }
+      });
   }
 });
 
-$(window).mouseup(function(event) {
-  $(window).unbind('mousemove');
-  dragging = false;
 
-  //implement custom window snapping
-  if (Math.abs(event.screenX - width) < bufferPixels) {
-    //right snap
-    win.setPosition(width / 2, 0);
-    win.setSize(width / 2, height);
-    snapped = true;
-  } else if (Math.abs(event.screenX - 0) < bufferPixels) {
-    //left snap
-    win.setPosition(0, 0);
-    win.setSize(width / 2, height);
-    snapped = true;
-  } else if (Math.abs(event.screenY - 0) < bufferPixels) {
-    //top snap
-    win.setPosition(0, 0);
-    win.setSize(width, height);
-    snapped = true;
-  }
-});
 
 $(".ripple").mouseup(function() {
   selectNavbar(true, event);
@@ -793,12 +797,12 @@ function handleLoadCommit(webview) {
   const protocol = require('url').parse(webview.getURL()).protocol;
   if (protocol == "https:" || protocol == "http:") {
     var fav = "https://www.google.com/s2/favicons?domain=" + stripURL(webview.getURL());
-    history.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
+    db.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
       if (site == null) {
         //doesn't exist, so add
-        history.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
+        db.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
       } else {
-        history.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
+        db.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
           url: webview.getURL(),
           favicon: fav,
           title: webview.getTitle(),
@@ -1604,17 +1608,17 @@ if (typeof Dexie === 'undefined' && typeof require !== 'undefined') {
   var Dexie = require('dexie')
 }
 
-var history = new Dexie("history");
-history.version(1).stores({
+var db = new Dexie("history");
+db.version(1).stores({
   sites: "++id,url,favicon,title,lastVisit,numVisits"
 });
 
-history.open().catch (function (err) {
+db.open().catch (function (err) {
     console.error('Failed to open db: ' + (err.stack || err));
 });
 
 if (typeof module !== 'undefined') {
-  module.exports = history
+  module.exports = db
 }
 },{"dexie":5}],4:[function(require,module,exports){
 if (typeof Dexie === 'undefined' && typeof require !== 'undefined') {
