@@ -26,21 +26,76 @@ input {
 
 #ripple-container{
   position: relative;
-  height: 100%;
   width: 100%;
+  /*border-bottom: 3px solid #F3F6F8;*/
 }
+
+#ripple-container:before {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  background: #F3F6F8;
+  z-index: 998;
+  clear: both;
+  transition: width .5s ease, background-color .5s ease;
+}
+
+#ripple-container:after {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 0;
+  background: transparent;
+  position: absolute;
+  bottom: 0;
+  z-index: 999;
+  clear: both;
+  transition: width .5s ease, background-color .5s ease;
+}
+
+#add-tab-container:after {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: #F3F6F8;
+  z-index: 998;
+  clear: both;
+  transition: width .5s ease, background-color .5s ease;
+}
+
+/*#ripple-container:hover:after {
+  width: 100%;
+  background: black;
+}*/
 
 #controls {
   z-index: 999;
   font-size: 10px;
   height: 3.8em;
   overflow: hidden;
-  border-bottom: 1px solid #DAD9DA;
+  /*border-bottom: 1px solid #DAD9DA;*/
 }
 
 #controls button,
 #controls input {
   font-size: 14px;
+}
+
+#back, #refresh, .titlebar-windows .control, .titlebar-mac {
+  border-bottom: 3px solid #F3F6F8;
+  transition: all .5s ease;
+}
+
+#back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
+  border-bottom: 3px solid #dedede;
+}
+
+.titlebar-windows .control.close:hover {
+  border-bottom: 3px solid #bf4943;
 }
 
 button,
@@ -70,7 +125,7 @@ compared to the back/forward buttons */
   position: relative;
   z-index: 999;
   float: left;
-  height: 100%;
+  height: calc(100% - 3px);
   opacity: 0;
   transition: opacity 0.3s;
   display: flex;
@@ -97,8 +152,8 @@ compared to the back/forward buttons */
 #add-tab{
   flex: auto;
   font-size: 10px;
-  height: 2.8em;
-  background-color: #efefef;
+  height: calc(2.75em - 3px);
+  background-color: #F3F6F8;
   /*border-bottom-left-radius: 5px;*/
   padding: 0 12px 0 12px;
   /*border-left: 1px solid #DAD9DA;*/
@@ -106,7 +161,7 @@ compared to the back/forward buttons */
 }
 
 #add-tab:hover{
-  background-color: #dedede;
+  background-color: #e8e8e8;
 }
 
 #add-tab.no-border{
@@ -167,12 +222,12 @@ compared to the back/forward buttons */
   width: calc(100% - 50px);
   background: none;
   float: right;
-  height: 100%;
+  height: calc(100% - 3px);
   margin-top: auto;
   margin-bottom: auto;
 }
 
-#refresh:hover, #back.hover-style:hover{
+#refresh:hover, #back:not([disabled]):hover{
   background-color: #EFF1F2;
 }
 
@@ -348,7 +403,7 @@ case we use a different background color and label). */
   border-radius: 50%;
   width: 50px;
   height: 50px;
-  background: #EFF1F2;
+  background: #F3F6F8;
   animation: ripple-animation 1s;
   animation-fill-mode: forwards;
   pointer-events: none;

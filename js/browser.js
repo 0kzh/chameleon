@@ -72,6 +72,15 @@ if (document.getElementById('download-manager').addEventListener) {
   document.getElementById('download-manager').attachEvent("onmousewheel", scrollHorizontally);
 }
 
+// TODO: add setting
+$("#location").on("input propertychange paste", () => {
+  //update bottom border to match width
+  const nav_icon_width = $("#navbarIcon").width();
+  const text_width = $("#location").textWidth();
+  $('#border-match-width').remove();
+  $('<style id="border-match-width">#ripple-container:after { width: ' + (nav_icon_width + text_width+30) + 'px; background:#86949B}</style>').appendTo('head');
+});
+
 document.querySelector('#location-form').onsubmit = function(e) {
   e.preventDefault();
   //special redirects
@@ -108,6 +117,8 @@ document.addEventListener("activeTabChange", function(e) {
   } else {
     $('#location').css("transition", "none");
     $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    $('#border-active').remove();
+    $('#border-match-width').remove();
     // $('#location').css("transition", "transform 0.5s");
     $("#navbarIcon").css("opacity", "0");
     // if ($("#add-tab").hasClass("no-border")) {
@@ -264,6 +275,8 @@ function setupWebview(webviewId) {
       // $("#location").css("-webkit-app-region", "drag");
       $("#location").prop('disabled', true);
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      $('#border-active').remove();
+      $('#border-match-width').remove();
       $("#navbarIcon").css("opacity", "0");
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
@@ -278,6 +291,8 @@ function setupWebview(webviewId) {
       // $("#location").css("-webkit-app-region", "drag");
       $("#location").prop('disabled', true);
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      $('#border-active').remove();
+      $('#border-match-width').remove();
       $("#navbarIcon").css("opacity", "0");
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
@@ -418,6 +433,8 @@ function navigateTo(url) {
   // $("#location").css("-webkit-app-region", "drag");
   $("#location").prop('disabled', true);
   $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+  $('#border-active').remove();
+  $('#border-match-width').remove();
   $("#navbarIcon").css("opacity", "0");
   // if ($("#add-tab").hasClass("no-border")) {
   //     $(".ripple").css("border-right", "1px solid transparent");
@@ -735,6 +752,8 @@ function handleKeyDown(event) {
         // $("#location").css("-webkit-app-region", "drag");
         $("#location").prop('disabled', true);
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+        $('#border-active').remove();
+        $('#border-match-width').remove();
         $("#navbarIcon").css("opacity", "0");
         // if ($("#add-tab").hasClass("no-border")) {
         //     $(".ripple").css("border-right", "1px solid transparent");
@@ -783,6 +802,8 @@ function handleLoadCommit(webview) {
     document.querySelector('#location').value = stripURL(webview.getURL());
     $("#location").prop('disabled', true);
     $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    $('#border-active').remove();
+    $('#border-match-width').remove();
     $("#navbarIcon").css("opacity", "0");
   }
   updateBackButton(webview);
@@ -863,6 +884,8 @@ function handleTitleUpdate(event, webview) {
     // $("#location").css("-webkit-app-region", "drag");
     $("#location").prop('disabled', true);
     $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    $('#border-active').remove();
+    $('#border-match-width').remove();
     $("#navbarIcon").css("opacity", "0");
     // if ($("#add-tab").hasClass("no-border")) {
     //     $(".ripple").css("border-right", "1px solid transparent");
@@ -1135,11 +1158,11 @@ function getNavbarOffset() {
 
 function updateBackButton(webview) {
   if (webview.canGoBack()) {
-    if (!$("#back").hasClass("hover-style")) {
-      $("#back").addClass("hover-style");
-    }
+    $("#back").prop("disabled", false);
   } else {
-    $("#back").removeClass("hover-style");
+    if (!$("#back").is(":disabled")) {
+      $("#back").prop("disabled", true);
+    }
   }
 }
 
@@ -1188,6 +1211,7 @@ function selectNavbar(animate, event) {
     // $("#location").css("-webkit-app-region", "no-drag");
     $("#location").prop('disabled', false);
     $("#navbarIcon").css("opacity", "1");
+    $('<style id="border-active">#ripple-container:before, #add-tab-container:after{background:#dedede}</style>').appendTo('head');
     // if (settings.darkMode) {
     //     $(".ripple").css("border-right", "1px solid #121212");
     // } else {

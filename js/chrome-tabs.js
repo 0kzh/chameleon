@@ -183,7 +183,7 @@ class ChromeTabs {
     } else if (tabEls.length == 1) {
       //hide toolbar if only one tab
       document.querySelector("#tab-bar").style.display = "none";
-      $("#add-tab").detach().removeClass("no-border").insertBefore(".titlebar-windows");
+      $("#add-tab").detach().removeClass("no-border").appendTo("#add-tab-container");
       $(".ripple").css("margin-right", "0");
       // if (settings.darkMode) {
       //     $(".ripple").css("border-right", "1px solid #121212");
@@ -247,7 +247,7 @@ class ChromeTabs {
     } else if (tabEls.length == 1) {
       //hide toolbar if only one tab
       document.querySelector("#tab-bar").style.display = "none";
-      $("#add-tab").detach().removeClass("no-border").insertBefore(".titlebar-windows");
+      $("#add-tab").detach().removeClass("no-border").appendTo("#add-tab-container");
       $(".ripple").css("margin-right", "0");
       // if (settings != null) {
       //     if (settings.darkMode) {
