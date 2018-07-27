@@ -1,5 +1,23 @@
 const { ipcRenderer } = require('electron');
+const pace = require('../vendor/pace.min.js');
+const url = require('url');
 var loaded = false;
+
+pace.start();
+const protocol = url.parse(window.location.href).protocol;
+pace.on("update", function(percent) {
+  if (protocol == "https:" || protocol == "http:") {
+    console.log(percent)
+    // some websites never fully load
+    if (percent > 98) {
+      ipcRenderer.sendToHost("page-load-progress", 100);
+    } else {
+      ipcRenderer.sendToHost("page-load-progress", percent);
+    }
+  } else {
+    ipcRenderer.sendToHost("page-load-progress", 0);
+  }
+});
 
 document.addEventListener('click', function(event) {
   ipcRenderer.sendToHost("click");
@@ -41,19 +59,19 @@ document.addEventListener("mousemove", function(e) {
   // console.log(e.target.contains())
   var x = e.target;
   var found = false;
-  if(x.hasAttribute("href")) {
+  if (x.hasAttribute("href")) {
     found = true;
   } else {
     while (x = x.parentElement) {
-      if(x == null) break;
-      if(x.hasAttribute("href")) {
+      if (x == null) break;
+      if (x.hasAttribute("href")) {
         found = true;
         break;
       }
     }
   }
 
-  if(found) {
+  if (found) {
     ipcRenderer.sendToHost("href-mouseover", x.getAttribute("href"));
   } else {
     ipcRenderer.sendToHost("href-mouseout");

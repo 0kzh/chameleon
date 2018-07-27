@@ -3,63 +3,79 @@
 #back,
 #refresh,
 .ripple {
-    background: #373737;
+  background: #373737;
 }
 
 #refresh:hover,
-#back.hover-style:hover {
-    background-color: #282828;
+#back:not([disabled]):hover {
+  background-color: #282828;
 }
 
 .ripple-effect {
-    background: #282828;
+  background: #282828;
 }
 
 #add-tab {
-    background-color: #282828;
-    /*box-shadow: inset 6px -6px 10px -6px #111111;*/
+  background-color: #2B2B2B;
+  /*box-shadow: inset 6px -6px 10px -6px #111111;*/
 }
 
 #add-tab:hover {
-    background-color: #1D1D1D;
-    /*box-shadow: inset 8px -8px 12px -6px #111111;*/
+  background-color: #222222;
+  /*box-shadow: inset 8px -8px 12px -6px #111111;*/
+}
+
+#back,
+#refresh,
+.titlebar-windows .control,
+.titlebar-mac {
+  border-bottom: 3px solid #333333;
+  transition: all .5s ease;
+}
+
+#back:not([disabled]):hover,
+#refresh:hover,
+.titlebar-windows .control:hover {
+  border-bottom: 3px solid #222222;
 }
 
 .titlebar-windows .control:hover {
-    background-color: #5D5D5D;
+  background-color: #5D5D5D;
 }
 
 #controls .titlebar-windows .control:hover svg {
-    fill: #ffffff;
+  fill: #ffffff;
 }
 
-.titlebar-windows .close:hover {
-    background-color: #E81123;
+.titlebar-windows .control.close:hover {
+  background-color: #E81123;
+  border-bottom: 3px solid #b71c1c;
 }
 
 
 #add-tab.no-border {
-    border-left: none;
+  border-left: none;
 }
 
 #controls {
-    border-bottom: none;
+  border-bottom: none;
 }
 
 #tab-bar {
-    border-top: 1px solid #424242;
-    border-bottom: 1px solid #424242;
+  border-top: 1px solid #282828;
+  border-bottom: 1px solid #282828;
 }
 
 .chrome-tabs .chrome-tab {
-    border-right: 1px solid #424242;
-    border-left: 1px solid #424242;
+  border-right: 1px solid #1D1D1D;
+  border-left: 1px solid #1D1D1D;
 }
+
 
 
 /*
 .ripple{
-	border-right: 1px solid #121212;
+    border-right: 1px solid #121212;
 }
 
 #navbarIcon {
@@ -67,7 +83,7 @@
 }
 
 #add-tab{
-	border-right: 1px solid #121212;
+    border-right: 1px solid #121212;
 }
 
 #add-tab.no-border{
@@ -75,49 +91,74 @@
 }*/
 
 .chrome-tabs .chrome-tab .chrome-tab-background {
-    left: -1px;
-    width: calc(100% + 1px);
+  left: -1px;
+  width: calc(100% + 1px);
 }
 
 #location {
-    color: #BDBDBD;
+  color: #BDBDBD;
 }
 
 #controls svg:not(.stoplight-buttons),
 #add-tab svg:not(.stoplight-buttons) {
-    fill: #7E7E80;
+  fill: #7E7E80;
 }
 
 #download-manager {
-    background: #373737;
-    border-top: none;
-    color: #ffffff;
+  background: #373737;
+  border-top: none;
+  color: #ffffff;
 }
 
-#download-controls{
-    background: #282828;
+#download-controls {
+  background: #282828;
 }
 
 .download-item {
-    border-right: 1px solid #7E7E80;
+  border-right: 1px solid #7E7E80;
 }
 
 .download-content:hover {
-	background: #282828;
+  background: #282828;
 }
 
-.action:hover{
-	background: #282828;
+.action:hover {
+  background: #282828;
 }
 
-.close-download:hover{
-	background: rgba(255, 255, 255, 0.1);
+.close-download:hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .download-folder::before {
-    content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="16" viewBox="-4 0 30 18" version="1.1"> <path fill="#BDBDBD" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/> </svg>');
+  content: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="22" height="16" viewBox="-4 0 30 18" version="1.1"> <path fill="#BDBDBD" d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z"/> </svg>');
 }
 
-.download-close::before, .close-download::before {
-    content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><path stroke='#BDBDBD' stroke-linecap='round' stroke-width='1.125' d='M4 4 L10 10 M10 4 L4 10'></path></svg>");
+.download-close::before,
+.close-download::before {
+  content: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><path stroke='#BDBDBD' stroke-linecap='round' stroke-width='1.125' d='M4 4 L10 10 M10 4 L4 10'></path></svg>");
+}
+
+#ripple-container:before {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  background: #333333;
+  z-index: 998;
+  clear: both;
+  transition: width .5s ease, background-color .5s ease;
+}
+
+#add-tab-container:after {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 100%;
+  background: #333333;
+  z-index: 998;
+  clear: both;
+  transition: width .5s ease, background-color .5s ease;
 }

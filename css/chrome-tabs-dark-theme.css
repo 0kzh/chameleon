@@ -10,10 +10,10 @@
   stroke: rgba(0,0,0,0.5);
 }
 .chrome-tabs.chrome-tabs-dark-theme .chrome-tab .chrome-tab-background > svg .chrome-tab-background {
-  fill: #2F2F2F;
+  fill: #2B2B2B;
 }
 .chrome-tabs.chrome-tabs-dark-theme .chrome-tab.chrome-tab-current .chrome-tab-background > svg .chrome-tab-background {
-  fill: #505050;
+  fill: #4A4A4A;
 }
 .chrome-tabs.chrome-tabs-dark-theme .chrome-tab .chrome-tab-title {
   -webkit-font-smoothing: antialiased;

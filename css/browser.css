@@ -21,6 +21,7 @@ input {
 #tab-bar{
   width: 100%;
   display: flex;
+  border-top: 1px solid #DAD9DA;
   border-bottom: 1px solid #DAD9DA;
 }
 
@@ -53,7 +54,7 @@ input {
   bottom: 0;
   z-index: 999;
   clear: both;
-  transition: width .5s ease, background-color .5s ease;
+  transition: background-color .5s ease;
 }
 
 #add-tab-container:after {
@@ -165,7 +166,7 @@ compared to the back/forward buttons */
 }
 
 #add-tab.no-border{
-  border-left: 1px solid #DAD9DA;
+  height: 2.8em;
 }
 
 #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {

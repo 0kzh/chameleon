@@ -40,6 +40,7 @@ const defaultSettings = {
   controlsStyle: 'auto',
   downloadsDirectory: app.getPath('downloads')
 };
+let loadedSettings;
 
 //load settings
 settings.onLoad(loadSettings);
@@ -72,15 +73,6 @@ if (document.getElementById('download-manager').addEventListener) {
   // IE 6/7/8
   document.getElementById('download-manager').attachEvent("onmousewheel", scrollHorizontally);
 }
-
-// TODO: add setting
-$("#location").on("input propertychange paste", () => {
-  //update bottom border to match width
-  const nav_icon_width = $("#navbarIcon").width();
-  const text_width = $("#location").textWidth();
-  $('#border-match-width').remove();
-  $('<style id="border-match-width">#ripple-container:after { width: ' + (nav_icon_width + text_width+30) + 'px; background:#86949B}</style>').appendTo('head');
-});
 
 document.querySelector('#location-form').onsubmit = function(e) {
   e.preventDefault();
@@ -240,6 +232,7 @@ $("#back").click(function() {
   var webview = getCurrentWebview();
   if (webview.canGoBack()) {
     webview.goBack();
+    $('#border-match-width').remove();
   }
 });
 
@@ -293,7 +286,6 @@ function setupWebview(webviewId) {
       $("#location").prop('disabled', true);
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
       $('#border-active').remove();
-      $('#border-match-width').remove();
       $("#navbarIcon").css("opacity", "0");
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
@@ -312,6 +304,19 @@ function setupWebview(webviewId) {
     } else if (e.channel == "href-mouseout") {
       $("#href-dest").html();
       $("#href-dest").hide();
+    } else if (e.channel == "page-load-progress") {
+      const progress = e.args[0];
+      const bottomBarWidth = $("#ripple-container").width();
+      $('#border-match-width').remove();
+      $('<style id="border-match-width">#ripple-container:after { width: ' + (progress / 100 * bottomBarWidth) + 'px; background:#117AF3; transition: width .5s ease, background-color .5s ease;}</style>').appendTo('head');
+      if (progress == 100) {
+        $('<style id="border-fade-out">#ripple-container:after { width: 100%; background:transparent; transition: background-color .5s ease;}</style>').appendTo('head');
+        setTimeout(() => {
+          $('#border-match-width').remove();
+          $('#border-fade-out').remove();
+          $('#border-active').remove();
+        }, 500);
+      }
     }
   });
   // $("#location").on("blur", function(){
@@ -804,7 +809,6 @@ function handleLoadCommit(webview) {
     $("#location").prop('disabled', true);
     $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
     $('#border-active').remove();
-    $('#border-match-width').remove();
     $("#navbarIcon").css("opacity", "0");
   }
   updateBackButton(webview);
@@ -1008,6 +1012,7 @@ function closeBoxes() {
 function loadSettings() {
   //if required, set default settings
   setDefaultSettings();
+  loadedSettings = settings.list;
 
   settings.get('downloadsDirectory', (value) => {
     if (value == '') {
@@ -1212,7 +1217,12 @@ function selectNavbar(animate, event) {
     // $("#location").css("-webkit-app-region", "no-drag");
     $("#location").prop('disabled', false);
     $("#navbarIcon").css("opacity", "1");
-    $('<style id="border-active">#ripple-container:before, #add-tab-container:after{background:#dedede}</style>').appendTo('head');
+    if (loadedSettings.theme == 'dark') {
+      $('<style id="border-active">#ripple-container:before, #add-tab-container:after{background:#222222}</style>').appendTo('head');
+    } else if (loadedSettings.theme == 'light') {
+      $('<style id="border-active">#ripple-container:before, #add-tab-container:after{background:#dedede}</style>').appendTo('head');
+    }
+    
     // if (settings.darkMode) {
     //     $(".ripple").css("border-right", "1px solid #121212");
     // } else {
