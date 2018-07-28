@@ -2,12 +2,12 @@ if (typeof Dexie === 'undefined' && typeof require !== 'undefined') {
   var Dexie = require('dexie')
 }
 
-var db = new Dexie("settings");
-db.version(1).stores({
+var settingsDB = new Dexie("settings");
+settingsDB.version(1).stores({
   settings: "key, value"
 });
 
-db.open().catch (function (err) {
+settingsDB.open().catch (function (err) {
     console.error('Failed to open db: ' + (err.stack || err));
 });
 
@@ -20,7 +20,7 @@ var settings = {
 		if (settings.loaded) {
 			cb(settings.list[key]);
 		} else {
-			db.settings.where('key').equals(key).first((item) => {
+			settingsDB.settings.where('key').equals(key).first((item) => {
 				if (item) {
 					cb(item.value);
 				} else {
@@ -30,10 +30,10 @@ var settings = {
 		}
 	},
 	set: function(key, value) {
-		db.settings.put({ key: key, value: value});
+		settingsDB.settings.put({ key: key, value: value});
 	},
 	load: function() {
-		db.settings.each((setting) => {
+		settingsDB.settings.each((setting) => {
 			settings.list[setting.key] = setting.value;
 		}).then(() => {
 			settings.loaded = true;

@@ -1,7 +1,6 @@
 const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
 const url = require('url');
-var loaded = false;
 
 pace.start();
 const protocol = url.parse(window.location.href).protocol;

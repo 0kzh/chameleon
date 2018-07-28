@@ -1,5 +1,8 @@
 settings.get('theme', (value) => {
 	$('#'+value).click();
+	if (value == 'dark') {
+	  $('head').append('<link rel="stylesheet" href="../../vendor/bootstrap_dark.min.css" type="text/css" />');
+	}
 });
 
 settings.get('controlsStyle', (value) => {

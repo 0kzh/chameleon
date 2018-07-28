@@ -13,6 +13,12 @@ const dateTemplate = `
   <hr>
 `;
 
+settings.get('theme', (value) => {
+  if (value == 'dark') {
+    $('head').append('<link rel="stylesheet" href="../../vendor/bootstrap_dark.min.css" type="text/css" />');
+  }
+});
+
 db.sites.orderBy('lastVisit').reverse().toArray(displaySites);
 
 function displaySites(sites) {

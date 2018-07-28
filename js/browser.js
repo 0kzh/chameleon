@@ -876,6 +876,8 @@ function handleTitleUpdate(event, webview) {
   const protocol = require('url').parse(webview.getURL()).protocol
   if (protocol === 'https:') {
     $('#navbarIcon').html(httpsSecure);
+  } else if (protocol === 'http:'){
+    $('#navbarIcon').html(notSecure);
   } else {
     $('#navbarIcon').html(svgSearch);
   }
@@ -1263,6 +1265,7 @@ const svgBookmark = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="
 const svgSettings = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 14v-4h-3.23c-.229-1.003-.624-1.94-1.156-2.785l2.286-2.286-2.83-2.829-2.286 2.286c-.845-.532-1.781-.928-2.784-1.156v-3.23h-4v3.23c-1.003.228-1.94.625-2.785 1.157l-2.286-2.286-2.829 2.828 2.287 2.287c-.533.845-.928 1.781-1.157 2.784h-3.23v4h3.23c.229 1.003.624 1.939 1.156 2.784l-2.286 2.287 2.829 2.829 2.286-2.286c.845.531 1.782.928 2.785 1.156v3.23h4v-3.23c1.003-.228 1.939-.624 2.784-1.156l2.286 2.286 2.828-2.829-2.285-2.286c.532-.845.928-1.782 1.156-2.785h3.231zm-12 2c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"/></svg>';
 const svgArrowLeft = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.67 0l2.83 2.829-9.339 9.175 9.339 9.167-2.83 2.829-12.17-11.996z"/></svg>';
 const svgArrowRight = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z"/></svg>';
+const notSecure = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>';
 const httpsSecure = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>';
 const svgRefresh = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 41 41" style="enable-background:new 0 0 41 41;" xml:space="preserve"> <path class="st0" d="M19.5,7c-9.3,0.5-16.6,8.5-16,18.1c0.5,8.5,7.5,15.4,16,15.9c9.8,0.5,17.9-7.3,17.9-17h-6 c0,6.5-5.6,11.7-12.3,10.9c-4.9-0.6-9-4.5-9.6-9.4c-0.9-6.4,3.8-11.9,9.9-12.5v6.8l9.9-9.9l-9.9-9.9V7z"/></svg>';
 const svgAdd = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z"/></svg>';

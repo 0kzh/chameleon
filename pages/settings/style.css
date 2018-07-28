@@ -40,3 +40,15 @@ label {
   display: flex !important;
   align-items: center;
 }
+
+@media only screen and (max-width: 768px) {
+  .settings .settings-content {
+    width: auto;
+  }
+  .settings .settings-left {
+    float: none;
+    display: block;
+    width: 100%;
+    margin-bottom: 50px;
+  }
+}
