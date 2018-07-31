@@ -2,6 +2,11 @@ const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
 const url = require('url');
 
+document.addEventListener('mouseup', function(event) {
+  console.log('click')
+  ipcRenderer.sendToHost("click");
+});
+
 pace.start();
 const protocol = url.parse(window.location.href).protocol;
 pace.on("update", function(percent) {
@@ -16,10 +21,6 @@ pace.on("update", function(percent) {
   } else {
     ipcRenderer.sendToHost("page-load-progress", 0);
   }
-});
-
-document.addEventListener('click', function(event) {
-  ipcRenderer.sendToHost("click");
 });
 
 //disable youtube autoplay

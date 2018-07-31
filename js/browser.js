@@ -6,6 +6,7 @@ const unusedFilename = require('unused-filename');
 const { remote, ipcRenderer, shell } = window.require('electron');
 const { dialog } = window.require('electron').remote;
 const app = window.require('electron').remote.app;
+const searchInPage = require('electron-in-page-search').default;
 const $ = require('jquery');
 const fs = require('fs');
 
@@ -152,7 +153,6 @@ $(".titlebar-mac").dblclick(function() {
   }
 });
 
-
 $(".ripple").mousedown(function(e) {
   if ($(this).find(".ripple-effect").length == 0) {
     if (Math.abs(win.getSize()[0] - width) < bufferPixels || Math.abs(win.getSize()[1] - height) < bufferPixels) {
@@ -238,7 +238,6 @@ $("#back").click(function() {
 $("#refresh").click(function() {
   getCurrentWebview().reload();
 });
-
 
 function setupWebview(webviewId) {
   var webview = document.querySelector('webview[tab-id="' + webviewId + '"]');
@@ -342,84 +341,40 @@ function setupWebview(webviewId) {
     typeof(webview.find) == "function") {
     var findMatchCase = false;
 
-    document.querySelector('#zoom').onclick = function() {
-      if (document.querySelector('#zoom-box').style.display == '-webkit-flex') {
-        closeZoomBox();
-      } else {
-        openZoomBox();
-      }
-    };
+    // document.querySelector('#find-text').oninput = function(e) {
+    // }
 
-    document.querySelector('#zoom-form').onsubmit = function(e) {
-      e.preventDefault();
-      var zoomText = document.forms['zoom-form']['zoom-text'];
-      var zoomFactor = Number(zoomText.value);
-      if (zoomFactor > 5) {
-        zoomText.value = "5";
-        zoomFactor = 5;
-      } else if (zoomFactor < 0.25) {
-        zoomText.value = "0.25";
-        zoomFactor = 0.25;
-      }
-      webview.setZoom(zoomFactor);
-    }
+    // document.querySelector('#find-text').onkeydown = function(e) {
+    //   if (event.ctrlKey && event.keyCode == 13) {
+    //     e.preventDefault();
+    //     webview.stopFinding('activate');
+    //     closeFindBox();
+    //   }
+    // }
 
-    document.querySelector('#zoom-in').onclick = function(e) {
-      e.preventDefault();
-      increaseZoom();
-    }
+    // document.querySelector('#match-case').onclick = function(e) {
+    //   e.preventDefault();
+    //   findMatchCase = !findMatchCase;
+    //   var matchCase = document.querySelector('#match-case');
+    //   if (findMatchCase) {
+    //     matchCase.style.color = "blue";
+    //     matchCase.style['font-weight'] = "bold";
+    //   } else {
+    //     matchCase.style.color = "black";
+    //     matchCase.style['font-weight'] = "";
+    //   }
+    //   webview.find(document.forms['find-form']['find-text'].value, { matchCase: findMatchCase });
+    // }
 
-    document.querySelector('#zoom-out').onclick = function(e) {
-      e.preventDefault();
-      decreaseZoom();
-    }
+    // document.querySelector('#find-backward').onclick = function(e) {
+    //   e.preventDefault();
+    //   webview.find(document.forms['find-form']['find-text'].value, { backward: true, matchCase: findMatchCase });
+    // }
 
-    document.querySelector('#find').onclick = function() {
-      if (document.querySelector('#find-box').style.display == 'block') {
-        document.querySelector('webview').stopFinding();
-        closeFindBox();
-      } else {
-        openFindBox();
-      }
-    };
-
-    document.querySelector('#find-text').oninput = function(e) {
-      webview.find(document.forms['find-form']['find-text'].value, { matchCase: findMatchCase });
-    }
-
-    document.querySelector('#find-text').onkeydown = function(e) {
-      if (event.ctrlKey && event.keyCode == 13) {
-        e.preventDefault();
-        webview.stopFinding('activate');
-        closeFindBox();
-      }
-    }
-
-    document.querySelector('#match-case').onclick = function(e) {
-      e.preventDefault();
-      findMatchCase = !findMatchCase;
-      var matchCase = document.querySelector('#match-case');
-      if (findMatchCase) {
-        matchCase.style.color = "blue";
-        matchCase.style['font-weight'] = "bold";
-      } else {
-        matchCase.style.color = "black";
-        matchCase.style['font-weight'] = "";
-      }
-      webview.find(document.forms['find-form']['find-text'].value, { matchCase: findMatchCase });
-    }
-
-    document.querySelector('#find-backward').onclick = function(e) {
-      e.preventDefault();
-      webview.find(document.forms['find-form']['find-text'].value, { backward: true, matchCase: findMatchCase });
-    }
-
-    document.querySelector('#find-form').onsubmit = function(e) {
-      e.preventDefault();
-      webview.find(document.forms['find-form']['find-text'].value, { matchCase: findMatchCase });
-    }
-
-    webview.addEventListener('findupdate', handleFindUpdate);
+    // document.querySelector('#find-form').onsubmit = function(e) {
+    //   e.preventDefault();
+    //   webview.find(document.forms['find-form']['find-text'].value, { matchCase: findMatchCase });
+    // }
   }
 }
 
@@ -519,41 +474,6 @@ function resetExitedState() {
   document.body.classList.remove('exited');
   document.body.classList.remove('crashed');
   document.body.classList.remove('killed');
-}
-
-function handleFindUpdate(event) {
-  var findResults = document.querySelector('#find-results');
-  if (event.searchText == "") {
-    findResults.innerText = "";
-  } else {
-    findResults.innerText =
-      event.activeMatchOrdinal + " of " + event.numberOfMatches;
-  }
-
-  // Ensure that the find box does not obscure the active match.
-  if (event.finalUpdate && !event.canceled) {
-    var findBox = document.querySelector('#find-box');
-    findBox.style.left = "";
-    findBox.style.opacity = "";
-    var findBoxRect = findBox.getBoundingClientRect();
-    if (findBoxObscuresActiveMatch(findBoxRect, event.selectionRect)) {
-      // Move the find box out of the way if there is room on the screen, or
-      // make it semi-transparent otherwise.
-      var potentialLeft = event.selectionRect.left - findBoxRect.width - 10;
-      if (potentialLeft >= 5) {
-        findBox.style.left = potentialLeft + "px";
-      } else {
-        findBox.style.opacity = "0.5";
-      }
-    }
-  }
-}
-
-function findBoxObscuresActiveMatch(findBoxRect, matchRect) {
-  return findBoxRect.left < matchRect.left + matchRect.width &&
-    findBoxRect.right > matchRect.left &&
-    findBoxRect.top < matchRect.top + matchRect.height &&
-    findBoxRect.bottom > matchRect.top;
 }
 
 ipcRenderer.on('shortcut', function(event, data) {
@@ -772,7 +692,8 @@ function handleKeyDown(event) {
       // Ctrl+F.
       case 70:
         event.preventDefault();
-        openFindBox();
+        const search = searchInPage(getCurrentWebview());
+        search.openSearchWindow();
         break;
 
         // Ctrl + Y
@@ -811,10 +732,6 @@ function handleLoadCommit(webview) {
     $("#navbarIcon").css("opacity", "0");
   }
   updateBackButton(webview);
-  // document.querySelector('#forward').disabled = !webview.canGoForward();
-  // webview.sendInputEvent({type:'mouseDown', x:-1, y: -1, button:'left', clickCount: 1});
-  // webview.sendInputEvent({type:'mouseUp', x:-1, y: -1, button:'left', clickCount: 1});
-  closeBoxes();
 
   //update history
   //check if exists; if true, get numVisits
@@ -966,7 +883,6 @@ function increaseZoom() {
   webview.getZoom(function(zoomFactor) {
     var nextHigherZoom = getNextPresetZoom(zoomFactor).high;
     webview.setZoom(nextHigherZoom);
-    document.forms['zoom-form']['zoom-text'].value = nextHigherZoom.toString();
   });
 }
 
@@ -975,39 +891,7 @@ function decreaseZoom() {
   webview.getZoom(function(zoomFactor) {
     var nextLowerZoom = getNextPresetZoom(zoomFactor).low;
     webview.setZoom(nextLowerZoom);
-    document.forms['zoom-form']['zoom-text'].value = nextLowerZoom.toString();
   });
-}
-
-function openZoomBox() {
-  document.querySelector('webview').getZoom(function(zoomFactor) {
-    var zoomText = document.forms['zoom-form']['zoom-text'];
-    zoomText.value = Number(zoomFactor.toFixed(6)).toString();
-    document.querySelector('#zoom-box').style.display = '-webkit-flex';
-    zoomText.select();
-  });
-}
-
-function closeZoomBox() {
-  document.querySelector('#zoom-box').style.display = 'none';
-}
-
-function openFindBox() {
-  document.querySelector('#find-box').style.display = 'block';
-  document.forms['find-form']['find-text'].select();
-}
-
-function closeFindBox() {
-  var findBox = document.querySelector('#find-box');
-  findBox.style.display = 'none';
-  findBox.style.left = "";
-  findBox.style.opacity = "";
-  document.querySelector('#find-results').innerText = "";
-}
-
-function closeBoxes() {
-  closeZoomBox();
-  closeFindBox();
 }
 
 function loadSettings() {
