@@ -694,7 +694,13 @@ function handleKeyDown(event) {
       case 70:
         event.preventDefault();
         const search = searchInPage(getCurrentWebview());
-        search.openSearchWindow();
+        if ($('.electron-in-page-search-window').hasClass('search-active')) {
+          console.log('ayy');
+          search.closeSearchWindow();
+          search.finalize();
+        } else {
+          search.openSearchWindow();
+        }
         break;
 
         // Ctrl + Y
@@ -1108,13 +1114,6 @@ function selectNavbar(animate, event) {
     } else if (loadedSettings.theme == 'light') {
       $('<style id="border-active">#ripple-container:before, #add-tab-container:after{background:#dedede}</style>').appendTo('head');
     }
-    
-    // if (settings.darkMode) {
-    //     $(".ripple").css("border-right", "1px solid #121212");
-    // } else {
-    //     $(".ripple").css("border-right", "1px solid #DAD9DA");
-    // }
-
 
     var webview = getCurrentWebview();
     if ($('#location').val() == "Search or enter address") {

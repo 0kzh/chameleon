@@ -21,6 +21,9 @@ app.on('ready', function() {
         mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     }
     mainWindow.loadURL('file://' + __dirname + '/browser.html');
+    //add extensions
+    BrowserWindow.addDevToolsExtension('extensions/TouchpadSwipe');
+
     //removes .css files (style tags not included)
     // const ses = mainWindow.webContents.session
     // ses.webRequest.onBeforeRequest({urls: ['https://*/*.css', 'http://*/*.css']}, function(details, callback) {
