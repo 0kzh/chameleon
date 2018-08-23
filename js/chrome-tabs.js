@@ -140,7 +140,7 @@ class ChromeTabs {
     if (url) {
       $('#tabs-content').append('<webview plugins ' + 'src=' + url + ' preload="./js/inject.js"></webview>');
     } else {
-      $('#tabs-content').append('<webview plugins src="../pages/blank/blank.html" preload="./js/inject.js"></webview>');
+      $('#tabs-content').append('<webview plugins src="about:blank" preload="./js/inject.js"></webview>');
     }
     return document.querySelector('#tabs-content').lastElementChild;
   }

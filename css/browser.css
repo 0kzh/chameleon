@@ -3,6 +3,10 @@ html{
   overflow-x: hidden;
 }
 
+html.dark-theme.home webview {
+  background: #424242;
+}
+
 body {
   margin: 0;
   padding: 0;

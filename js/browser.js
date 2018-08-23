@@ -913,7 +913,7 @@ function loadSettings() {
     if (value == 'dark') {
       $('head').append('<link rel="stylesheet" href="css/darkmode.css" type="text/css" />');
       if (el.classList.contains('chrome-tabs-dark-theme')) {
-        document.documentElement.classList.remove('dark-theme') // TODO: does this ever trigger?
+        document.documentElement.classList.remove('dark-theme')
         el.classList.remove('chrome-tabs-dark-theme')
       } else {
         document.documentElement.classList.add('dark-theme')
@@ -990,6 +990,7 @@ function extractHostname(url) {
 
 function stripURL(url) {
   if (url.startsWith("about:blank")) {
+    document.documentElement.classList.add('home');
     if ($(".ripple").find(".ripple-effect").length == 0) {
       $("#navbarIcon").html(svgSearch);
       return "Search or enter address";
@@ -997,6 +998,7 @@ function stripURL(url) {
       return "";
     }
   } else {
+    document.documentElement.classList.remove('home');
     $(getCurrentWebview()).css('background', '');
   }
 
