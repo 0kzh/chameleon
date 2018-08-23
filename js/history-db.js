@@ -10,7 +10,3 @@ db.version(1).stores({
 db.open().catch (function (err) {
     console.error('Failed to open db: ' + (err.stack || err));
 });
-
-if (typeof module !== 'undefined') {
-  module.exports = db
-}

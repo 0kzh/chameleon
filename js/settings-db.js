@@ -56,7 +56,3 @@ var settings = {
 }
 
 settings.load();
-
-if (typeof module !== 'undefined') {
-  module.exports = settings
-}

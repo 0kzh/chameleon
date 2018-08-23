@@ -22,7 +22,7 @@ app.on('ready', function() {
     }
     mainWindow.loadURL('file://' + __dirname + '/browser.html');
     //add extensions
-    BrowserWindow.addDevToolsExtension('extensions/TouchpadSwipe');
+    // BrowserWindow.addDevToolsExtension('extensions/DisableAutoplay');
 
     //removes .css files (style tags not included)
     // const ses = mainWindow.webContents.session

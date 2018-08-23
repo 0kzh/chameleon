@@ -1,20 +1,21 @@
 const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
+const Readability = require('../vendor/Readability.js');
 const url = require('url');
 
 document.addEventListener('mouseup', function(event) {
-  console.log('click')
   ipcRenderer.sendToHost("click");
 });
 
 pace.start();
 const protocol = url.parse(window.location.href).protocol;
+var scrollActive = false;
 pace.on("update", function(percent) {
   if (protocol == "https:" || protocol == "http:") {
-    console.log(percent)
     // some websites never fully load
     if (percent > 98) {
       ipcRenderer.sendToHost("page-load-progress", 100);
+      pace.stop();
     } else {
       ipcRenderer.sendToHost("page-load-progress", percent);
     }
@@ -53,6 +54,10 @@ function waitForElementToDisplay(selector, time, callback) {
 
 document.addEventListener("DOMContentLoaded", function() {
   loaded = true;
+  var docClone = document.cloneNode(true); 
+  const article = new Readability(docClone).parse();
+  console.log(article.title);
+  console.log(article.byline);
 });
 
 document.addEventListener("mousemove", function(e) {
@@ -78,6 +83,25 @@ document.addEventListener("mousemove", function(e) {
   }
 });
 
+document.addEventListener("wheel", function(e) {
+  var threshold = 75;
+  if (window.pageXOffset == 0) {
+    if(!scrollActive)
+      threshold -= e.wheelDeltaX;
+  } else {
+    scrollActive = true;
+  }
+
+  if (threshold < 0) {
+    console.log("trigger!")
+    threshold = 75;
+  }
+
+  setTimeout(function() {
+    threshold = 75;
+    scrollActive = false;
+  }, 100);
+});
 
 //press backwards key to go back in history; taken from https://github.com/j-delaney/back-to-backspace
 const tagBlacklist = [

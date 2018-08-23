@@ -1,13 +1,9 @@
 const path = require('path');
-const { ChromeTabs } = require('./chrome-tabs.js');
-const db = require('./history-db.js');
-const settings = require('./settings-db.js');
 const unusedFilename = require('unused-filename');
-const { remote, ipcRenderer, shell } = window.require('electron');
+const { ipcRenderer, shell } = window.require('electron');
 const { dialog } = window.require('electron').remote;
 const app = window.require('electron').remote.app;
 const searchInPage = require('electron-in-page-search').default;
-const $ = require('jquery');
 const fs = require('fs');
 
 var isWin = process.platform === "win32";
