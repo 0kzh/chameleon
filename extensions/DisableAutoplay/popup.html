@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+    <body>
+        <div id="error-popup">
+            <div id="error-page-overlay"></div>
+            <div id="error-main-container">
+                <div id="error-main">Error encountered<br /><br />Details are in the Developer Console</div>
+            </div>
+        </div>
+        <div id="click-reload" hidden="hidden">Mode changes take effect on a page reload.<br /><br />Click to reload the page.</div>
+        <div id="main-heading" title="Click to open the Options page">
+            <div id="extension-name"></div>
+            <div id="extension-version"></div>
+            <div style="font-size: 0.9em;">Open Options page</div>
+        </div>
+        <center>
+            <div id="mode-settings">
+                <!-- TODO: Uncomment when autobuffering is added -->
+                <!--<input id="mode-setting-all" name="mode-setting-option" type="radio"></input>
+                <label for="mode-setting-all">Disable autoplay & autobuffer</label>-->
+
+                <input id="mode-setting-autoplay-only" name="mode-setting-option" type="radio"></input>
+                <!--<label for="mode-setting-autoplay-only">Disable autoplay only</label>-->
+                <label for="mode-setting-autoplay-only" title="Select this Mode to stop only autoplay">Disable autoplay</label>
+
+                <input id="mode-setting-none" name="mode-setting-option" type="radio"></input>
+                <label for="mode-setting-none" title="Select this Mode to do nothing">Disable nothing</label>
+
+                <span class="slide-button"></span>
+            </div>
+        </center>
+        <p class="text-content">Currently disabling: <span id="current-mode"></span></p>
+        <div class="subheading">Totals</div>
+        <div class="text-content">
+            <span>Media elements: <span id="media-element-count" class="darker-text"></span></span>
+            <br />
+            <span>Autoplay attempts: <span id="autoplay-attempts" class="darker-text"></span></span>
+        </div>
+        <div class="subheading">Media players</div>
+        <div id="statistics" class="text-content"></div>
+    </body>
+    <head>
+        <script src="popup.js"></script>
+        <style>
+            html, body {
+                border: 0;
+                margin: 0;
+                padding: 0;
+                white-space: nowrap;
+            }
+            p {
+                margin: inherit;
+                padding: inherit;
+            }
+            #error-page-overlay {
+                position: fixed;
+                background: rgba(0, 0, 0, 0.75);
+                width: 100%;
+                height: 100%;
+                z-index: 199;
+                top: 0;
+                left: 0;
+            }
+            #error-main-container {
+                position: absolute;
+                width: 100%;
+                z-index: 200;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+            #error-main {
+                margin: 1em 1em 1em 1em;
+                padding: 1em 1em 1em 1em;
+                white-space: normal;
+                color: #eeeeee;
+                background: #666666;
+                border-radius: 0.5em;
+            }
+            #click-reload {
+                position: fixed; /* Stick to the bottom of the viewport */
+                bottom: 0;
+                z-index: 100;
+                margin: 1em 1em 1em 1em;
+                padding: 1em 1em 1em 1em;
+                white-space: normal;
+                color: #eeeeee;
+                background: rgba(44, 44, 44, 0.75);
+                border-radius: 0.5em;
+            }
+            #click-reload:hover {
+                background: rgba(44, 44, 44, 1);
+            }
+            #main-heading {
+                margin: 0;
+                border: 0;
+                padding: 0.5em 0.75em 0.5em 0.75em;
+                color: #eeeeee;
+                background-color: #444444;
+                text-align: center;
+            }
+            #extension-name {
+                font-size: 0.9em;
+                font-weight: bolder;
+            }
+            #extension-version {
+                font-size: 0.88em;
+                font-weight: normal;
+            }
+            #can-run-is-false {
+                text-align: center;
+                color: #666666;
+                white-space: normal;
+                margin: 0em 1em 0.8em 1em;
+            }
+            .subheading {
+                background-color: #eeeeee;
+                border: 0;
+                border-top: 0.1em solid #cccccc;
+                color: #666666;
+                font-size: 1.1em;
+                font-weight: normal;
+                padding: 0.5em 0.25em 0.5em 0.25em;
+                text-align: center;
+            }
+            .text-content {
+                text-align: center;
+                color: #666666;
+                margin: 0.8em 1em 0.8em 1em;
+                white-space: normal;
+            }
+            .darker-text {
+                color: #333333;
+            }
+
+            #mode-settings {
+                margin: 1em 1em 1em 1em;
+
+                display: block;
+                position: relative;
+                padding: 0;
+
+                /*background-color: #2d3035;*/
+                background-color: #f2f2f2;
+
+                color: #777777;
+                font-weight: bold;
+                text-align: center;
+                /*text-shadow:0px 1px 0px #545454;*/
+                text-shadow: 0.1em 0.1em 0.1em #eeeeee;
+	
+                border-radius: 0.5em;	
+
+                box-shadow: inset 0 0.1em 0.2em rgba(0, 0, 0, 0.5), 0 0.1em 0 rgba(255, 255, 255, 0.2);
+            }
+            #mode-settings input {
+                position: absolute;
+                opacity: 0;
+            }
+            #mode-settings label {
+                position: relative;
+                z-index: 2;
+                display: block;
+
+                padding: 0 1em 0 1em;
+                text-align: center;
+
+                /* TODO: Uncomment when autobuffering is added */
+                /*height: 33.3333333333%;*/
+                height: 50%;
+
+                line-height: 3em;
+                vertical-align: middle;
+            }
+            #mode-settings .slide-button {
+                position: absolute;
+                top: 0;
+                left: 0;
+                padding: 0;
+                z-index: 1;
+
+                width: 100%;
+
+                /* TODO: Uncomment when autobuffering is added */
+                /*height: 33.3333333333%;*/
+                height: 50%;
+
+                display: block;
+
+                transition: all 0.2s ease-out;
+
+                border: 0.1em solid #999999;
+
+                /*background-color: #70c66b;*/
+                background: linear-gradient(to bottom, #91c714 5%, #6d960c 100%);
+
+                box-shadow: 0 0.1em 0.1em rgba(0, 0, 0, 0.2), inset 0 0.1em 0.1em rgba(255, 255, 255, 0.5);
+
+                border-radius: 0.5em;
+            }
+            #mode-settings span.slide-button[hidden] {
+                visibility: hidden;
+            }
+            /* TODO: Uncomment when autobuffering is added */
+            /*
+            #mode-settings input:checked:nth-of-type(2) ~ .slide-button {	
+                top: 33.3333333333%;
+            }
+            */
+            #mode-settings input:checked:last-of-type ~ .slide-button {
+                /*top: 66.6666666666%;*/
+                top: 50%;
+                left: 0;
+            }
+            #mode-settings * {
+                box-sizing: border-box;
+            }
+            #mode-settings input:checked + label {
+                color: #333333;
+                text-shadow: 0 0.1em 0 rgba(255,255,255,0.5);
+            }
+            #mode-settings p {
+                color: #333333;
+
+                text-shadow: none;
+            }
+            #mode-settings span {
+                color: #ffffff;
+            }
+        </style>
+    </head>
+</html>

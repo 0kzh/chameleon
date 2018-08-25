@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head><title>TouchpadSwipe - Options</title>
+    <style type="text/css" rel="stylesheet">
+        body {
+            padding: 10px;
+        }
+
+        div {
+            padding: 5px;
+        }
+        .success {
+            color: #4BB543;
+        }
+    </style>
+</head>
+<body>
+<p>If you like my plugin you can buy me a beer / coffee: <a href="https://www.paypal.me/koseduhemak" target="_blank">https://www.paypal.me/koseduhemak</a></p>
+<table border="0" cellpadding="4" cellspacing="4">
+    <tr>
+        <td><label for="animations">Enable/Disable animations:</label></td>
+        <td><input type="checkbox" name="animations" id="animations"></td>
+    </tr>
+    <tr>
+        <td><label for="reverse">Reverse scrolling:</label></td>
+        <td><input type="checkbox" name="reverse" id="reverse"></td>
+    </tr>
+    <tr>
+        <td><label for="sensitivity">Current sensitivity: (Higher values = less sensitive, lower values = more sensitive)</label></td>
+        <td><input type="number" name="sensitivity" id="sensitivity"></td>
+    </tr>
+</table>
+
+<div id="status"></div>
+<button id="save">Save</button>
+
+<script src="options.js"></script>
+</body>
+</html>
