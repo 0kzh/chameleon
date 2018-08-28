@@ -1,7 +1,3 @@
-if (typeof Dexie === 'undefined' && typeof require !== 'undefined') {
-  var Dexie = require('dexie')
-}
-
 var settingsDB = new Dexie("settings");
 settingsDB.version(1).stores({
   settings: "key, value"

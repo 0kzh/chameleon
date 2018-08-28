@@ -311,6 +311,10 @@ function setupWebview(webviewId) {
           $('#border-active').remove();
         }, 500);
       }
+    } else if (e.channel == "show-reader") {
+      navigateTo("file://" + app.getAppPath() + "\\pages\\reader\\reader.html");
+      const article = e.args[0];
+      db.articles.add({ title: article.title, byline: article.byline, content: article.content, length: article.length, url: getCurrentWebview().getURL() });
     }
   });
   // $("#location").on("blur", function(){

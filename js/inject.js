@@ -56,8 +56,9 @@ document.addEventListener("DOMContentLoaded", function() {
   loaded = true;
   var docClone = document.cloneNode(true); 
   const article = new Readability(docClone).parse();
-  console.log(article.title);
-  console.log(article.byline);
+  if (article.title && article.byline) {
+    ipcRenderer.sendToHost("show-reader", article);
+  }
 });
 
 document.addEventListener("mousemove", function(e) {
