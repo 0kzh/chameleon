@@ -4,7 +4,7 @@ const { app, BrowserWindow } = require('electron');
 require('electron-dl')();
 
 let mainWindow;
-var isWin = process.platform === "win32";
+var os = process.platform;
 var downloadId = 0;
 
 app.on('window-all-closed', function() {
@@ -15,10 +15,12 @@ app.on('ready', function() {
     // settings.onLoad(() => {
     //     mainWindow.show();
     // });
-    if (isWin) {
+    if (os === "win32") {
         mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
-    } else {
+    } else if (os === "darwin") {
         mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
+    } else {
+        mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     }
     mainWindow.loadURL('file://' + __dirname + '/browser.html');
     //add extensions

@@ -7,6 +7,20 @@ html.dark-theme.home webview {
   background: #424242;
 }
 
+html.border webview {
+  box-sizing: border-box;
+  border-right: 4px #F3F6F8 solid;
+  border-bottom: 4px #F3F6F8 solid;
+  border-left: 4px #F3F6F8 solid;
+}
+
+html.border #controls {
+  box-sizing: border-box;
+  border-right: 4px #F3F6F8 solid;
+  border-top: 4px #F3F6F8 solid;
+  border-left: 4px #F3F6F8 solid;
+}medium
+
 body {
   margin: 0;
   padding: 0;

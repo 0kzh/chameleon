@@ -6,7 +6,6 @@ const app = window.require('electron').remote.app;
 const searchInPage = require('electron-in-page-search').default;
 const fs = require('fs');
 
-var isWin = process.platform === "win32";
 window.onresize = doLayout;
 var isLoading = false;
 var el = document.querySelector('.chrome-tabs');
@@ -40,6 +39,11 @@ let loadedSettings;
 
 //load settings
 settings.onLoad(loadSettings);
+
+//add border if linux
+if (process.platform !== "win32" && process.platform !== "darwin") {
+  document.documentElement.classList.add('border')
+}
 
 chromeTabs.init(el, { tabOverlapDistance: 14, minWidth: 45, maxWidth: 248 });
 
@@ -936,15 +940,14 @@ function loadSettings() {
         $(".titlebar-windows").show();
         $(".titlebar-mac").hide();
         break;
-      case "auto":
-        if (isWin) {
+      default:
+        if (process.platform === "win32") {
           $(".titlebar-windows").show();
           $(".titlebar-mac").hide();
         } else {
           $(".titlebar-windows").hide();
           $(".titlebar-mac").show();
         }
-        break;
     }
   });
 
