@@ -156,7 +156,7 @@ $("#clear-history").on("click", event => {
     //if successful, re-render everything (should be empty)
     db.sites.orderBy('lastVisit').reverse().toArray(displaySites);
   }).catch(function(error) {
-    console.error("Error deleting site: " + error);
+    console.error("Error clearing history: " + error);
   });
 });
 

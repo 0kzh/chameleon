@@ -54,11 +54,11 @@ function waitForElementToDisplay(selector, time, callback) {
 
 document.addEventListener("DOMContentLoaded", function() {
   loaded = true;
-  // var docClone = document.cloneNode(true); 
-  const article = new Readability(document).parse();
-  // if (article.title && article.byline) {
-    // ipcRenderer.sendToHost("show-reader", article);
-  // }
+  var docClone = document.cloneNode(true); 
+  const article = new Readability(docClone).parse();
+  if (article.title && article.byline) {
+    ipcRenderer.sendToHost("show-reader", article);
+  }
 });
 
 document.addEventListener("mousemove", function(e) {

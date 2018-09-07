@@ -9,11 +9,15 @@ settings.get('controlsStyle', (value) => {
 	$('#'+value).click();
 });
 
+settings.get('navbarAlign', (value) => {
+	$('#'+value).click();
+});
+
 settings.get('downloadsDirectory', (value) => {
 	$('#location').val(value);
 });
 
-$(':file').on('change', function() {
+$(document).on('change', ':file', () => {
   var input = $(this)
   input.trigger('fileselect');
 });
@@ -23,8 +27,9 @@ $(':file').on('fileselect', (event) => {
   $("#location").val(selectedPath);
 });
 
-$('#save').on('click', () => {
+$(document).on('click', '#save', () => {
 	settings.set('theme', $('input[name="theme"]:checked').val());
 	settings.set('controlsStyle', $('input[name="titlebar"]:checked').val());
 	settings.set('downloadsDirectory', $('#location').val());
+	settings.set('navbarAlign', $('input[name="navbar"]:checked').val());
 });

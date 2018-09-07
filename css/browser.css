@@ -3,10 +3,6 @@ html{
   overflow-x: hidden;
 }
 
-html.dark-theme.home webview {
-  background: #424242;
-}
-
 html.border webview {
   box-sizing: border-box;
   border-right: 4px #F3F6F8 solid;
@@ -19,7 +15,25 @@ html.border #controls {
   border-right: 4px #F3F6F8 solid;
   border-top: 4px #F3F6F8 solid;
   border-left: 4px #F3F6F8 solid;
-}medium
+}
+
+html.dark-theme.home webview {
+  background: #424242;
+}
+
+html.border.dark-theme webview {
+  box-sizing: border-box;
+  border-right: 4px #333333 solid;
+  border-bottom: 4px #333333 solid;
+  border-left: 4px #333333 solid;
+}
+
+html.border.dark-theme #controls {
+  box-sizing: border-box;
+  border-right: 4px #333333 solid;
+  border-top: 4px #333333 solid;
+  border-left: 4px #333333 solid;
+}
 
 body {
   margin: 0;
@@ -141,12 +155,11 @@ compared to the back/forward buttons */
   z-index: 999;
   float: left;
   height: calc(100% - 3px);
-  opacity: 0;
   transition: opacity 0.3s;
   display: flex;
   align-items: center;
   justify-content: center;
-  /*border-left: 1px solid #DAD9DA;*/
+  border-left: 3px solid #F3F6F8;
 }
 
 #navbarIcon svg{

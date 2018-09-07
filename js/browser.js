@@ -33,7 +33,8 @@ const downloadItemTemplate = `<div class="download-item">
 const defaultSettings = {
   theme: 'light',
   controlsStyle: 'auto',
-  downloadsDirectory: app.getPath('downloads')
+  downloadsDirectory: app.getPath('downloads'),
+  navbarAlign: 'left'
 };
 let loadedSettings;
 
@@ -108,12 +109,15 @@ document.addEventListener("activeTabChange", function(e) {
   if ($("#location").val() == "Search or enter address") {
     selectNavbar(false, null);
   } else {
-    $('#location').css("transition", "none");
-    $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    if (loadedSettings.navbarAlign === 'center') {
+      $('#location').css("transition", "none");
+      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      $("#navbarIcon").css("opacity", "0");
+    }
     $('#border-active').remove();
     $('#border-match-width').remove();
     // $('#location').css("transition", "transform 0.5s");
-    $("#navbarIcon").css("opacity", "0");
+    
     // if ($("#add-tab").hasClass("no-border")) {
     //     $(".ripple").css("border-right", "1px solid transparent");
     // }
@@ -266,10 +270,12 @@ function setupWebview(webviewId) {
       $("#location").val(stripURL(e.url));
       // $("#location").css("-webkit-app-region", "drag");
       $("#location").prop('disabled', true);
-      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      if (loadedSettings.navbarAlign === 'center') {
+        $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+        $("#navbarIcon").css("opacity", "0");
+      }
       $('#border-active').remove();
       $('#border-match-width').remove();
-      $("#navbarIcon").css("opacity", "0");
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
@@ -282,9 +288,11 @@ function setupWebview(webviewId) {
       $("#location").val(stripURL(webview.getURL()));
       // $("#location").css("-webkit-app-region", "drag");
       $("#location").prop('disabled', true);
-      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      if (loadedSettings.navbarAlign === 'center') {
+        $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+        $("#navbarIcon").css("opacity", "0");
+      }
       $('#border-active').remove();
-      $("#navbarIcon").css("opacity", "0");
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
@@ -314,6 +322,7 @@ function setupWebview(webviewId) {
           $('#border-fade-out').remove();
           $('#border-active').remove();
         }, 500);
+        updateNavbarIcon();
       }
     } else if (e.channel == "show-reader") {
       navigateTo("file://" + app.getAppPath() + "\\pages\\reader\\reader.html");
@@ -396,10 +405,12 @@ function navigateTo(url) {
   $('.ripple-effect').remove();
   // $("#location").css("-webkit-app-region", "drag");
   $("#location").prop('disabled', true);
-  $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+  if (loadedSettings.navbarAlign === 'center') {
+    $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    $("#navbarIcon").css("opacity", "0");
+  }
   $('#border-active').remove();
   $('#border-match-width').remove();
-  $("#navbarIcon").css("opacity", "0");
   // if ($("#add-tab").hasClass("no-border")) {
   //     $(".ripple").css("border-right", "1px solid transparent");
   // }
@@ -453,7 +464,8 @@ function doLayout() {
     webview.style.width = webviewWidth + 'px';
     webview.style.height = webviewHeight + 'px';
 
-    if ($(".ripple").find(".ripple-effect").length == 0) {
+    if ($(".ripple").find(".ripple-effect").length == 0 && loadedSettings.navbarAlign === 'center') {
+      $("#navbarIcon").css("opacity", "0");
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
     }
 
@@ -486,7 +498,9 @@ ipcRenderer.on('shortcut', function(event, data) {
     if ($('#location').val() != "") {
       $('#location').blur();
       $("#location").prop('disabled', true);
-      $("#navbarIcon").css("opacity", "0");
+      if (loadedSettings.navbarAlign === 'center') {
+        $("#navbarIcon").css("opacity", "0");
+      }
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
@@ -542,7 +556,6 @@ remote.getCurrentWebContents().session.on('will-download', (event, item, webCont
   const savePath = tempItem.getSavePath();
   const name = path.extname(filename) ? filename : getFilenameFromMime(filename, tempItem.getMimeType());
   filePath = unusedFilename.sync(path.join(dir, name));
-  console.log(filePath);
   tempItem.setSavePath(filePath);
 
   var downloadItem = $(downloadItemTemplate);
@@ -680,10 +693,12 @@ function handleKeyDown(event) {
         }
         // $("#location").css("-webkit-app-region", "drag");
         $("#location").prop('disabled', true);
-        $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+        if (loadedSettings.navbarAlign === 'center') {
+          $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+          $("#navbarIcon").css("opacity", "0");
+        }
         $('#border-active').remove();
         $('#border-match-width').remove();
-        $("#navbarIcon").css("opacity", "0");
         // if ($("#add-tab").hasClass("no-border")) {
         //     $(".ripple").css("border-right", "1px solid transparent");
         // }
@@ -736,10 +751,13 @@ function handleLoadCommit(webview) {
   if ($(".ripple").find(".ripple-effect").length == 0 && selected == webview) {
     console.log("finish load:" + stripURL(webview.getURL()));
     document.querySelector('#location').value = stripURL(webview.getURL());
+    updateNavbarIcon();
     $("#location").prop('disabled', true);
-    $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    if (loadedSettings.navbarAlign === 'center') {
+      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      $("#navbarIcon").css("opacity", "0");
+    }
     $('#border-active').remove();
-    $("#navbarIcon").css("opacity", "0");
   }
   updateBackButton(webview);
 
@@ -772,11 +790,24 @@ function handleLoadStart(event, webview) {
     setFavicon(webview, url, url);
   }
   document.body.classList.add('loading');
+  $('#navbarIcon').html(svgLoading);
 
   isLoading = true;
   resetExitedState();
   if (!event.isTopLevel) {
     return;
+  }
+}
+
+function updateNavbarIcon() {
+  //update icon if https
+  const protocol = require('url').parse(getCurrentWebview().getURL()).protocol
+  if (protocol === 'https:') {
+    $('#navbarIcon').html(httpsSecure);
+  } else if (protocol === 'http:'){
+    $('#navbarIcon').html(notSecure);
+  } else {
+    $('#navbarIcon').html(svgSearch);
   }
 }
 
@@ -799,15 +830,7 @@ function handleTitleUpdate(event, webview) {
 
   var pattern = new RegExp("https?:\/\/(www.)?youtube.com\/watch\\?v=*");
 
-  //update icon if https
-  const protocol = require('url').parse(webview.getURL()).protocol
-  if (protocol === 'https:') {
-    $('#navbarIcon').html(httpsSecure);
-  } else if (protocol === 'http:'){
-    $('#navbarIcon').html(notSecure);
-  } else {
-    $('#navbarIcon').html(svgSearch);
-  }
+  updateNavbarIcon();
 
   var selected = getCurrentWebview();
   //only update location if webview in focus
@@ -816,10 +839,12 @@ function handleTitleUpdate(event, webview) {
     document.querySelector('#location').value = stripURL(webview.getURL());
     // $("#location").css("-webkit-app-region", "drag");
     $("#location").prop('disabled', true);
-    $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    if (loadedSettings.navbarAlign === 'center') {
+      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      $("#navbarIcon").css("opacity", "0");
+    }
     $('#border-active').remove();
     $('#border-match-width').remove();
-    $("#navbarIcon").css("opacity", "0");
     // if ($("#add-tab").hasClass("no-border")) {
     //     $(".ripple").css("border-right", "1px solid transparent");
     // }
@@ -1154,9 +1179,10 @@ const svgSettings = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="
 const svgArrowLeft = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.67 0l2.83 2.829-9.339 9.175 9.339 9.167-2.83 2.829-12.17-11.996z"/></svg>';
 const svgArrowRight = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z"/></svg>';
 const notSecure = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>';
-const httpsSecure = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>';
+const httpsSecure = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#28C940" d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>';
 const svgRefresh = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 41 41" style="enable-background:new 0 0 41 41;" xml:space="preserve"> <path class="st0" d="M19.5,7c-9.3,0.5-16.6,8.5-16,18.1c0.5,8.5,7.5,15.4,16,15.9c9.8,0.5,17.9-7.3,17.9-17h-6 c0,6.5-5.6,11.7-12.3,10.9c-4.9-0.6-9-4.5-9.6-9.4c-0.9-6.4,3.8-11.9,9.9-12.5v6.8l9.9-9.9l-9.9-9.9V7z"/></svg>';
 const svgAdd = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z"/></svg>';
+const svgLoading= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18.513 7.119c.958-1.143 1.487-2.577 1.487-4.036v-3.083h-16v3.083c0 1.459.528 2.892 1.487 4.035l3.086 3.68c.567.677.571 1.625.009 2.306l-3.13 3.794c-.936 1.136-1.452 2.555-1.452 3.995v3.107h16v-3.107c0-1.44-.517-2.858-1.453-3.994l-3.13-3.794c-.562-.681-.558-1.629.009-2.306l3.087-3.68zm-4.639 7.257l3.13 3.794c.652.792.996 1.726.996 2.83h-1.061c-.793-2.017-4.939-5-4.939-5s-4.147 2.983-4.94 5h-1.06c0-1.104.343-2.039.996-2.829l3.129-3.793c1.167-1.414 1.159-3.459-.019-4.864l-3.086-3.681c-.66-.785-1.02-1.736-1.02-2.834h12c0 1.101-.363 2.05-1.02 2.834l-3.087 3.68c-1.177 1.405-1.185 3.451-.019 4.863z"/></svg>';
 
 $('#navbarIcon').html(svgSearch);
 $('#bookmark').html(svgBookmark);
