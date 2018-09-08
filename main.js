@@ -16,9 +16,11 @@ app.on('ready', function() {
     //     mainWindow.show();
     // });
     if (os === "win32") {
-        mainWindow = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
+        mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
+    } else if (os === "darwin") {
+        mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     } else {
-        mainWindow = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
+        mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });mainWindow = new BrowserWindow({ titleBarStyle: 'customButtonsOnHover', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     }
     mainWindow.loadURL('file://' + __dirname + '/browser.html');
     //add extensions
