@@ -91,7 +91,6 @@ document.addEventListener("mousemove", function(e) {
 document.addEventListener("wheel", function(e) {
   if (window.pageXOffset === 0) {
     if (!scrollActive) {
-      console.log(e.wheelDeltaX);
       threshold = threshold > 0 ? threshold - e.wheelDeltaX * 0.01 : 0
       var percent = -(threshold / maxThreshold) * 100
       percent = percent < -100 ? -100 : percent
@@ -106,7 +105,8 @@ document.addEventListener("wheel", function(e) {
     clearTimeout(timer);        
   }
   timer = setTimeout(function() {
-    if (threshold < 0) {
+    console.log(threshold);
+    if (threshold <= 0) {
       ipcRenderer.sendToHost("go-back");
     }
     threshold = maxThreshold;

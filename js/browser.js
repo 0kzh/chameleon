@@ -352,6 +352,7 @@ function setupWebview(webviewId) {
         $("#back-indicator").css("opacity", "0");
       }, 150);
     } else if (e.channel == "go-back") {
+      console.log("go back!");
       if (webview.canGoBack()) {
         webview.goBack();
         $('#border-match-width').remove();
