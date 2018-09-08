@@ -2,6 +2,9 @@ const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
 const Readability = require('../vendor/Readability.js');
 const url = require('url');
+const maxThreshold = 1200;
+var threshold = maxThreshold;
+var timer = null;
 
 document.addEventListener('mouseup', function(event) {
   ipcRenderer.sendToHost("click");
@@ -25,23 +28,23 @@ pace.on("update", function(percent) {
 });
 
 //disable youtube autoplay
-document.addEventListener("yt-navigate-finish", function() {
-  waitForElementToDisplay("paper-toggle-button#toggle", 1000, function() {
-    var autoplayButton = document.querySelector("paper-toggle-button#toggle");
-    console.log(autoplayButton.getAttribute("checked"));
-    if (autoplayButton.getAttribute("checked") == "") {
-      autoplayButton.click();
-    }
-  });
+// document.addEventListener("yt-navigate-finish", function() {
+//   waitForElementToDisplay("paper-toggle-button#toggle", 1000, function() {
+//     var autoplayButton = document.querySelector("paper-toggle-button#toggle");
+//     console.log(autoplayButton.getAttribute("checked"));
+//     if (autoplayButton.getAttribute("checked") == "") {
+//       autoplayButton.click();
+//     }
+//   });
 
-  waitForElementToDisplay("ytd-topbar-logo-renderer#logo", 1000, function() {
-    document.querySelector("ytd-topbar-logo-renderer#logo").removeAttribute("use-yoodle")
-  });
-});
+//   waitForElementToDisplay("ytd-topbar-logo-renderer#logo", 1000, function() {
+//     document.querySelector("ytd-topbar-logo-renderer#logo").removeAttribute("use-yoodle")
+//   });
+// });
  
-document.addEventListener("yt-navigate-start", function() {
-  location.reload();
-});
+// document.addEventListener("yt-navigate-start", function() {
+//   location.reload();
+// });
 
 function waitForElementToDisplay(selector, time, callback) {
   if (document.querySelector(selector) != null) {
@@ -56,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function() {
   loaded = true;
   var docClone = document.cloneNode(true); 
   const article = new Readability(docClone).parse();
-  if (article.title && article.byline) {
+  if (article && article.title && article.byline) {
     ipcRenderer.sendToHost("show-reader", article);
   }
 });
@@ -84,24 +87,28 @@ document.addEventListener("mousemove", function(e) {
   }
 });
 
+// custom event detection for two finger swipe to go back
 document.addEventListener("wheel", function(e) {
-  var threshold = 75;
-  if (window.pageXOffset == 0) {
-    if(!scrollActive)
-      threshold -= e.wheelDeltaX;
+  if (window.pageXOffset === 0) {
+    if (!scrollActive) {
+      threshold = threshold > 0 ? threshold - e.wheelDeltaX : 0
+      var percent = ((1 - (threshold / maxThreshold)) * 100)
+      percent = percent > 100 ? 100 : percent
+      ipcRenderer.sendToHost("show-back-arrow", percent);
+    }
   } else {
     scrollActive = true;
   }
 
-  if (threshold < 0) {
-    console.log("trigger!")
-    threshold = 75;
+  if(timer !== null) {
+    clearTimeout(timer);        
   }
-
-  setTimeout(function() {
-    threshold = 75;
-    scrollActive = false;
-  }, 100);
+  timer = setTimeout(function() {
+    if (threshold < 0) {
+      ipcRenderer.sendToHost("go-back");
+    }
+    threshold = maxThreshold;
+  }, 150);
 });
 
 //press backwards key to go back in history; taken from https://github.com/j-delaney/back-to-backspace

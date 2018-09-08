@@ -41,10 +41,7 @@ let loadedSettings;
 //load settings
 settings.onLoad(loadSettings);
 
-//add border if linux
-if (process.platform !== "win32" && process.platform !== "darwin") {
-  document.documentElement.classList.add('border')
-}
+addBorder();
 
 chromeTabs.init(el, { tabOverlapDistance: 14, minWidth: 45, maxWidth: 248 });
 
@@ -128,6 +125,20 @@ document.addEventListener("closeWindow", function(e) {
   window.close();
 });
 
+function maximizeWindow() {
+  win.maximize();
+  removeBorder();
+  $(".icon-unmaximize").show();
+  $(".icon-maximize").hide();
+}
+
+function unmaximizeWindow() {
+  win.unmaximize();
+  addBorder();
+  $(".icon-unmaximize").hide();
+  $(".icon-maximize").show();
+}
+
 //titlebar actions
 $(".titlebar-close, .close").click(function() {
   win.close();
@@ -139,21 +150,17 @@ $(".titlebar-minimize, .minimize").click(function() {
 
 $(".titlebar-fullscreen, .maximize").click(function() {
   if (win.isMaximized()) {
-    win.unmaximize();
-    $(".icon-unmaximize").hide();
-    $(".icon-maximize").show();
+    unmaximizeWindow();
   } else {
-    win.maximize();
-    $(".icon-unmaximize").show();
-    $(".icon-maximize").hide();
+    maximizeWindow();
   }
 });
 
 $(".titlebar-mac").dblclick(function() {
   if (win.isMaximized()) {
-    win.unmaximize();
+    unmaximizeWindow();
   } else {
-    win.maximize();
+    maximizeWindow();
   }
 });
 
@@ -185,6 +192,7 @@ $(".ripple").mousedown(function(e) {
       if (!win.isMaximized()) {
         if (snapped) {
           snapped = false;
+          addBorder();
         }
 
         $(".icon-maximize").show();
@@ -213,6 +221,7 @@ $(".ripple").mousedown(function(e) {
           win.setPosition(0, 0);
           win.setSize(width, height);
           snapped = true;
+          removeBorder();
         }
       });
   }
@@ -328,24 +337,10 @@ function setupWebview(webviewId) {
       navigateTo("file://" + app.getAppPath() + "\\pages\\reader\\reader.html");
       const article = e.args[0];
       db.articles.add({ title: article.title, byline: article.byline, content: article.content, length: article.length, url: getCurrentWebview().getURL() });
+    } else if (e.channel == "show-back-arrow") {
+      const percent = e.args[0];
     }
   });
-  // $("#location").on("blur", function(){
-  //     $('.ripple-effect').remove();
-  //     $('#location').css("transition", "transform 0.5s");
-  //     $("#location").css("transform", "translateX(50%) translateX(-"+ $("#location").textWidth() / 2 +"px)");
-  //     //get current webview
-  //     var tabId = el.querySelector('.chrome-tab-current').getAttribute("tab-id");
-  //     var wv = document.querySelector('webview[tab-id="'+tabId+'"]');
-  //     $("#location").val(stripURL(wv.getURL()));
-  // });
-
-  // $("#location").on("animationend webkitAnimationEnd oAnimationEnd", function(e){
-  //   //make sure only called once; equivalent to .one()
-  //   // $(this).off(e);
-  //   console.log("end")
-  //   $('#location').css("transition", "transform 0.5s");
-  // });
 
   window.addEventListener('keydown', handleKeyDown);
 
@@ -464,11 +459,13 @@ function doLayout() {
     webview.style.width = webviewWidth + 'px';
     webview.style.height = webviewHeight + 'px';
 
-    if ($(".ripple").find(".ripple-effect").length == 0 && loadedSettings.navbarAlign === 'center') {
-      $("#navbarIcon").css("opacity", "0");
-      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
-    }
-
+    // settings not loaded yet, use callback
+    settings.get('navbarAlign', (value) => {
+      if (value === 'center' && $(".ripple").find(".ripple-effect").length === 0) {
+        $("#navbarIcon").css("opacity", "0");
+        $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      }
+    });
     var sadWebview = document.querySelector('#sad-webview');
     sadWebview.style.width = webviewWidth + 'px';
     sadWebview.style.height = webviewHeight * 2 / 3 + 'px';
@@ -753,7 +750,7 @@ function handleLoadCommit(webview) {
     document.querySelector('#location').value = stripURL(webview.getURL());
     updateNavbarIcon();
     $("#location").prop('disabled', true);
-    if (loadedSettings.navbarAlign === 'center') {
+    if (loadedSettings && loadedSettings.navbarAlign === 'center') {
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
       $("#navbarIcon").css("opacity", "0");
     }
@@ -1090,6 +1087,16 @@ function updateBackButton(webview) {
     if (!$("#back").is(":disabled")) {
       $("#back").prop("disabled", true);
     }
+  }
+}
+
+function removeBorder() {
+  document.documentElement.classList.remove('border')
+}
+
+function addBorder() {
+  if (process.platform !== "win32" && process.platform !== "darwin") {
+    document.documentElement.classList.add('border')
   }
 }
 
