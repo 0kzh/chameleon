@@ -19,6 +19,7 @@ var dir;
 const bufferPixels = 5;
 var snapped = false;
 var startTime = 0;
+var timer;
 const downloadItemTemplate = `<div class="download-item">
                                   <div class="download-content">
                                     <div class="download-icon"></div>
@@ -339,12 +340,19 @@ function setupWebview(webviewId) {
       db.articles.add({ title: article.title, byline: article.byline, content: article.content, length: article.length, url: getCurrentWebview().getURL() });
     } else if (e.channel == "show-back-arrow") {
       const percent = e.args[0];
+      $("#back-indicator").css("opacity", "100");
       $("#back-indicator").css("transform", "translateY(-50%) translateX(" + percent + "%)");
-    } else if (e.channel == "go-back") {
-      const threshold = e.args[0];
-      $("#back-indicator").css("transform", "translateY(-50%) translateX(-100%)");
 
-      if (threshold < 0 && webview.canGoBack()) {
+      if(timer !== null) {
+        clearTimeout(timer);        
+      }
+
+      timer = setTimeout(function() {
+        $("#back-indicator").css("transform", "translateY(-50%) translateX(-100%)");
+        $("#back-indicator").css("opacity", "0");
+      }, 150);
+    } else if (e.channel == "go-back") {
+      if (webview.canGoBack()) {
         webview.goBack();
         $('#border-match-width').remove();
       }

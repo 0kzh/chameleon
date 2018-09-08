@@ -375,6 +375,7 @@ case we use a different background color and label). */
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
+  opacity: 0;
 }
 
 #href-dest {
