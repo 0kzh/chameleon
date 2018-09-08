@@ -2,7 +2,7 @@ const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
 const Readability = require('../vendor/Readability.js');
 const url = require('url');
-const maxThreshold = 1200;
+const maxThreshold = 10;
 var threshold = maxThreshold;
 var timer = null;
 
@@ -91,9 +91,10 @@ document.addEventListener("mousemove", function(e) {
 document.addEventListener("wheel", function(e) {
   if (window.pageXOffset === 0) {
     if (!scrollActive) {
-      threshold = threshold > 0 ? threshold - e.wheelDeltaX : 0
-      var percent = ((1 - (threshold / maxThreshold)) * 100)
-      percent = percent > 100 ? 100 : percent
+      threshold = threshold > 0 ? threshold - e.wheelDeltaX * 0.01 : 0
+      var percent = -(threshold / maxThreshold) * 100
+      percent = percent < -100 ? -100 : percent
+      percent = percent > 0 ? 0 : percent
       ipcRenderer.sendToHost("show-back-arrow", percent);
     }
   } else {
@@ -104,9 +105,7 @@ document.addEventListener("wheel", function(e) {
     clearTimeout(timer);        
   }
   timer = setTimeout(function() {
-    if (threshold < 0) {
-      ipcRenderer.sendToHost("go-back");
-    }
+    ipcRenderer.sendToHost("go-back", threshold);
     threshold = maxThreshold;
   }, 150);
 });

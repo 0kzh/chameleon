@@ -339,6 +339,15 @@ function setupWebview(webviewId) {
       db.articles.add({ title: article.title, byline: article.byline, content: article.content, length: article.length, url: getCurrentWebview().getURL() });
     } else if (e.channel == "show-back-arrow") {
       const percent = e.args[0];
+      $("#back-indicator").css("transform", "translateY(-50%) translateX(" + percent + "%)");
+    } else if (e.channel == "go-back") {
+      const threshold = e.args[0];
+      $("#back-indicator").css("transform", "translateY(-50%) translateX(-100%)");
+
+      if (threshold < 0 && webview.canGoBack()) {
+        webview.goBack();
+        $('#border-match-width').remove();
+      }
     }
   });
 
@@ -1187,9 +1196,10 @@ const svgArrowLeft = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height=
 const svgArrowRight = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M7.33 24l-2.83-2.829 9.339-9.175-9.339-9.167 2.83-2.829 12.17 11.996z"/></svg>';
 const notSecure = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v3h2v-3c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-4v14h18v-14h-12z"/></svg>';
 const httpsSecure = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#28C940" d="M18 10v-4c0-3.313-2.687-6-6-6s-6 2.687-6 6v4h-3v14h18v-14h-3zm-10 0v-4c0-2.206 1.794-4 4-4s4 1.794 4 4v4h-8z"/></svg>';
-const svgRefresh = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 41 41" style="enable-background:new 0 0 41 41;" xml:space="preserve"> <path class="st0" d="M19.5,7c-9.3,0.5-16.6,8.5-16,18.1c0.5,8.5,7.5,15.4,16,15.9c9.8,0.5,17.9-7.3,17.9-17h-6 c0,6.5-5.6,11.7-12.3,10.9c-4.9-0.6-9-4.5-9.6-9.4c-0.9-6.4,3.8-11.9,9.9-12.5v6.8l9.9-9.9l-9.9-9.9V7z"/></svg>';
+const svgRefresh = '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 41 41" style="enable-background:new 0 0 41 41;" xml:space="preserve"> <path class="st0" d="M19.5,7c-9.3,0.5-16.6,8.5-16,18.1c0.5,8.5,7.5,15.4,16,15.9c9.8,0.5,17.9-7.3,17.9-17h-6 c0,6.5-5.6,11.7-12.3,10.9c-4.9-0.6-9-4.5-9.6-9.4c-0.9-6.4,3.8-11.9,9.9-12.5v6.8l9.9-9.9l-9.9-9.9V7z"/></svg>';
 const svgAdd = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M24 10h-10v-10h-4v10h-10v4h10v10h4v-10h10z"/></svg>';
 const svgLoading= '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M18.513 7.119c.958-1.143 1.487-2.577 1.487-4.036v-3.083h-16v3.083c0 1.459.528 2.892 1.487 4.035l3.086 3.68c.567.677.571 1.625.009 2.306l-3.13 3.794c-.936 1.136-1.452 2.555-1.452 3.995v3.107h16v-3.107c0-1.44-.517-2.858-1.453-3.994l-3.13-3.794c-.562-.681-.558-1.629.009-2.306l3.087-3.68zm-4.639 7.257l3.13 3.794c.652.792.996 1.726.996 2.83h-1.061c-.793-2.017-4.939-5-4.939-5s-4.147 2.983-4.94 5h-1.06c0-1.104.343-2.039.996-2.829l3.129-3.793c1.167-1.414 1.159-3.459-.019-4.864l-3.086-3.681c-.66-.785-1.02-1.736-1.02-2.834h12c0 1.101-.363 2.05-1.02 2.834l-3.087 3.68c-1.177 1.405-1.185 3.451-.019 4.863z"/></svg>';
+const svgBackIndicator = '<svg xmlns="http://www.w3.org/2000/svg"><g transform="translate(0.000000,150.000000) scale(0.100000,-0.100000)" fill="#000000" fill-opacity="0.75" stroke="none"> <path d="M0 754 l0 -747 63 7 c317 35 563 277 622 611 35 203 -2 387 -113 560 -117 183 -332 315 -513 315 l-59 0 0 -746z m370 187 c14 -28 15 -27 -36 -81 l-47 -50 125 0 c130 0 148 -5 148 -45 0 -40 -18 -45 -148 -45 l-125 0 47 -50 c25 -27 46 -54 46 -60 0 -20 -38 -49 -59 -43 -28 7 -181 176 -181 199 0 10 39 58 87 106 91 91 122 106 143 69z"/></g></svg>';
 
 $('#navbarIcon').html(svgSearch);
 $('#bookmark').html(svgBookmark);
@@ -1197,4 +1207,5 @@ $('#settings').html(svgSettings);
 $('#back').html(svgArrowLeft);
 $('#refresh').html(svgRefresh);
 $('#add-tab').html(svgAdd);
+$('#back-indicator').html(svgBackIndicator);
 // $('#forward').html(svgArrowRight);

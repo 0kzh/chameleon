@@ -371,6 +371,12 @@ case we use a different background color and label). */
     }
 }
 
+#back-indicator {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 #href-dest {
   position: absolute;
   bottom: 0;
