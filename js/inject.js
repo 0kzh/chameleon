@@ -2,8 +2,8 @@ const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
 const Readability = require('../vendor/Readability.js');
 const url = require('url');
-const maxThreshold = 10;
-const vertScrollThreshold = 13;
+const maxThreshold = 6;
+const vertScrollThreshold = 15;
 var threshold = maxThreshold
 var timer = null;
 
@@ -91,9 +91,10 @@ document.addEventListener("mousemove", function(e) {
 // custom event detection for two finger swipe to go back
 document.addEventListener("wheel", function(e) {
   if (window.pageXOffset === 0) {
-    if (!scrollActive && Math.abs(e.wheelDeltaY) <= vertScrollThreshold) {
+    if (!scrollActive) {
       threshold = threshold > 0 ? threshold - e.wheelDeltaX * 0.01 : 0
-      if (threshold < 10) {
+      console.log(threshold);
+      if (threshold < maxThreshold) {
         var percent = -(threshold / maxThreshold) * 100
         percent = percent < -100 ? -100 : percent
         percent = percent > 0 ? 0 : percent
