@@ -2,8 +2,8 @@ const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
 const Readability = require('../vendor/Readability.js');
 const url = require('url');
-const maxThreshold = 13;
-const vertScrollThreshold = 5;
+const maxThreshold = 10;
+const vertScrollThreshold = 13;
 var threshold = maxThreshold
 var timer = null;
 
