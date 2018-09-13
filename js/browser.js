@@ -342,26 +342,10 @@ function setupWebview(webviewId) {
       const percent = e.args[0];
       $("#back-indicator").css("opacity", "100");
       $("#back-indicator").css("transform", "translateY(-50%) translateX(" + percent + "%)");
-
-      if(timer !== null) {
-        clearTimeout(timer);
-      }
-
-      timer = setTimeout(function() {
-        $("#back-indicator").css("opacity", "0");
-      }, 150);
     } else if (e.channel == "show-forward-arrow") {
       const percent = e.args[0];
       $("#forward-indicator").css("opacity", "100");
       $("#forward-indicator").css("transform", "translateY(-50%) translateX(" + - (percent - 100) + "%)");
-
-      if(timer !== null) {
-        clearTimeout(timer);
-      }
-
-      timer = setTimeout(function() {
-        $("#forward-indicator").css("opacity", "0");
-      }, 150);
     } else if (e.channel == "go-back") {
       if (webview.canGoBack()) {
         webview.goBack();
@@ -372,6 +356,9 @@ function setupWebview(webviewId) {
         webview.goForward();
         $('#border-match-width').remove();
       }
+    } else if (e.channel == "hide-indicators") {
+      $("#back-indicator").css("opacity", "0");
+      $("#forward-indicator").css("opacity", "0");
     }
   });
 

@@ -3,7 +3,7 @@ const pace = require('../vendor/pace.min.js');
 const Readability = require('../vendor/Readability.js');
 const url = require('url');
 const maxThreshold = 6;
-const vertScrollThreshold = 15;
+const vertScrollThreshold = 6;
 var threshold = maxThreshold
 var timer = null;
 
@@ -14,6 +14,7 @@ document.addEventListener('mouseup', function(event) {
 pace.start();
 const protocol = url.parse(window.location.href).protocol;
 var scrollActive = false;
+var indicatorStatus = "hidden";
 pace.on("update", function(percent) {
   if (protocol == "https:" || protocol == "http:") {
     // some websites never fully load
@@ -90,22 +91,26 @@ document.addEventListener("mousemove", function(e) {
 
 // custom event detection for two finger swipe to go back
 document.addEventListener("wheel", function(e) {
+  if (indicatorStatus == "hidden" && e.wheelDeltaY != 0) {
+    scrollActive = true;
+  }
+
   if (window.pageXOffset === 0) {
     if (!scrollActive) {
-      threshold = threshold > 0 ? threshold - e.wheelDeltaX * 0.01 : 0
-      console.log(threshold);
-      if (threshold < maxThreshold) {
+      threshold = threshold - e.wheelDeltaX * 0.01
+      if (threshold < maxThreshold && indicatorStatus != "forward") {
         var percent = -(threshold / maxThreshold) * 100
         percent = percent < -100 ? -100 : percent
         percent = percent > 0 ? 0 : percent
         ipcRenderer.sendToHost("show-back-arrow", percent);
-      } else {
+        indicatorStatus = "back";
+      } else if (indicatorStatus != "back") {
         var percent = ((threshold - maxThreshold) / maxThreshold) * 100
         percent = percent > 100 ? 100 : percent
         percent = percent < 0 ? 0 : percent
         ipcRenderer.sendToHost("show-forward-arrow", percent);
+        indicatorStatus = "forward";
       }
-
     }
   } else {
     scrollActive = true;
@@ -121,6 +126,9 @@ document.addEventListener("wheel", function(e) {
       ipcRenderer.sendToHost("go-forward");
     }
     threshold = maxThreshold;
+    scrollActive = false;
+    indicatorStatus = "hidden";
+    ipcRenderer.sendToHost("hide-indicators");
   }, 150);
 });
 
