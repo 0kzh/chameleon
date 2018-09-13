@@ -378,6 +378,19 @@ case we use a different background color and label). */
   opacity: 0;
 }
 
+#forward-indicator {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  opacity: 0;
+}
+
+#back-indicator img, #forward-indicator img {
+  height: 100%;
+  width: 100%;
+}
+
 #href-dest {
   position: absolute;
   bottom: 0;
