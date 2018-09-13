@@ -2,8 +2,9 @@ const { ipcRenderer } = require('electron');
 const pace = require('../vendor/pace.min.js');
 const Readability = require('../vendor/Readability.js');
 const url = require('url');
-const maxThreshold = 10;
-var threshold = maxThreshold;
+const maxThreshold = 13;
+const vertScrollThreshold = 5;
+var threshold = maxThreshold
 var timer = null;
 
 document.addEventListener('mouseup', function(event) {
@@ -41,7 +42,7 @@ pace.on("update", function(percent) {
 //     document.querySelector("ytd-topbar-logo-renderer#logo").removeAttribute("use-yoodle")
 //   });
 // });
- 
+
 // document.addEventListener("yt-navigate-start", function() {
 //   location.reload();
 // });
@@ -57,7 +58,7 @@ function waitForElementToDisplay(selector, time, callback) {
 
 document.addEventListener("DOMContentLoaded", function() {
   loaded = true;
-  var docClone = document.cloneNode(true); 
+  var docClone = document.cloneNode(true);
   const article = new Readability(docClone).parse();
   if (article && article.title && article.byline) {
     ipcRenderer.sendToHost("show-reader", article);
@@ -90,24 +91,33 @@ document.addEventListener("mousemove", function(e) {
 // custom event detection for two finger swipe to go back
 document.addEventListener("wheel", function(e) {
   if (window.pageXOffset === 0) {
-    if (!scrollActive) {
+    if (!scrollActive && Math.abs(e.wheelDeltaY) <= vertScrollThreshold) {
       threshold = threshold > 0 ? threshold - e.wheelDeltaX * 0.01 : 0
-      var percent = -(threshold / maxThreshold) * 100
-      percent = percent < -100 ? -100 : percent
-      percent = percent > 0 ? 0 : percent
-      ipcRenderer.sendToHost("show-back-arrow", percent);
+      if (threshold < 10) {
+        var percent = -(threshold / maxThreshold) * 100
+        percent = percent < -100 ? -100 : percent
+        percent = percent > 0 ? 0 : percent
+        ipcRenderer.sendToHost("show-back-arrow", percent);
+      } else {
+        var percent = ((threshold - maxThreshold) / maxThreshold) * 100
+        percent = percent > 100 ? 100 : percent
+        percent = percent < 0 ? 0 : percent
+        ipcRenderer.sendToHost("show-forward-arrow", percent);
+      }
+
     }
   } else {
     scrollActive = true;
   }
 
-  if(timer !== null) {
-    clearTimeout(timer);        
+  if (timer !== null) {
+    clearTimeout(timer);
   }
   timer = setTimeout(function() {
-    console.log(threshold);
     if (threshold <= 0) {
       ipcRenderer.sendToHost("go-back");
+    } else if (threshold - maxThreshold > maxThreshold) {
+      ipcRenderer.sendToHost("go-forward");
     }
     threshold = maxThreshold;
   }, 150);
