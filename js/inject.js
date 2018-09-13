@@ -91,7 +91,7 @@ document.addEventListener("mousemove", function(e) {
 
 // custom event detection for two finger swipe to go back
 document.addEventListener("wheel", function(e) {
-  if (indicatorStatus == "hidden" && Math.abs(e.wheelDeltaY) <= vertScrollThreshold) {
+  if (indicatorStatus == "hidden" && Math.abs(e.wheelDeltaY) >= vertScrollThreshold) {
     scrollActive = true;
   }
 
