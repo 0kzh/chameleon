@@ -87,6 +87,7 @@ document.addEventListener("activeTabChange", function(e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
   $('.ripple-effect').remove();
   $("#location").prop('disabled', true);
+  $('#border-active').remove();
   //TODO: check if webContents ready; using empty catch is bad practice
   try {
     //if page loaded, set omnibar url

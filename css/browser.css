@@ -283,7 +283,7 @@ webview {
 
 webview.hidden {
   display: flex !important;
-  /*visibility: hidden;*/
+  visibility: hidden;
   z-index: -1;
 }
 
