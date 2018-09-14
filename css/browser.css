@@ -375,7 +375,7 @@ case we use a different background color and label). */
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0;
+  display: none;
 }
 
 #forward-indicator {
@@ -383,7 +383,7 @@ case we use a different background color and label). */
   top: 50%;
   right: 0;
   transform: translateY(-50%);
-  opacity: 0;
+  display: none;
 }
 
 #back-indicator img, #forward-indicator img {

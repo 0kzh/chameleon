@@ -341,11 +341,11 @@ function setupWebview(webviewId) {
       db.articles.add({ title: article.title, byline: article.byline, content: article.content, length: article.length, url: getCurrentWebview().getURL() });
     } else if (e.channel == "show-back-arrow") {
       const percent = e.args[0];
-      $("#back-indicator").css("opacity", "100");
+      $("#back-indicator").css("display", "block");
       $("#back-indicator").css("transform", "translateY(-50%) translateX(" + percent + "%)");
     } else if (e.channel == "show-forward-arrow") {
       const percent = e.args[0];
-      $("#forward-indicator").css("opacity", "100");
+      $("#forward-indicator").css("display", "block");
       $("#forward-indicator").css("transform", "translateY(-50%) translateX(" + - (percent - 100) + "%)");
     } else if (e.channel == "go-back") {
       if (webview.canGoBack()) {
@@ -358,8 +358,8 @@ function setupWebview(webviewId) {
         $('#border-match-width').remove();
       }
     } else if (e.channel == "hide-indicators") {
-      $("#back-indicator").css("opacity", "0");
-      $("#forward-indicator").css("opacity", "0");
+      $("#back-indicator").css("display", "none");
+      $("#forward-indicator").css("display", "none");
     }
   });
 
