@@ -20,6 +20,7 @@ app.on('ready', function() {
     } else {
         mainWindow = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     }
+    mainWindow.setWindowButtonVisibility(false);
     mainWindow.loadURL('file://' + __dirname + '/browser.html');
     //add extensions
     // BrowserWindow.addDevToolsExtension('extensions/DisableAutoplay');
