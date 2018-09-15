@@ -20,6 +20,7 @@ const bufferPixels = 5;
 var snapped = false;
 var startTime = 0;
 var timer;
+var pendingRefreshOnConnect;
 const downloadItemTemplate = `<div class="download-item">
                                   <div class="download-content">
                                     <div class="download-icon"></div>
@@ -259,7 +260,7 @@ function setupWebview(webviewId) {
   webview.addEventListener('close', handleExit);
   webview.addEventListener('did-start-loading', function(e) { handleLoadStart(e, webview) });
   webview.addEventListener('did-stop-loading', handleLoadStop);
-  webview.addEventListener('did-fail-load', handleLoadAbort);
+  webview.addEventListener('did-fail-load', handleLoadError);
   webview.addEventListener('did-get-redirect-request', handleLoadRedirect);
   webview.addEventListener('did-finish-load', function() { handleLoadCommit(webview) });
   webview.addEventListener('page-title-updated', function(e) { handleTitleUpdate(e, webview) }); //this is when the DOM becomes visible
@@ -360,6 +361,15 @@ function setupWebview(webviewId) {
     } else if (e.channel == "hide-indicators") {
       $("#back-indicator").css("display", "none");
       $("#forward-indicator").css("display", "none");
+    } else if (e.channel == "network-online") {
+      if (pendingRefreshOnConnect) {
+        // timeout is needed because network isn't available immediately
+        setTimeout(() => {
+          getCurrentWebview().reload();
+          pendingRefreshOnConnect = false;
+          $("#webview-overlay").css("visibility", "hidden");
+        }, 2000);
+      }
     }
   });
 
@@ -480,6 +490,10 @@ function doLayout() {
     webview.style.width = webviewWidth + 'px';
     webview.style.height = webviewHeight + 'px';
 
+    var overlayWebview = document.querySelector('#webview-overlay');
+    overlayWebview.style.width = webviewWidth + 'px';
+    overlayWebview.style.height = webviewHeight + 'px';
+
     // settings not loaded yet, use callback
     settings.get('navbarAlign', (value) => {
       if (value === 'center' && $(".ripple").find(".ripple-effect").length === 0) {
@@ -487,10 +501,6 @@ function doLayout() {
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
       }
     });
-    var sadWebview = document.querySelector('#sad-webview');
-    sadWebview.style.width = webviewWidth + 'px';
-    sadWebview.style.height = webviewHeight * 2 / 3 + 'px';
-    sadWebview.style.paddingTop = webviewHeight / 3 + 'px';
   });
 }
 
@@ -877,11 +887,27 @@ function handleLoadStop(event) {
   isLoading = false;
 }
 
-function handleLoadAbort(event) {
-  // console.log('LoadAbort');
-  // console.log('  url: ' + event.url);
-  // console.log('  isTopLevel: ' + event.isTopLevel);
-  // console.log('  type: ' + event.type);
+
+
+function handleLoadError(event) {
+  $("#webview-overlay").css("visibility", "visible");
+  const innerDoc = $($('#webview-overlay object')[0].contentDocument);
+  const currentUrl = getCurrentWebview().getURL();
+  innerDoc.find("#title").html(errorCodes[event.errorCode].title);
+  innerDoc.find("#description").html(errorCodes[event.errorCode].description.replace("%s", currentUrl));
+  innerDoc.find("#error-code").html(event.errorDescription);
+  innerDoc.find("#try-again").on('click', () => {
+    if (event.errorCode == '-501') { // if trying to connect securely to a site without ssl certificate, use http instead
+      navigateTo(currentUrl.replace('https://', 'http://'));
+    } else {
+      getCurrentWebview().reload()
+    }
+    $("#webview-overlay").css("visibility", "hidden");
+  });
+
+  if (errorCodes[event.errorCode].retryOnReconnect) {
+    pendingRefreshOnConnect = true;
+  }
 }
 
 function handleLoadRedirect(event) {
@@ -1086,6 +1112,10 @@ function stripURL(url) {
 function getCurrentWebview() {
   var tabId = el.querySelector('.chrome-tab-current').getAttribute("tab-id");
   return document.querySelector('webview[tab-id="' + tabId + '"]');
+}
+
+function getCurrentUrl() {
+  return $("#location").val();
 }
 
 function getNavbarOffset() {

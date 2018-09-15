@@ -66,6 +66,10 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 });
 
+window.addEventListener('online', function () {
+  ipcRenderer.sendToHost("network-online");
+});
+
 document.addEventListener("mousemove", function(e) {
   // console.log(e.target.contains())
   var x = e.target;

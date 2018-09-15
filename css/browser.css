@@ -276,9 +276,10 @@ compared to the back/forward buttons */
   visibility: visible;
 }
 
-#sad-webview,
+#webview-overlay,
 webview {
   position: absolute;
+  padding: 0;
 }
 
 webview.hidden {
@@ -287,60 +288,13 @@ webview.hidden {
   z-index: -1;
 }
 
-/* The reload button turns into a spinning trobber */
-.loading #reload {
-  -webkit-animation: spinner-animation .5s infinite linear;
-  -webkit-transform-origin: 50% 55.5%;
-}
-
-@-webkit-keyframes spinner-animation {
-  0% { -webkit-transform: rotate(0deg); }
-  100% {-webkit-transform: rotate(360deg); }
-}
-
-/* Due to http://crbug.com/156219 we can't use display: none */
-#sad-webview,
-.exited webview {
-  visibility: hidden;
+#webview-overlay {
   visibility: hidden;
 }
 
-.exited #sad-webview {
-  visibility: visible;
-  background: #343f51;
-  text-align: center;
-  color: #fff;
-}
-
-#sad-webview h2 {
-  font-size: 14px;
-}
-
-#sad-webview p {
-  font-size: 11px;
-}
-
-#sad-webview-icon {
-  font-size: 96px;
-  margin-bottom: 10px;
-}
-
-/* Variant of the crashed page when the process is intentionally killed (in that
-case we use a different background color and label). */
-.exited #sad-webview #killed-label {
-  display: none;
-}
-
-.killed #sad-webview {
-  background: #393058;
-}
-
-.killed #sad-webview #killed-label {
-  display: block;
-}
-
-.killed #sad-webview #crashed-label {
-  display: none;
+#webview-overlay object {
+  width: 100%;
+  height: 100%;
 }
 
 .ripple{
