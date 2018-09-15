@@ -133,6 +133,7 @@ function maximizeWindow() {
     win.setFullScreen(true);
   } else {
     win.maximize();
+    snapped = true;
   }
   removeBorder();
   $(".icon-unmaximize").show();
@@ -160,6 +161,7 @@ $(".titlebar-minimize, .minimize").click(function() {
 });
 
 $(".titlebar-fullscreen, .maximize").click(function() {
+  console.log(win.isMaximized());
   if (win.isMaximized()) {
     unmaximizeWindow();
   } else {
@@ -205,19 +207,17 @@ $(".ripple").mousedown(function(e) {
         });
       }
 
-      if (!win.isMaximized()) {
-        if (snapped) {
-          mouseX = mouseX || event.screenX;
-          mouseY = mouseY || event.screenY;
-          const deltaX = event.screenX - mouseX;
-          const deltaY = event.screenY - mouseY;
-          // Add buffer so that screen doesn't unsnap when mouse if moved 1px
-          if (Math.sqrt(deltaX * deltaX + deltaY * deltaY) > 25) {
-            snapped = false;
-            addBorder();
-          }
+      if (snapped) {
+        mouseX = mouseX || event.screenX;
+        mouseY = mouseY || event.screenY;
+        const deltaX = event.screenX - mouseX;
+        const deltaY = event.screenY - mouseY;
+        // Add buffer so that screen doesn't unsnap when mouse if moved 1px
+        if (Math.sqrt(deltaX * deltaX + deltaY * deltaY) > 25) {
+          snapped = false;
+          addBorder();
         }
-
+        unmaximizeWindow();
         $(".icon-maximize").show();
         $(".icon-unmaximize").hide();
       }
@@ -241,8 +241,7 @@ $(".ripple").mousedown(function(e) {
           snapped = true;
         } else if (Math.abs(event.screenY - 0) < bufferPixels) {
           //top snap
-          win.setPosition(0, 0);
-          win.setSize(width, height);
+          maximizeWindow();
           snapped = true;
           removeBorder();
         }
