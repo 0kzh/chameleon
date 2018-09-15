@@ -161,7 +161,6 @@ $(".titlebar-minimize, .minimize").click(function() {
 });
 
 $(".titlebar-fullscreen, .maximize").click(function() {
-  console.log(win.isMaximized());
   if (win.isMaximized()) {
     unmaximizeWindow();
   } else {
