@@ -129,14 +129,22 @@ document.addEventListener("closeWindow", function(e) {
 });
 
 function maximizeWindow() {
-  win.maximize();
+  if (process.platform === "darwin") {
+    win.setFullScreen(true);
+  } else {
+    win.maximize();
+  }
   removeBorder();
   $(".icon-unmaximize").show();
   $(".icon-maximize").hide();
 }
 
 function unmaximizeWindow() {
-  win.unmaximize();
+  if (process.platform === "darwin") {
+    win.setFullScreen(false);
+  } else {
+    win.unmaximize();
+  }
   addBorder();
   $(".icon-unmaximize").hide();
   $(".icon-maximize").show();
