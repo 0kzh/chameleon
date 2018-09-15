@@ -128,8 +128,8 @@ document.addEventListener("closeWindow", function(e) {
   window.close();
 });
 
-function maximizeWindow() {
-  if (process.platform === "darwin") {
+function maximizeWindow(fullscreen) {
+  if (process.platform === "darwin" && fullscreen) {
     win.setFullScreen(true);
   } else {
     win.maximize();
@@ -140,8 +140,8 @@ function maximizeWindow() {
   $(".icon-maximize").hide();
 }
 
-function unmaximizeWindow() {
-  if (process.platform === "darwin") {
+function unmaximizeWindow(fullscreen) {
+  if (process.platform === "darwin" && fullscreen) {
     win.setFullScreen(false);
   } else {
     win.unmaximize();
@@ -162,17 +162,17 @@ $(".titlebar-minimize, .minimize").click(function() {
 
 $(".titlebar-fullscreen, .maximize").click(function() {
   if (win.isMaximized()) {
-    unmaximizeWindow();
+    unmaximizeWindow(true);
   } else {
-    maximizeWindow();
+    maximizeWindow(true);
   }
 });
 
 $(".titlebar-mac").dblclick(function() {
   if (win.isMaximized()) {
-    unmaximizeWindow();
+    unmaximizeWindow(true);
   } else {
-    maximizeWindow();
+    maximizeWindow(true);
   }
 });
 
@@ -216,7 +216,7 @@ $(".ripple").mousedown(function(e) {
           snapped = false;
           addBorder();
         }
-        unmaximizeWindow();
+        unmaximizeWindow(false);
         $(".icon-maximize").show();
         $(".icon-unmaximize").hide();
       }
@@ -240,7 +240,7 @@ $(".ripple").mousedown(function(e) {
           snapped = true;
         } else if (Math.abs(event.screenY - 0) < bufferPixels) {
           //top snap
-          maximizeWindow();
+          maximizeWindow(false);
           snapped = true;
           removeBorder();
         }
