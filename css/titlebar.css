@@ -18,7 +18,7 @@
 }
 
 .titlebar-windows .control {
-  height: calc(100% - 0.55em);
+  height: 2.9em;
   display: flex;
   align-items: center;
   justify-content: center;
