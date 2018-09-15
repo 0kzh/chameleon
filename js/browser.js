@@ -191,19 +191,31 @@ $(".ripple").mousedown(function(e) {
       winSize.height = win.getSize()[1];
     }
 
+    var mouseX;
+    var mouseY;
+
     $(window).mousemove(function(event) {
       dragging = true;
-      win.setBounds({
-        width: winSize.width,
-        height: winSize.height,
-        x: event.screenX - offsets.x,
-        y: event.screenY - offsets.y
-      });
+      if (!snapped) {
+        win.setBounds({
+          width: winSize.width,
+          height: winSize.height,
+          x: event.screenX - offsets.x,
+          y: event.screenY - offsets.y
+        });
+      }
 
       if (!win.isMaximized()) {
         if (snapped) {
-          snapped = false;
-          addBorder();
+          mouseX = mouseX || event.screenX;
+          mouseY = mouseY || event.screenY;
+          const deltaX = event.screenX - mouseX;
+          const deltaY = event.screenY - mouseY;
+          // Add buffer so that screen doesn't unsnap when mouse if moved 1px
+          if (Math.sqrt(deltaX * deltaX + deltaY * deltaY) > 25) {
+            snapped = false;
+            addBorder();
+          }
         }
 
         $(".icon-maximize").show();
