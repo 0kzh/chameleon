@@ -3,7 +3,8 @@ const pace = require('../vendor/pace.min.js');
 const Readability = require('../vendor/Readability.js');
 const url = require('url');
 const maxThreshold = 6;
-const vertScrollThreshold = 6;
+// 3 for Mac
+const vertScrollThreshold = 3;
 var threshold = maxThreshold
 var timer = null;
 
@@ -59,11 +60,11 @@ function waitForElementToDisplay(selector, time, callback) {
 
 document.addEventListener("DOMContentLoaded", function() {
   loaded = true;
-  var docClone = document.cloneNode(true);
-  const article = new Readability(docClone).parse();
-  if (article && article.title && article.byline) {
-    ipcRenderer.sendToHost("show-reader", article);
-  }
+  // var docClone = document.cloneNode(true);
+  // const article = new Readability(docClone).parse();
+  // if (article && article.title && article.byline) {
+  //   ipcRenderer.sendToHost("show-reader", article);
+  // }
 });
 
 window.addEventListener('online', function () {
