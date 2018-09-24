@@ -2,14 +2,10 @@
   "name": "Browser",
   "version": "1.1.0",
   "main": "main.js",
-  "scripts": {
-    "start": "node setup.js"
-  },
   "devDependencies": {
     "@getstation/repackage-chrome-extension-for-electron": "^0.1.1",
     "draggabilly": "^2.1.1",
     "electron": "^2.0.8",
-    "electron-prebuilt": "brave/electron-prebuilt",
     "electron-rebuild": "^1.7.3",
     "jquery": "^3.3.1"
   },

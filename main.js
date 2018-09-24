@@ -21,9 +21,9 @@ app.on('ready', function() {
         mainWindow = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     }
     // This method is only available in the 4.0.0 nightly pre-releases
-    // if (os === "darwin" && process.versions.electron.includes("4.0.0")) {
-    //     mainWindow.setWindowButtonVisibility(false);
-    // }
+    if (os === "darwin" && process.versions.electron.includes("4.0.0")) {
+        mainWindow.setWindowButtonVisibility(false);
+    }
     mainWindow.loadURL('file://' + __dirname + '/browser.html');
     //add extensions
     // BrowserWindow.addDevToolsExtension('extensions/DisableAutoplay');
