@@ -938,6 +938,20 @@ function handleLoadError(event) {
       }
       hideErrorPage();
     });
+
+    innerDoc.find("body").on('click', () => {
+      // from ipc-message click
+      var webview = getCurrentWebview();
+      $('.ripple-effect').remove();
+      console.log("click:" + stripURL(webview.getURL()));
+      $("#location").val(stripURL(webview.getURL()));
+      $("#location").prop('disabled', true);
+      if (loadedSettings.navbarAlign === 'center') {
+        $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+        $("#navbarIcon").css("opacity", "0");
+      }
+      $('#border-active').remove();
+    });
   
     if (errorCodes[event.errorCode].retryOnReconnect) {
       pendingRefreshOnConnect = true;
