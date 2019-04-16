@@ -865,23 +865,6 @@ function updateNavbarIcon() {
 
 function handleTitleUpdate(event, webview) {
   setFavicon(webview, webview.getTitle(), webview.getURL());
-
-  let fileContents = fs.readFile("./filters.json", "utf8", (err, data) => {
-    if (err) throw err;
-    //for each website, check for regex and insert css
-    $.each(JSON.parse(data), function(index, val) {
-      var pattern = new RegExp(val.url);
-      if (pattern.test(webview.getURL()) && val.enabled) {
-        //hidden elements
-        webview.insertCSS(val.hidden + " { display: none !important } ");
-        //custom CSS (if specified)
-        webview.insertCSS(val.customCSS);
-      }
-    })
-  });
-
-  var pattern = new RegExp("https?:\/\/(www.)?youtube.com\/watch\\?v=*");
-
   updateNavbarIcon();
 
   var selected = getCurrentWebview();
