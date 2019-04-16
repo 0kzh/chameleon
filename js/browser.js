@@ -252,6 +252,10 @@ $(".ripple").mouseup(function() {
   selectNavbar(true, event);
 });
 
+$(document).mouseleave(function() {
+  $("#href-dest").hide();
+});
+
 $("#add-tab").click(function() {
   chromeTabs.addTab({
     title: 'New Tab',
