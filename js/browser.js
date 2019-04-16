@@ -176,7 +176,7 @@ $(".titlebar-mac").dblclick(function() {
   }
 });
 
-$(".ripple").mousedown(function(e) {
+$(".ripple, .titlebar").mousedown(function(e) {
   if ($(this).find(".ripple-effect").length == 0) {
     if (Math.abs(win.getSize()[0] - width) < bufferPixels || Math.abs(win.getSize()[1] - height) < bufferPixels) {
       //if maximized, take percentage offset
