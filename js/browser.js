@@ -905,13 +905,21 @@ function handleLoadStop(event) {
   isLoading = false;
 }
 
+function showErrorPage() {
+  $("#webview-overlay").css("visibility", "visible");
+}
 
+function hideErrorPage() {
+  $("#webview-overlay").css("visibility", "hidden");
+}
 
 function handleLoadError(event) {
   // if error code is valid
   if (errorCodes[event.errorCode] != null) {
     // show error page
-    $("#webview-overlay").css("visibility", "visible");
+    showErrorPage();
+
+    $(getCurrentWebview()).addClass("error-active");
     const innerDoc = $($('#webview-overlay object')[0].contentDocument);
     const currentUrl = getCurrentWebview().getURL();
     innerDoc.find("#title").html(errorCodes[event.errorCode].title);
@@ -923,7 +931,7 @@ function handleLoadError(event) {
       } else {
         getCurrentWebview().reload()
       }
-      $("#webview-overlay").css("visibility", "hidden");
+      hideErrorPage();
     });
   
     if (errorCodes[event.errorCode].retryOnReconnect) {

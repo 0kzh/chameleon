@@ -206,11 +206,17 @@ class ChromeTabs {
     if (currentTab) currentTab.classList.remove('chrome-tab-current');
     tabEl.classList.add('chrome-tab-current');
 
-    //hide all other webviews
-    let targetWebview;
+    // hide all other webviews
     document.querySelectorAll("webview").forEach(function(webview) {
       if (webview.getAttribute("tab-id") == tabEl.getAttribute("tab-id")) {
         webview.classList.remove("hidden");
+        
+        // show or hide error page
+        if ($(webview).hasClass("error-active")) {
+          $("#webview-overlay").css("visibility", "visible");
+        } else {
+          $("#webview-overlay").css("visibility", "hidden");
+        }
       } else {
         webview.classList.add("hidden");
       }
