@@ -248,8 +248,6 @@ $(".ripple").mousedown(function(e) {
   }
 });
 
-
-
 $(".ripple").mouseup(function() {
   selectNavbar(true, event);
 });
@@ -311,6 +309,7 @@ function setupWebview(webviewId) {
       // }
     }
   });
+
   webview.addEventListener('ipc-message', (e) => {
     if (e.channel == "click") {
       $('.ripple-effect').remove();
@@ -831,6 +830,11 @@ function handleLoadCommit(webview) {
 
 function handleLoadStart(event, webview) {
   event.preventDefault();
+
+  // clear error page
+  $(getCurrentWebview()).removeClass("error-active");
+  hideErrorPage();
+
   var url = $(event.target.outerHTML).attr("src");
   if (webview.getURL() == "") {
     setFavicon(webview, url, url);
@@ -916,6 +920,7 @@ function hideErrorPage() {
 function handleLoadError(event) {
   // if error code is valid
   if (errorCodes[event.errorCode] != null) {
+    console.log("load error:" + getCurrentUrl())
     // show error page
     showErrorPage();
 
