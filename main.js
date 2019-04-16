@@ -20,8 +20,8 @@ app.on('ready', function() {
     } else {
         mainWindow = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     }
-    // This method is only available in the 4.0.0 nightly pre-releases
-    if (os === "darwin" && process.versions.electron.includes("4.0.0")) {
+    // This method is only available after version 4.0.0
+    if (os === "darwin" && compareVersion(process.versions.electron, "4.0.0")) {
         mainWindow.setWindowButtonVisibility(false);
     }
     mainWindow.loadURL('file://' + __dirname + '/browser.html');
@@ -52,4 +52,19 @@ function onDownloadProgress(item){
     // mainWindow.webContents.send('download' , {action: "progress",
     //                                           downloadedSize: item.getReceivedBytes(),
     //                                           timestamp: item.getLastModifiedTime()});  
+}
+
+function compareVersion(v1, v2) {
+    if (typeof v1 !== 'string') return false;
+    if (typeof v2 !== 'string') return false;
+    v1 = v1.split('.');
+    v2 = v2.split('.');
+    const k = Math.min(v1.length, v2.length);
+    for (let i = 0; i < k; ++ i) {
+        v1[i] = parseInt(v1[i], 10);
+        v2[i] = parseInt(v2[i], 10);
+        if (v1[i] > v2[i]) return true;
+        if (v1[i] < v2[i]) return false;        
+    }
+    return v1.length == v2.length ? false : (v1.length < v2.length ? false : true);
 }
