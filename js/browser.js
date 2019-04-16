@@ -908,23 +908,27 @@ function handleLoadStop(event) {
 
 
 function handleLoadError(event) {
-  $("#webview-overlay").css("visibility", "visible");
-  const innerDoc = $($('#webview-overlay object')[0].contentDocument);
-  const currentUrl = getCurrentWebview().getURL();
-  innerDoc.find("#title").html(errorCodes[event.errorCode].title);
-  innerDoc.find("#description").html(errorCodes[event.errorCode].description.replace("%s", currentUrl));
-  innerDoc.find("#error-code").html(event.errorDescription);
-  innerDoc.find("#try-again").on('click', () => {
-    if (event.errorCode == '-501') { // if trying to connect securely to a site without ssl certificate, use http instead
-      navigateTo(currentUrl.replace('https://', 'http://'));
-    } else {
-      getCurrentWebview().reload()
+  // if error code is valid
+  if (errorCodes[event.errorCode] != null) {
+    // show error page
+    $("#webview-overlay").css("visibility", "visible");
+    const innerDoc = $($('#webview-overlay object')[0].contentDocument);
+    const currentUrl = getCurrentWebview().getURL();
+    innerDoc.find("#title").html(errorCodes[event.errorCode].title);
+    innerDoc.find("#description").html(errorCodes[event.errorCode].description.replace("%s", currentUrl));
+    innerDoc.find("#error-code").html(event.errorDescription);
+    innerDoc.find("#try-again").on('click', () => {
+      if (event.errorCode == '-501') { // if trying to connect securely to a site without ssl certificate, use http instead
+        navigateTo(currentUrl.replace('https://', 'http://'));
+      } else {
+        getCurrentWebview().reload()
+      }
+      $("#webview-overlay").css("visibility", "hidden");
+    });
+  
+    if (errorCodes[event.errorCode].retryOnReconnect) {
+      pendingRefreshOnConnect = true;
     }
-    $("#webview-overlay").css("visibility", "hidden");
-  });
-
-  if (errorCodes[event.errorCode].retryOnReconnect) {
-    pendingRefreshOnConnect = true;
   }
 }
 
