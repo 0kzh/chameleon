@@ -923,7 +923,7 @@ function handleLoadError(event) {
     const innerDoc = $($('#webview-overlay object')[0].contentDocument);
     const currentUrl = getCurrentWebview().getURL();
     innerDoc.find("#title").html(errorCodes[event.errorCode].title);
-    innerDoc.find("#description").html(errorCodes[event.errorCode].description.replace("%s", currentUrl));
+    innerDoc.find("#description").html(errorCodes[event.errorCode].description.replace("%s", stripURL(currentUrl)));
     innerDoc.find("#error-code").html(event.errorDescription);
     innerDoc.find("#try-again").on('click', () => {
       if (event.errorCode == '-501') { // if trying to connect securely to a site without ssl certificate, use http instead
