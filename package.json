@@ -5,8 +5,8 @@
   "devDependencies": {
     "@getstation/repackage-chrome-extension-for-electron": "^0.1.1",
     "draggabilly": "^2.1.1",
-    "electron": "^2.0.8",
-    "electron-rebuild": "^1.7.3",
+    "electron": "^4.0.0",
+    "electron-rebuild": "^1.8.4",
     "jquery": "^3.3.1"
   },
   "dependencies": {

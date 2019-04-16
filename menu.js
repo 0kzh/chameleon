@@ -19,6 +19,11 @@ const template = [
         click: () => { mainWindow.webContents.send('shortcut' , {action:'addTab'}); }
       },
       {
+        label: 'New Window',
+        accelerator: 'CmdOrCtrl+N',
+        click: () => { mainWindow.webContents.send('shortcut' , {action:'newWindow'}); }
+      },
+      {
         type: 'separator'
       },
       {

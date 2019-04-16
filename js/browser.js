@@ -583,6 +583,8 @@ ipcRenderer.on('shortcut', function(event, data) {
 
       getCurrentWebview().getWebContents().savePage(savePath, 'HTMLComplete', function() {});
     }
+  } else if (data.action == "newWindow") {
+    ipcRenderer.send('open-window', false);
   } else if (data.action == "printPage") {
     getCurrentWebview().print();
   } else if (data.action == "viewHistory") {
