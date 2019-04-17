@@ -1,10 +1,11 @@
 const path = require('path');
 const unusedFilename = require('unused-filename');
-const { ipcRenderer, shell } = window.require('electron');
+const { ipcRenderer, shell, nativeImage } = window.require('electron');
 const { dialog } = window.require('electron').remote;
 const app = window.require('electron').remote.app;
 const searchInPage = require('electron-in-page-search').default;
 const fs = require('fs');
+const domtoimage = require('dom-to-image');
 
 window.onresize = doLayout;
 var isLoading = false;
@@ -256,12 +257,6 @@ $(document).mouseleave(function() {
   $("#href-dest").hide();
 });
 
-$(document).mousemove(function(e) {
-  console.log(e)
-  console.log(e.pageX + "," + e.pageY)
-});
-
-
 $("#add-tab").click(function() {
   chromeTabs.addTab({
     title: 'New Tab',
@@ -283,9 +278,19 @@ $("#refresh").click(function() {
 
 $("body").on("mouseleave", function(e) {
   if($(".is-dragging").length > 0) {
-    console.log("mouseout")
+    // drag tab to new window
+    remote.getCurrentWebContents().capturePage((image) => {
+
+      // crop screenshot to tab bar
+      const rect = document.querySelector(".is-dragging").getBoundingClientRect();
+      console.log(rect)
+      image = image.crop({ x: rect.x, y: rect.y, width: rect.width, height: rect.height});
+      remote.getCurrentWebContents().startDrag({
+        file: null,
+        icon: image,
+      });
+    })
   }
-  // e.stopPropagation();
 });
 
 function setupWebview(webviewId) {
@@ -385,8 +390,6 @@ function setupWebview(webviewId) {
     } else if (e.channel == "href-mouseout") {
       $("#href-dest").html();
       $("#href-dest").hide();
-    } else if (e.channel == "mouseleave") {
-      console.log("mouseleave")
     } else if (e.channel == "page-load-progress") {
       const progress = e.args[0];
       const bottomBarWidth = $("#ripple-container").width();

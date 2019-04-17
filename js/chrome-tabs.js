@@ -311,47 +311,6 @@ class ChromeTabs {
 
       this.draggabillyInstances.push(draggabillyInstance);
 
-      webview.addEventListener('ipc-message', (e) => {
-        if (e.channel == "stop-drag") {
-          console.log("stop drag")
-          
-          const finalTranslateX = parseFloat(tabEl.style.left, 10);
-          tabEl.style.transform = `translate3d(0, 0, 0)`;
-
-          // Animate dragged tab back into its place
-          requestAnimationFrame(() => {
-            tabEl.style.left = '0';
-            tabEl.style.transform = `translate3d(${ finalTranslateX }px, 0, 0)`;
-
-            requestAnimationFrame(() => {
-              tabEl.classList.remove('chrome-tab-currently-dragged');
-              this.el.classList.remove('chrome-tabs-sorting');
-
-              this.setCurrentTab(tabEl);
-              tabEl.classList.add('chrome-tab-just-dragged');
-
-              requestAnimationFrame(() => {
-                tabEl.style.transform = '';
-
-                // this.setupDraggabilly();
-              })
-            })
-          })
-        }
-      });
-
-      // $(window).addEventListener('mousemove', (e) => {
-      //   // var top = e.pageY;
-      //   // var right = document.body.clientWidth - e.pageX;
-      //   // var bottom = document.body.clientHeight - e.pageY;
-      //   // var left = e.pageX;
-    
-      //   console.log("asdf")
-      //   // if(top < 10 || right < 20 || bottom < 10 || left < 10){
-      //   //     console.log('Mouse has moved out of window');
-      //   // }
-      // });
-
       draggabillyInstance.on('dragStart', () => {
         this.cleanUpPreviouslyDraggedTabs();
         tabEl.classList.add('chrome-tab-currently-dragged');
