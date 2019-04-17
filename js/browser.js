@@ -256,6 +256,12 @@ $(document).mouseleave(function() {
   $("#href-dest").hide();
 });
 
+$(document).mousemove(function(e) {
+  console.log(e)
+  console.log(e.pageX + "," + e.pageY)
+});
+
+
 $("#add-tab").click(function() {
   chromeTabs.addTab({
     title: 'New Tab',
@@ -273,6 +279,13 @@ $("#back").click(function() {
 
 $("#refresh").click(function() {
   getCurrentWebview().reload();
+});
+
+$("body").on("mouseleave", function(e) {
+  if($(".is-dragging").length > 0) {
+    console.log("mouseout")
+  }
+  // e.stopPropagation();
 });
 
 function setupWebview(webviewId) {
@@ -329,6 +342,35 @@ function setupWebview(webviewId) {
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
+    } else if (e.channel == "mousemove") { 
+      if (e.args[0] != null && e.args[1] != null) {
+        var mouseMoveEvent = document.createEvent("MouseEvents");
+
+        mouseMoveEvent.initMouseEvent(
+                  "mousemove", //event type
+                  true, //canBubble
+                  true, //cancelable
+                  window, //AbstractView
+                  1, // detail
+                  e.args[0], // screenX
+                  e.args[1] + $("body").height(), // screenY
+                  e.args[2], // clientX
+                  e.args[3] + $("body").height(), // clientY
+                  false, // ctrlKey
+                  false, // altKey
+                  false, // shiftKey
+                  false, // metaKey 
+                  0, // button
+                  null // relatedTarget
+        );
+      
+        document.dispatchEvent(mouseMoveEvent)
+      }
+      
+    } else if (e.channel == "mouseup") {
+      var mouseUpEvent = document.createEvent ('MouseEvents');
+      mouseUpEvent.initEvent("mouseup", true, true);
+      document.dispatchEvent(mouseUpEvent)
     } else if (e.channel == "href-mouseover") {
       var url = e.args[0];
       var webviewURL = webview.getURL().replace(/\/+$/, "");
@@ -343,6 +385,8 @@ function setupWebview(webviewId) {
     } else if (e.channel == "href-mouseout") {
       $("#href-dest").html();
       $("#href-dest").hide();
+    } else if (e.channel == "mouseleave") {
+      console.log("mouseleave")
     } else if (e.channel == "page-load-progress") {
       const progress = e.args[0];
       const bottomBarWidth = $("#ripple-container").width();

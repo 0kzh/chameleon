@@ -71,7 +71,9 @@ window.addEventListener('online', function () {
 });
 
 document.addEventListener("mousemove", function(e) {
-  // console.log(e.target.contains())
+  
+  ipcRenderer.sendToHost("mousemove", e.pageX, e.pageY, e.clientX, e.clientY);
+
   var x = e.target;
   var found = false;
   if (x.hasAttribute("href")) {
@@ -91,6 +93,10 @@ document.addEventListener("mousemove", function(e) {
   } else {
     ipcRenderer.sendToHost("href-mouseout");
   }
+});
+
+document.addEventListener("mouseup", function(e) {
+  ipcRenderer.sendToHost("mouseup");
 });
 
 // custom event detection for two finger swipe to go back
