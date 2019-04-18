@@ -297,6 +297,9 @@ $("body").on("mouseleave", function(e) {
     // drag tab to new window
     remote.getGlobal('draggingTab').dragging = true;
     remote.getGlobal('draggingTab').url = getCurrentWebview().getURL();
+
+    // remove tab
+    $(".is-dragging").animate({ top: -100 })
   }
 });
 
@@ -306,7 +309,7 @@ $(window).mouseup(function(){
     // open new window
     ipcRenderer.send('open-window', false);
     remote.getGlobal('draggingTab').dragging = false;
-  }
+  }  
 });
 
 function setupWebview(webviewId) {
@@ -391,6 +394,7 @@ function setupWebview(webviewId) {
       }
       
     } else if (e.channel == "mouseup") {
+      console.log("mouseup!")
       var mouseUpEvent = document.createEvent ('MouseEvents');
       mouseUpEvent.initEvent("mouseup", true, true);
       document.dispatchEvent(mouseUpEvent)
