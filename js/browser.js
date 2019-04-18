@@ -384,8 +384,10 @@ function setupWebview(webviewId) {
                   0, // button
                   null // relatedTarget
         );
-      
-        document.dispatchEvent(mouseMoveEvent)
+
+        if (win.isFocused()) {
+          document.dispatchEvent(mouseMoveEvent)
+        }
       }
       
     } else if (e.channel == "mouseup") {
