@@ -297,9 +297,43 @@ $("body").on("mouseleave", function(e) {
     // drag tab to new window
     remote.getGlobal('draggingTab').dragging = true;
     remote.getGlobal('draggingTab').url = getCurrentWebview().getURL();
+    remote.getGlobal('draggingTab').title = getCurrentWebview().getTitle();
+    remote.getGlobal('draggingTab').favicon = "https://www.google.com/s2/favicons?domain=" + stripURL(getCurrentWebview().getURL());
 
-    // remove tab
-    $(".is-dragging").animate({ top: -100 })
+    // animate tab leaving
+    $(".is-dragging").animate({ top: -50 }, "fast")
+  }
+});
+
+$("body").on("mouseenter", function(e) {
+  console.log("entered")
+  const dragging = remote.getGlobal('draggingTab').dragging;
+  if (dragging && win.isFocused()) {
+    remote.getGlobal('draggingTab').dragging = false;
+    $(".is-dragging").animate({ top: 0 }, "fast")
+  }
+});
+
+// $(".is-dragging").on('dragstart', function(e) {
+//   e.preventDefault();
+// });
+
+$(window).on('dragover', function(e) {
+  console.log("dragover")
+});
+
+$("#controls").on("mouseenter", function(e) {
+  // console.log("entered")
+  const dragging = remote.getGlobal('draggingTab').dragging;
+  if (dragging && !win.isFocused()) {
+    // a tab is being dragged into this window
+    var i = $('.chrome-tabs .chrome-tab-current').index();
+    chromeTabs.addTab({
+      title: remote.getGlobal('draggingTab').title,
+      favicon: remote.getGlobal('draggingTab').favicon,
+      url: remote.getGlobal('draggingTab').url,
+      index: i
+    });
   }
 });
 
@@ -309,6 +343,7 @@ $(window).mouseup(function(){
     // open new window
     ipcRenderer.send('open-window', false);
     remote.getGlobal('draggingTab').dragging = false;
+    chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
   }  
 });
 

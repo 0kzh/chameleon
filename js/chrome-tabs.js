@@ -2,10 +2,9 @@ const { remote } = window.require('electron');
 const { webContents } = require('electron').remote
 const $ = require('jquery');
 console.log(webContents)
-Draggabilly = require('draggabilly');
 
 const tabTemplate = `
-  <div class="chrome-tab">
+  <div class="chrome-tab" draggable="true">
     <div class="chrome-tab-background">
       <svg x="0" y="0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"> <defs> <symbol id="topleft" viewBox="0 0 500 29" > <path d="M0 0.0 L500 0.0 500 29 0 29"/> </symbol> <symbol id="topright" viewBox="0 0 500 29"> <use xlink:href="#topleft"/> </symbol> <clipPath id="crop"> <rect class="mask" width="100%" height="100%" x="0"/> </clipPath> </defs> <svg x="0" y="0" width="50%" height="100%" transfrom="scale(-1, 1)" preserveAspectRatio="none"> <use xlink:href="#topleft" width="500" height="29" class="chrome-tab-background"/> </svg> <g transform="scale(-1, 1)"> <svg width="50%" height="100%" x="-100%" y="0" preserveAspectRatio="none"> <use xlink:href="#topright" width="500" height="29" class="chrome-tab-background"/> </svg> </g> </svg>
     </div>
@@ -24,11 +23,11 @@ const defaultTapProperties = {
 
 let instanceId = 0;
 let tabId = 0;
+let mouseDownX = 0;
+let mouseDownY = 0;
+let mouseDownOffsetLeft = 0;
 
 class ChromeTabs {
-  constructor() {
-    this.draggabillyInstances = [];
-  }
 
   init(el, options) {
     this.el = el;
@@ -43,7 +42,7 @@ class ChromeTabs {
     this.setupEvents();
     this.layoutTabs();
     this.fixZIndexes();
-    this.setupDraggabilly();
+    this.setupDrag();
   }
 
   emit(eventName, data) {
@@ -173,7 +172,7 @@ class ChromeTabs {
     this.setCurrentTab(tabEl);
     this.layoutTabs();
     this.fixZIndexes();
-    this.setupDraggabilly();
+    this.setupDrag();
     tabId++;
     //simulate omnibar focus
     $("#location").trigger('click');
@@ -199,7 +198,7 @@ class ChromeTabs {
       $(".ripple").css("margin-right", "-1px");
       this.layoutTabs();
       this.fixZIndexes();
-      this.setupDraggabilly();
+      this.setupDrag();
     }
   }
 
@@ -245,7 +244,7 @@ class ChromeTabs {
     this.emit('tabRemove', { tabEl })
     this.layoutTabs();
     this.fixZIndexes();
-    this.setupDraggabilly();
+    this.setupDrag();
 
 
     const tabEls = document.querySelectorAll(".chrome-tab");
@@ -272,7 +271,7 @@ class ChromeTabs {
       $(".ripple").css("margin-right", "-1px");
       this.layoutTabs();
       this.fixZIndexes();
-      this.setupDraggabilly();
+      this.setupDrag();
     }
   }
 
@@ -291,69 +290,76 @@ class ChromeTabs {
     this.tabEls.forEach((tabEl) => tabEl.classList.remove('chrome-tab-just-dragged'));
   }
 
-  setupDraggabilly() {
+  setupDrag() {
     const tabEls = this.tabEls;
     const tabEffectiveWidth = this.tabEffectiveWidth;
     const tabPositions = this.tabPositions;
-
-    this.draggabillyInstances.forEach(draggabillyInstance => draggabillyInstance.destroy());
     
     tabEls.forEach((tabEl, originalIndex) => {
+      $("body").unbind('mousemove');
+      $("body").unbind('mouseup');
+      $(tabEl).unbind('dragstart');
       const id = tabEl.getAttribute("tab-id");
       const webview = document.querySelector('webview[tab-id="' + id + '"]');
 
       const originalTabPositionX = tabPositions[originalIndex];
-      const draggabillyInstance = new Draggabilly(tabEl, {
-        axis: 'x',
-        containment: this.tabContentEl,
-        cancel: '.nodrag'
-      });
 
-      this.draggabillyInstances.push(draggabillyInstance);
+      $(tabEl).on('dragstart', (e) => {
+        e.preventDefault();
+        mouseDownX = e.clientX;
+        mouseDownY = e.clientY;
+        mouseDownOffsetLeft = $(tabEl).position().left;
+        let deltaX;
 
-      draggabillyInstance.on('dragStart', () => {
-        this.cleanUpPreviouslyDraggedTabs();
-        tabEl.classList.add('chrome-tab-currently-dragged');
-        this.el.classList.add('chrome-tabs-sorting');
-        this.fixZIndexes();
-      });
+        $(window).on('mousemove', (e) => {
+          $(tabEl).addClass("is-dragging")
+          deltaX = e.clientX - mouseDownX;
+          // console.log("translate3d(" + deltaX + ", 0, 0)")
+          $(tabEl).css("left", mouseDownOffsetLeft + "px")
+          if (deltaX < -mouseDownOffsetLeft) {
+            deltaX = -mouseDownOffsetLeft
+          } else if ((deltaX + mouseDownOffsetLeft) > $(this.tabContentEl).width() / 2) {
+            deltaX = 0
+          }
+          $(tabEl).css("transform", "translate3d(" + deltaX + "px, 0, 0)");
+          // Current index be computed within the event since it can change during the dragMove
+          const tabEls = this.tabEls;
+          const currentIndex = tabEls.indexOf(tabEl);
 
-      draggabillyInstance.on('dragEnd', () => {
-        const finalTranslateX = parseFloat(tabEl.style.left, 10);
-        tabEl.style.transform = `translate3d(0, 0, 0)`;
+          const currentTabPositionX = originalTabPositionX + deltaX;
+          const destinationIndex = Math.max(0, Math.min(tabEls.length, Math.floor((currentTabPositionX + (tabEffectiveWidth / 2)) / tabEffectiveWidth)));
 
-        // Animate dragged tab back into its place
-        requestAnimationFrame(() => {
-          tabEl.style.left = '0';
-          tabEl.style.transform = `translate3d(${ finalTranslateX }px, 0, 0)`;
+          if (currentIndex !== destinationIndex) {
+            this.animateTabMove(tabEl, currentIndex, destinationIndex);
+          }
+        });
 
-          requestAnimationFrame(() => {
-            tabEl.classList.remove('chrome-tab-currently-dragged');
-            this.el.classList.remove('chrome-tabs-sorting');
+        $(window).on('mouseup', (e) => {
+          $(window).unbind('mousemove');
+          $(window).unbind('mouseup');
+          $(tabEl).unbind('dragstart');
 
-            this.setCurrentTab(tabEl);
-            tabEl.classList.add('chrome-tab-just-dragged');
+          // Animate tab back
+          $(tabEl).css("left", "0");
+          $(tabEl).css("transform", `translate3d(${mouseDownOffsetLeft + deltaX}px, 0, 0)`);
+          $(tabEl).removeClass("is-dragging")
+          tabEl.classList.remove('chrome-tab-currently-dragged');
+          this.el.classList.remove('chrome-tabs-sorting');
+  
+          this.setCurrentTab(tabEl);
+          tabEl.classList.add('chrome-tab-just-dragged');
 
-            requestAnimationFrame(() => {
-              tabEl.style.transform = '';
+          setTimeout(() => {
+            tabEl.style.transform = '';
+            this.setupDrag();
+          }, 10)
 
-              this.setupDraggabilly();
-            })
-          })
-        })
-      })
+        });
 
-      draggabillyInstance.on('dragMove', (event, pointer, moveVector) => {
-        // Current index be computed within the event since it can change during the dragMove
-        const tabEls = this.tabEls;
-        const currentIndex = tabEls.indexOf(tabEl);
-
-        const currentTabPositionX = originalTabPositionX + moveVector.x;
-        const destinationIndex = Math.max(0, Math.min(tabEls.length, Math.floor((currentTabPositionX + (tabEffectiveWidth / 2)) / tabEffectiveWidth)));
-
-        if (currentIndex !== destinationIndex) {
-          this.animateTabMove(tabEl, currentIndex, destinationIndex);
-        }
+      this.cleanUpPreviouslyDraggedTabs();
+      tabEl.classList.add('chrome-tab-currently-dragged');
+      this.el.classList.add('chrome-tabs-sorting');
+      this.fixZIndexes();
       });
     })
   }

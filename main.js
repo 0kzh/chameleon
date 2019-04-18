@@ -5,7 +5,11 @@ require('electron-dl')();
 
 var os = process.platform;
 var downloadId = 0;
-global.draggingTab = { dragging: false, url: null }
+global.draggingTab = { dragging: false,
+                       url: null,
+                       title: null,
+                       favicon: null
+                     };
 
 app.on('window-all-closed', function() {
     app.quit();
