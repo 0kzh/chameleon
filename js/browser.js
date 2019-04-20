@@ -1,6 +1,6 @@
 const path = require('path');
 const unusedFilename = require('unused-filename');
-const { ipcRenderer, shell, nativeImage } = window.require('electron');
+const { ipcRenderer, shell, screen } = window.require('electron');
 const { dialog } = window.require('electron').remote;
 const app = window.require('electron').remote.app;
 const searchInPage = require('electron-in-page-search').default;
@@ -18,8 +18,8 @@ const { width, height } = remote.screen.getPrimaryDisplay().workAreaSize;
 var dir;
 const bufferPixels = 5;
 var snapped = false;
-var startTime = 0;
-var timer;
+var counter = 0;
+var oobTimer;
 var pendingRefreshOnConnect;
 const downloadItemTemplate = `<div class="download-item">
                                   <div class="download-content">
@@ -292,52 +292,82 @@ $("#refresh").click(function() {
   getCurrentWebview().reload();
 });
 
-$("body").on("mouseleave", function(e) {
-  if($(".is-dragging").length > 0) {
-    // drag tab to new window
-    remote.getGlobal('draggingTab').dragging = true;
-    remote.getGlobal('draggingTab').url = getCurrentWebview().getURL();
-    remote.getGlobal('draggingTab').title = getCurrentWebview().getTitle();
-    remote.getGlobal('draggingTab').favicon = "https://www.google.com/s2/favicons?domain=" + stripURL(getCurrentWebview().getURL());
+$(document).on("dragenter", function(e) {
+  e.preventDefault(); // needed for IE
+  counter++;
+  $(this).addClass('in-bounds');
 
-    // animate tab leaving
-    $(".is-dragging").animate({ top: -50 }, "fast")
-  }
-});
-
-$("body").on("mouseenter", function(e) {
-  console.log("entered")
-  const dragging = remote.getGlobal('draggingTab').dragging;
-  if (dragging && win.isFocused()) {
-    remote.getGlobal('draggingTab').dragging = false;
+  if (counter == 1) {
     $(".is-dragging").animate({ top: 0 }, "fast")
+    remote.getGlobal('draggingTab').dragging = false;
   }
-});
+})
+
+$(document).on("dragleave", function(e) {
+  counter--;
+  clearInterval(oobTimer)
+  oobTimer = setTimeout(() => {
+    if (counter == 0 && !isMouseInWindow()) {
+      // drag tab to new window
+      remote.getGlobal('draggingTab').dragging = true;
+      remote.getGlobal('draggingTab').url = getCurrentWebview().getURL();
+      remote.getGlobal('draggingTab').title = getCurrentWebview().getTitle();
+      remote.getGlobal('draggingTab').favicon = "https://www.google.com/s2/favicons?domain=" + stripURL(getCurrentWebview().getURL());
+      $(this).removeClass('in-bounds');
+      $(".is-dragging").animate({ top: -50 }, "fast")
+    }
+  }, 100)
+})
+// $("body").on("dragleave", function(e) {
+//   console.log("dragleave triggered")
+  // counter--;
+  // if (counter <= 0) { 
+  //     $(this).removeClass('in-bounds');
+  // }
+
+//   if (!$(this).hasClass("in-bounds")) {
+//     // console.log("outside")
+//     // $(".is-dragging").animate({ top: -50 }, "fast")
+//   }
+//   // if($(".is-dragging").length > 0) {
+//   //   // animate tab leaving
+//   // }
+// });
+
+// $("body").on("dragenter", function(e) {
+//   console.log("entered")
+//   const dragging = remote.getGlobal('draggingTab').dragging;
+//   if (dragging && win.isFocused()) {
+    // remote.getGlobal('draggingTab').dragging = false;
+//     $(".is-dragging").animate({ top: 0 }, "fast")
+//   }
+// });
 
 // $(".is-dragging").on('dragstart', function(e) {
 //   e.preventDefault();
 // });
 
-$(window).on('dragover', function(e) {
-  console.log("dragover")
-});
+// $(window).on('dragover', function(e) {
+//   console.log("dragover")
+// });
 
-$("#controls").on("mouseenter", function(e) {
-  // console.log("entered")
-  const dragging = remote.getGlobal('draggingTab').dragging;
-  if (dragging && !win.isFocused()) {
-    // a tab is being dragged into this window
-    var i = $('.chrome-tabs .chrome-tab-current').index();
-    chromeTabs.addTab({
-      title: remote.getGlobal('draggingTab').title,
-      favicon: remote.getGlobal('draggingTab').favicon,
-      url: remote.getGlobal('draggingTab').url,
-      index: i
-    });
-  }
-});
+// $("#controls").on("mouseenter", function(e) {
+//   // console.log("entered")
+//   const dragging = remote.getGlobal('draggingTab').dragging;
+//   if (dragging && !win.isFocused()) {
+//     // a tab is being dragged into this window
+//     var i = $('.chrome-tabs .chrome-tab-current').index();
+//     chromeTabs.addTab({
+//       title: remote.getGlobal('draggingTab').title,
+//       favicon: remote.getGlobal('draggingTab').favicon,
+//       url: remote.getGlobal('draggingTab').url,
+//       index: i
+//     });
+//   }
+// });
 
-$(window).mouseup(function(){
+$(window).on("dragend", function(){
+  clearInterval(oobTimer)
   const dragging = remote.getGlobal('draggingTab').dragging;
   if (dragging) {
     // open new window
@@ -401,38 +431,22 @@ function setupWebview(webviewId) {
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
-    } else if (e.channel == "mousemove") { 
+    } else if (e.channel == "mousemove" || e.channel == "dragover" || e.channel == "mouseup" || e.channel == "dragend" || e.channel == "dragenter" || e.channel == "dragleave") { 
       if (e.args[0] != null && e.args[1] != null) {
-        var mouseMoveEvent = document.createEvent("MouseEvents");
-
-        mouseMoveEvent.initMouseEvent(
-                  "mousemove", //event type
-                  true, //canBubble
-                  true, //cancelable
-                  window, //AbstractView
-                  1, // detail
-                  e.args[0], // screenX
-                  e.args[1] + $("body").height(), // screenY
-                  e.args[2], // clientX
-                  e.args[3] + $("body").height(), // clientY
-                  false, // ctrlKey
-                  false, // altKey
-                  false, // shiftKey
-                  false, // metaKey 
-                  0, // button
-                  null // relatedTarget
-        );
+        var event = new MouseEvent(e.channel, {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+          screenX: e.args[0],
+          screenY: e.args[1],
+          clientX: e.args[2],
+          clientY: e.args[3]
+        });
 
         if (win.isFocused()) {
-          document.dispatchEvent(mouseMoveEvent)
+          document.dispatchEvent(event)
         }
       }
-      
-    } else if (e.channel == "mouseup") {
-      console.log("mouseup!")
-      var mouseUpEvent = document.createEvent ('MouseEvents');
-      mouseUpEvent.initEvent("mouseup", true, true);
-      document.dispatchEvent(mouseUpEvent)
     } else if (e.channel == "href-mouseover") {
       var url = e.args[0];
       var webviewURL = webview.getURL().replace(/\/+$/, "");
@@ -692,8 +706,6 @@ ipcRenderer.on('shortcut', function(event, data) {
 
       getCurrentWebview().getWebContents().savePage(savePath, 'HTMLComplete', function() {});
     }
-  } else if (data.action == "ge") {
-
   } else if (data.action == "newWindow") {
     ipcRenderer.send('open-window', false);
   } else if (data.action == "printPage") {
@@ -871,7 +883,6 @@ function handleKeyDown(event) {
         event.preventDefault();
         const search = searchInPage(getCurrentWebview());
         if ($('.electron-in-page-search-window').hasClass('search-active')) {
-          console.log('ayy');
           search.closeSearchWindow();
           search.finalize();
         } else {
@@ -1373,6 +1384,16 @@ function getFilenameFromMime(name, mime) {
   }
 
   return `${name}.${exts[0].ext}`;
+}
+
+function isMouseInWindow() {
+  const cursorPos = screen.getCursorScreenPoint()
+  const cursorX = cursorPos.x
+  const cursorY = cursorPos.y
+  if (cursorX > window.screenX && cursorY > window.screenY && cursorX < (window.screenX + window.outerWidth) && cursorY < (window.screenY + window.outerHeight)) {
+    return true;
+  }
+  return false;
 }
 
 // set svgs

@@ -305,13 +305,19 @@ class ChromeTabs {
       const originalTabPositionX = tabPositions[originalIndex];
 
       $(tabEl).on('dragstart', (e) => {
-        e.preventDefault();
+        e.originalEvent.dataTransfer.clearData()
+        var emptyImage = document.createElement('img');
+        // Set the src to be a 0x0 gif
+        emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+        e.originalEvent.dataTransfer.setDragImage(emptyImage, 0, 0);
+
         mouseDownX = e.clientX;
         mouseDownY = e.clientY;
         mouseDownOffsetLeft = $(tabEl).position().left;
         let deltaX;
 
-        $(window).on('mousemove', (e) => {
+        $(window).on('dragover', (e) => {
+          
           $(tabEl).addClass("is-dragging")
           deltaX = e.clientX - mouseDownX;
           // console.log("translate3d(" + deltaX + ", 0, 0)")
@@ -334,9 +340,9 @@ class ChromeTabs {
           }
         });
 
-        $(window).on('mouseup', (e) => {
-          $(window).unbind('mousemove');
-          $(window).unbind('mouseup');
+        $(tabEl).on('dragend', (e) => {
+          $(window).unbind('dragover');
+          $(tabEl).unbind('dragend');
           $(tabEl).unbind('dragstart');
 
           // Animate tab back

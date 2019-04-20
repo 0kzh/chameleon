@@ -70,9 +70,21 @@ window.addEventListener('online', function () {
   ipcRenderer.sendToHost("network-online");
 });
 
+document.addEventListener("dragover", (e) => {
+  ipcRenderer.sendToHost("dragover", e.pageX, e.pageY, e.clientX, e.clientY);
+});
+
+document.addEventListener("dragenter", (e) => {
+  ipcRenderer.sendToHost("dragenter", e.pageX, e.pageY, e.clientX, e.clientY);
+});
+
+document.addEventListener("dragleave", (e) => {
+  ipcRenderer.sendToHost("dragleave", e.pageX, e.pageY, e.clientX, e.clientY);
+});
+
 document.addEventListener("mousemove", function(e) {
   
-  ipcRenderer.sendToHost("mousemove", e.pageX, e.pageY, e.clientX, e.clientY);
+  // ipcRenderer.sendToHost("mousemove", e.pageX, e.pageY, e.clientX, e.clientY);
 
   var x = e.target;
   var found = false;
@@ -97,6 +109,10 @@ document.addEventListener("mousemove", function(e) {
 
 document.addEventListener("mouseup", function(e) {
   ipcRenderer.sendToHost("mouseup");
+});
+
+document.addEventListener("dragend", function(e) {
+  ipcRenderer.sendToHost("dragend");
 });
 
 // custom event detection for two finger swipe to go back
