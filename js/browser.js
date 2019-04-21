@@ -293,23 +293,69 @@ $("#refresh").click(function() {
 });
 
 $(document).on("dragenter", function(e) {
-  e.preventDefault(); // needed for IE
+  e.preventDefault();
+  const windowID = remote.getCurrentWindow().id
+  let status = remote.getGlobal('draggingTab').status
+  console.log("enter:" + status)
+  // if a tab is being dragged to a different window and a new tab isn't created yet
+  console.log(windowID != remote.getGlobal('draggingTab').originWindowID)
+  if (windowID != remote.getGlobal('draggingTab').originWindowID) {
+    if (status == "exited" || status == "dragging") {
+      console.log("new tab")
+      remote.getGlobal('draggingTab').status = "entered";
+      var i = $('.chrome-tabs .chrome-tab-current').index();
+      chromeTabs.addTab({
+        title: remote.getGlobal('draggingTab').title,
+        favicon: remote.getGlobal('draggingTab').favicon,
+        url: remote.getGlobal('draggingTab').url,
+        index: i
+      });
+
+      remote.getGlobal('draggingTab').createdTab = windowID;
+
+      var event = new MouseEvent("dragstart", {
+        view: window,
+        bubbles: true,
+        cancelable: true,
+        screenX: screen.getCursorScreenPoint().x,
+        screenY: screen.getCursorScreenPoint().y,
+        clientX: getClientPos().x,
+        clientY: getClientPos().y
+      });
+
+      setTimeout(() => {
+        document.querySelector(".chrome-tab-current").dispatchEvent(event)
+      }, 100)
+    }
+  } else {
+    if (status == "exited") {
+      remote.getGlobal('draggingTab').status = "dragging"
+    }
+  }
+
   counter++;
   $(this).addClass('in-bounds');
 
+  // mouse re-entered
   if (counter == 1) {
     $(".is-dragging").animate({ top: 0 }, "fast")
-    remote.getGlobal('draggingTab').dragging = false;
+    // remote.getGlobal('draggingTab').status = "returned"
   }
 })
 
 $(document).on("dragleave", function(e) {
   counter--;
+  
   clearInterval(oobTimer)
   oobTimer = setTimeout(() => {
     if (counter == 0 && !isMouseInWindow()) {
       // drag tab to new window
-      remote.getGlobal('draggingTab').dragging = true;
+      let status = remote.getGlobal('draggingTab').status;
+      if (status == "entered") {
+        ipcRenderer.send('broadcast', 'removetab');
+      }
+      remote.getGlobal('draggingTab').status = "exited";
+
       remote.getGlobal('draggingTab').url = getCurrentWebview().getURL();
       remote.getGlobal('draggingTab').title = getCurrentWebview().getTitle();
       remote.getGlobal('draggingTab').favicon = "https://www.google.com/s2/favicons?domain=" + stripURL(getCurrentWebview().getURL());
@@ -317,64 +363,28 @@ $(document).on("dragleave", function(e) {
       $(".is-dragging").animate({ top: -50 }, "fast")
     }
   }, 100)
-})
-// $("body").on("dragleave", function(e) {
-//   console.log("dragleave triggered")
-  // counter--;
-  // if (counter <= 0) { 
-  //     $(this).removeClass('in-bounds');
-  // }
+});
 
-//   if (!$(this).hasClass("in-bounds")) {
-//     // console.log("outside")
-//     // $(".is-dragging").animate({ top: -50 }, "fast")
-//   }
-//   // if($(".is-dragging").length > 0) {
-//   //   // animate tab leaving
-//   // }
-// });
+$(window).on("dragend", function() {
 
-// $("body").on("dragenter", function(e) {
-//   console.log("entered")
-//   const dragging = remote.getGlobal('draggingTab').dragging;
-//   if (dragging && win.isFocused()) {
-    // remote.getGlobal('draggingTab').dragging = false;
-//     $(".is-dragging").animate({ top: 0 }, "fast")
-//   }
-// });
-
-// $(".is-dragging").on('dragstart', function(e) {
-//   e.preventDefault();
-// });
-
-// $(window).on('dragover', function(e) {
-//   console.log("dragover")
-// });
-
-// $("#controls").on("mouseenter", function(e) {
-//   // console.log("entered")
-//   const dragging = remote.getGlobal('draggingTab').dragging;
-//   if (dragging && !win.isFocused()) {
-//     // a tab is being dragged into this window
-//     var i = $('.chrome-tabs .chrome-tab-current').index();
-//     chromeTabs.addTab({
-//       title: remote.getGlobal('draggingTab').title,
-//       favicon: remote.getGlobal('draggingTab').favicon,
-//       url: remote.getGlobal('draggingTab').url,
-//       index: i
-//     });
-//   }
-// });
-
-$(window).on("dragend", function(){
-  clearInterval(oobTimer)
-  const dragging = remote.getGlobal('draggingTab').dragging;
-  if (dragging) {
-    // open new window
+  const status = remote.getGlobal('draggingTab').status
+  if (status == "exited") {
     ipcRenderer.send('open-window', false);
-    remote.getGlobal('draggingTab').dragging = false;
     chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
-  }  
+  }
+  
+  if (status == "entered") {
+    ipcRenderer.send('broadcast', 'dragend');
+    chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
+  }
+
+  // reset variables
+  remote.getGlobal('draggingTab').status = null;
+  remote.getGlobal('draggingTab').offset = 0;
+  remote.getGlobal('draggingTab').title = null;
+  remote.getGlobal('draggingTab').favicon = null;
+
+  clearInterval(oobTimer);
 });
 
 function setupWebview(webviewId) {
@@ -714,6 +724,32 @@ ipcRenderer.on('shortcut', function(event, data) {
     navigateTo("file:///" + app.getAppPath() + "\\pages\\history\\history.html");
   } else if (data.action == "viewSettings") {
     navigateTo("file:///" + app.getAppPath() + "\\pages\\settings\\settings.html");
+  }
+});
+
+ipcRenderer.on('dragend', function(event, data) {
+  // trigger dragend on all windows except origin
+  if (remote.getCurrentWindow().id != remote.getGlobal('draggingTab').originWindowID) {
+    var event = new MouseEvent("dragend", {
+      view: window,
+      bubbles: true,
+      cancelable: true,
+      screenX: screen.getCursorScreenPoint().x,
+      screenY: screen.getCursorScreenPoint().y,
+      clientX: getClientPos().x,
+      clientY: getClientPos().y
+    });
+
+    setTimeout(() => {
+      document.querySelector(".chrome-tab-current").dispatchEvent(event)
+    }, 100)
+  }
+});
+
+ipcRenderer.on('removetab', function(event, data) {
+  if (remote.getCurrentWindow().id == remote.getGlobal('draggingTab').createdTab) {
+    $(window).unbind('dragover');
+    chromeTabs.removeTab(document.querySelector('.chrome-tab-current'));
   }
 });
 
@@ -1394,6 +1430,13 @@ function isMouseInWindow() {
     return true;
   }
   return false;
+}
+
+function getClientPos() {
+  const cursorPos = screen.getCursorScreenPoint()
+  const cursorX = cursorPos.x
+  const cursorY = cursorPos.y
+  return { x: cursorX - window.screenX, y: cursorY - window.screenY }
 }
 
 // set svgs

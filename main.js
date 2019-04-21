@@ -1,11 +1,14 @@
 const fs = require('fs');
 // const { settings } = require('./js/settings-db.js');
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, webContents } = require('electron');
 require('electron-dl')();
 
 var os = process.platform;
 var downloadId = 0;
-global.draggingTab = { dragging: false,
+global.draggingTab = { status: null,
+                       createdTab: null, // windowID where tab was created
+                       originWindowID: -1,
+                       offset: 0,
                        url: null,
                        title: null,
                        favicon: null
@@ -23,6 +26,13 @@ ipcMain.on('open-window', (event, private) => {
     createNewWindow(private)
 })
 
+// Sends an ipc message to all windows
+ipcMain.on('broadcast', (event, message) => {
+    webContents.getAllWebContents().forEach(wc => {
+        wc.send(message)
+    })
+})
+
 function createNewWindow(private) {
     let window;
     if (os === "win32") {
@@ -34,17 +44,11 @@ function createNewWindow(private) {
     if (os === "darwin" && compareVersion(process.versions.electron, "4.0.0")) {
         window.setWindowButtonVisibility(false);
     }
+
     window.loadURL('file://' + __dirname + '/browser.html');
     require('./menu.js')(window);
     window.openDevTools();
     window.show()
-}
-
-function onDownloadProgress(item){
-  console.log(item);
-    // mainWindow.webContents.send('download' , {action: "progress",
-    //                                           downloadedSize: item.getReceivedBytes(),
-    //                                           timestamp: item.getLastModifiedTime()});  
 }
 
 function compareVersion(v1, v2) {

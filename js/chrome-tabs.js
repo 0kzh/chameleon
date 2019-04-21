@@ -1,7 +1,6 @@
 const { remote } = window.require('electron');
 const { webContents } = require('electron').remote
 const $ = require('jquery');
-console.log(webContents)
 
 const tabTemplate = `
   <div class="chrome-tab" draggable="true">
@@ -24,7 +23,6 @@ const defaultTapProperties = {
 let instanceId = 0;
 let tabId = 0;
 let mouseDownX = 0;
-let mouseDownY = 0;
 let mouseDownOffsetLeft = 0;
 
 class ChromeTabs {
@@ -305,22 +303,32 @@ class ChromeTabs {
       const originalTabPositionX = tabPositions[originalIndex];
 
       $(tabEl).on('dragstart', (e) => {
-        e.originalEvent.dataTransfer.clearData()
-        var emptyImage = document.createElement('img');
-        // Set the src to be a 0x0 gif
-        emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-        e.originalEvent.dataTransfer.setDragImage(emptyImage, 0, 0);
+        if (e.originalEvent && e.originalEvent.dataTransfer) {
+          e.originalEvent.dataTransfer.clearData();
 
-        mouseDownX = e.clientX;
-        mouseDownY = e.clientY;
+          remote.getGlobal('draggingTab').status = "dragging";
+          remote.getGlobal('draggingTab').originWindowID = remote.getCurrentWindow().id;
+
+          var emptyImage = document.createElement('img');
+          // Set the src to be a 0x0 gif
+          emptyImage.src = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+          e.originalEvent.dataTransfer.setDragImage(emptyImage, 0, 0);
+        }
+
         mouseDownOffsetLeft = $(tabEl).position().left;
+
+        if (remote.getGlobal('draggingTab').offset != 0) {
+          mouseDownX = $(tabEl).position().left + remote.getGlobal('draggingTab').offset
+        } else {
+          mouseDownX = e.clientX;
+          remote.getGlobal('draggingTab').offset = e.clientX - mouseDownOffsetLeft;
+        }
+
         let deltaX;
 
         $(window).on('dragover', (e) => {
-          
           $(tabEl).addClass("is-dragging")
           deltaX = e.clientX - mouseDownX;
-          // console.log("translate3d(" + deltaX + ", 0, 0)")
           $(tabEl).css("left", mouseDownOffsetLeft + "px")
           if (deltaX < -mouseDownOffsetLeft) {
             deltaX = -mouseDownOffsetLeft
@@ -344,6 +352,9 @@ class ChromeTabs {
           $(window).unbind('dragover');
           $(tabEl).unbind('dragend');
           $(tabEl).unbind('dragstart');
+
+          remote.getGlobal('draggingTab').offset = 0;
+          remote.getGlobal('draggingTab').originWindowID = -1;
 
           // Animate tab back
           $(tabEl).css("left", "0");
