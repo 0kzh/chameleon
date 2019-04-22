@@ -21,6 +21,7 @@ var snapped = false;
 var counter = 0;
 var oobTimer;
 var pendingRefreshOnConnect;
+var pendingReload = false;
 const downloadItemTemplate = `<div class="download-item">
                                   <div class="download-content">
                                     <div class="download-icon"></div>
@@ -36,7 +37,8 @@ const defaultSettings = {
   theme: 'light',
   controlsStyle: 'auto',
   downloadsDirectory: app.getPath('downloads'),
-  navbarAlign: 'left'
+  navbarAlign: 'left',
+  tabMoveConfirmation: true
 };
 let loadedSettings;
 
@@ -368,14 +370,53 @@ $(document).on("dragleave", function(e) {
 $(window).on("dragend", function() {
 
   const status = remote.getGlobal('draggingTab').status
-  if (status == "exited") {
-    ipcRenderer.send('open-window', false);
-    chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
-  }
   
-  if (status == "entered") {
-    ipcRenderer.send('broadcast', 'dragend');
-    chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
+
+  if (status == "entered" || status == "exited") {
+    const options = {
+      type: 'question',
+      buttons: ['Cancel', 'Yes'],
+      defaultId: 0,
+      title: 'Refresh Tab',
+      message: 'Moving this tab to another window will refresh the page. Are you sure you want to do this?',
+      checkboxLabel: 'Do not show this message again',
+      checkboxChecked: false,
+    };
+    
+    settings.get('tabMoveConfirmation', (shouldShow) => {
+      if (pendingReload || shouldShow == false) {
+        if (status == "exited") {
+          ipcRenderer.send('open-window', false);
+        } else if (status == "entered") {
+          ipcRenderer.send('broadcast', 'dragend');
+        }
+    
+        chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
+      } else {
+        dialog.showMessageBox(null, options, (response, checkboxChecked) => {
+          if (response == 0) {
+            $(".chrome-tab-current").animate({ top: 0 }, "fast")
+            if (status == "entered") {
+              ipcRenderer.send('broadcast', 'removetab');
+            }
+          } else if (response == 1) {
+            if (status == "exited") {
+              ipcRenderer.send('open-window', false);
+            } else if (status == "entered") {
+              ipcRenderer.send('broadcast', 'dragend');
+            }
+    
+            chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
+          }
+          
+          if (response == 1 && checkboxChecked) {
+            // save response
+            settings.set('tabMoveConfirmation', false);
+            pendingReload = true;
+          }
+        });
+      }
+    });
   }
 
   // reset variables

@@ -1,5 +1,6 @@
 {
   "darkMode": false,
   "controlsStyle": "auto",
-  "downloadDirectory": ""
+  "downloadDirectory": "",
+  "tabMoveConfirmation": false
 }
