@@ -1,10 +1,11 @@
 const path = require('path');
 const unusedFilename = require('unused-filename');
-const { ipcRenderer, shell, screen } = window.require('electron');
+const { ipcRenderer, shell, screen, clipboard } = window.require('electron');
 const { dialog } = window.require('electron').remote;
 const app = window.require('electron').remote.app;
 const searchInPage = require('electron-in-page-search').default;
 const fs = require('fs');
+const { Menu } = remote
 
 window.onresize = doLayout;
 var isLoading = false;
@@ -40,6 +41,7 @@ const defaultSettings = {
   navbarAlign: 'left',
   tabMoveConfirmation: true
 };
+let saveImagePath = "";
 let loadedSettings;
 
 //load settings
@@ -430,6 +432,7 @@ $(window).on("dragend", function() {
 
 function setupWebview(webviewId) {
   var webview = document.querySelector('webview[tab-id="' + webviewId + '"]');
+
   webview.addEventListener('close', handleExit);
   webview.addEventListener('did-start-loading', function(e) { handleLoadStart(e, webview) });
   webview.addEventListener('did-stop-loading', handleLoadStop);
@@ -497,6 +500,126 @@ function setupWebview(webviewId) {
         if (win.isFocused()) {
           document.dispatchEvent(event)
         }
+      }
+    } else if (e.channel == "webview-context-menu") {
+      console.log("ayylmao")
+      var href = e.args[0];
+      var src = e.args[1];
+      var selection = e.args[2];
+      var cutpaste = e.args[3];
+      var point = e.args[4];
+
+      const hasText = selection != "";
+
+      const defaultActions = {
+        cut: decorateMenuItem({
+          id: 'cut',
+          label: 'Cut',
+          enabled: cutpaste && hasText,
+          visible: cutpaste && hasText,
+          click(menuItem) {
+            clipboard.writeText(selection);
+            webview.delete();
+          }
+        }),
+        copy: decorateMenuItem({
+          id: 'copy',
+          label: 'Copy',
+          enabled: hasText,
+          visible: hasText,
+          click(menuItem) {
+            clipboard.writeText(selection);
+          }
+        }),
+        paste: decorateMenuItem({
+          id: 'paste',
+          label: 'Paste',
+          enabled: cutpaste,
+          visible: cutpaste,
+          click(menuItem) {
+            let clipboardContent = clipboard.readText();
+            webview.insertText(clipboardContent);
+          }
+        }),
+        inspect: () => ({
+          id: 'inspect',
+          label: 'Inspect Element',
+          enabled: true,
+          click() {
+            webview.inspectElement(point.x, point.y);
+          }
+        }),
+        separator: () => ({type: 'separator'}),
+        saveImage: decorateMenuItem({
+          id: 'save',
+          label: 'Save Image',
+          visible: src != "",
+          click(menuItem) {
+            getCurrentWebview().getWebContents().downloadURL(src);
+          }
+        }),
+        saveImageAs: decorateMenuItem({
+          id: 'saveImageAs',
+          label: 'Save Image As...',
+          visible: src != "",
+          click(menuItem) {
+            const fileName = src.replace(/^.*[\\\/]/, '');
+            const validFilename = new RegExp(/^[a-z0-9_.@()-]+\.[a-z0-9_.@()-]+$/)
+            dialog.showSaveDialog(null, {
+              defaultPath: validFilename.test(fileName) ? fileName : null
+            }, (path) => {
+              saveImagePath = path;
+              getCurrentWebview().getWebContents().downloadURL(src);
+            })
+          }
+        }),
+        copyLink: decorateMenuItem({
+          id: 'copyLink',
+          label: 'Copy Link',
+          visible: href != "",
+          click(menuItem) {
+            clipboard.write(href);
+          }
+        }),
+        copyImageAddress: decorateMenuItem({
+          id: 'copyImageAddress',
+          label: 'Copy Image Address',
+          visible: src != "",
+          click(menuItem) {
+            clipboard.write(src);
+          }
+        })
+      };
+
+      let menuTemplate = [
+        defaultActions.separator(),
+        defaultActions.cut(),
+        defaultActions.copy(),
+        defaultActions.paste(),
+        defaultActions.separator(),
+        defaultActions.saveImage(),
+        defaultActions.saveImageAs(),
+        defaultActions.copyImageAddress(),
+        defaultActions.separator(),
+        defaultActions.copyLink(),
+        defaultActions.separator(),
+        defaultActions.inspect(),
+        defaultActions.separator()
+      ];
+
+      menuTemplate = removeUnusedMenuItems(menuTemplate);
+
+      if (menuTemplate.length > 0) {
+        const menu = Menu.buildFromTemplate(menuTemplate);
+
+        /*
+        When `electron.remote`` is not available this runs in the browser process.
+        We can safely use `win`` in this case as it refers to the window the
+        context-menu should open in.
+        When this is being called from a webView, we can't use win as this
+        would refere to the webView which is not allowed to render a popup menu.
+        */
+        menu.popup(remote.getCurrentWindow());
       }
     } else if (e.channel == "href-mouseover") {
       var url = e.args[0];
@@ -802,7 +925,9 @@ remote.getCurrentWebContents().session.on('will-download', (event, item, webCont
   const filename = tempItem.getFilename();
   const savePath = tempItem.getSavePath();
   const name = path.extname(filename) ? filename : getFilenameFromMime(filename, tempItem.getMimeType());
-  filePath = unusedFilename.sync(path.join(dir, name));
+  filePath = saveImagePath != "" ? saveImagePath : unusedFilename.sync(path.join(dir, name));
+  console.log(filePath)
+  saveImagePath = "";
   tempItem.setSavePath(filePath);
 
   var downloadItem = $(downloadItemTemplate);
@@ -1479,6 +1604,28 @@ function getClientPos() {
   const cursorY = cursorPos.y
   return { x: cursorX - window.screenX, y: cursorY - window.screenY }
 }
+
+const decorateMenuItem = menuItem => {
+	return (options = {}) => {
+		if (options.transform && !options.click) {
+			menuItem.transform = options.transform;
+		}
+
+		return menuItem;
+	};
+};
+
+const removeUnusedMenuItems = menuTemplate => {
+	let notDeletedPreviousElement;
+
+	return menuTemplate
+		.filter(menuItem => menuItem !== undefined && menuItem.visible !== false)
+		.filter((menuItem, index, array) => {
+			const toDelete = menuItem.type === 'separator' && (!notDeletedPreviousElement || index === array.length - 1 || array[index + 1].type === 'separator');
+			notDeletedPreviousElement = toDelete ? notDeletedPreviousElement : menuItem;
+			return !toDelete;
+		});
+};
 
 // set svgs
 $('#navbarIcon').html(svgSearch);

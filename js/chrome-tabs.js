@@ -147,6 +147,7 @@ class ChromeTabs {
   addTab(tabProperties) {
     const tabEl = this.createNewTabEl();
     const webview = this.createNewWebView(tabProperties.url);
+    
     let templateWebview = document.querySelector('#tabs-content').firstElementChild;
     webview.style.width = templateWebview.style.width;
     webview.style.height = templateWebview.style.height;

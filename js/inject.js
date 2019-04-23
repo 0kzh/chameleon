@@ -158,6 +158,44 @@ document.addEventListener("wheel", function(e) {
   }, 150);
 });
 
+document.addEventListener('contextmenu', function (e) {
+  console.log(e)
+  var x = e.target;
+  var href = "";
+  var src = "";
+  var point = { x: e.pageX, y: e.pageY }
+  var cutpaste = false;
+  var clipboard = window.getSelection().toString();
+
+  if (x.tagName.toLowerCase() == "input" || x.tagName.toLowerCase() == "textarea") {
+    // cut and paste options
+    cutpaste = true;
+  }
+
+  x = e.target;
+
+  if (x.hasAttribute("href")) {
+    href = x.getAttribute("href");
+  } else {
+    while (x = x.parentElement) {
+      if (x == null) break;
+      if (x.hasAttribute("href")) {
+        href = x.getAttribute("href");
+        break;
+      }
+    }
+  }
+
+  x = e.target;
+
+  if (x.tagName.toLowerCase() == "img") {
+    src = x.getAttribute("src")
+  }
+
+  console.log("sending")
+  ipcRenderer.sendToHost("webview-context-menu", href, src, clipboard, cutpaste, point);
+});
+
 //press backwards key to go back in history; taken from https://github.com/j-delaney/back-to-backspace
 const tagBlacklist = [
   'input',
