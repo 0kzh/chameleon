@@ -500,7 +500,6 @@ function setupWebview(webviewId) {
         }
       }
     } else if (e.channel == "webview-context-menu") {
-      console.log("ayylmao")
       var href = e.args[0];
       var src = e.args[1];
       var selection = e.args[2];
@@ -916,6 +915,12 @@ ipcRenderer.on('removetab', function(event, data) {
 });
 
 win.webContents.session.on('will-download', (event, item, webContents) => {
+
+  // don't bother if cancel was pressed
+  if (item.isDestroyed()) {
+    return;
+  }
+
   var downloadState;
   let filePath;
   const filename = item.getFilename();

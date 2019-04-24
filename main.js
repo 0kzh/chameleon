@@ -58,6 +58,9 @@ function createNewWindow(private) {
         const filename = item.getFilename();
         const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
         filePath = dir.saveImagePath != "" ? dir.saveImagePath : unusedFilename.sync(path.join(dir.downloads, name));
+        if (filePath == null) {
+            event.preventDefault();
+        }
         saveImagePath = "";
         item.setSavePath(filePath);
     });
