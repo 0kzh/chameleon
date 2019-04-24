@@ -16,7 +16,6 @@ var dragging = false;
 var offsets = { x: 0, y: 0 };
 var winSize = { width: win.getSize()[0], height: win.getSize()[1] };
 const { width, height } = remote.screen.getPrimaryDisplay().workAreaSize;
-var dir;
 const bufferPixels = 5;
 var snapped = false;
 var counter = 0;
@@ -41,7 +40,6 @@ const defaultSettings = {
   navbarAlign: 'left',
   tabMoveConfirmation: true
 };
-let saveImagePath = "";
 let loadedSettings;
 
 //load settings
@@ -568,7 +566,7 @@ function setupWebview(webviewId) {
             dialog.showSaveDialog(null, {
               defaultPath: validFilename.test(fileName) ? fileName : null
             }, (path) => {
-              saveImagePath = path;
+              ipcRenderer.send('set-save-image-path', path)
               getCurrentWebview().getWebContents().downloadURL(src);
             })
           }
@@ -917,22 +915,17 @@ ipcRenderer.on('removetab', function(event, data) {
   }
 });
 
-remote.getCurrentWebContents().session.on('will-download', (event, item, webContents) => {
-
-  var tempItem = item;
+win.webContents.session.on('will-download', (event, item, webContents) => {
   var downloadState;
   let filePath;
-  const filename = tempItem.getFilename();
-  const savePath = tempItem.getSavePath();
-  const name = path.extname(filename) ? filename : getFilenameFromMime(filename, tempItem.getMimeType());
-  filePath = saveImagePath != "" ? saveImagePath : unusedFilename.sync(path.join(dir, name));
-  console.log(filePath)
-  saveImagePath = "";
-  tempItem.setSavePath(filePath);
+  const filename = item.getFilename();
+  const saveImagePath = remote.getGlobal('dir').saveImagePath
+  const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
+  filePath = saveImagePath != "" ? saveImagePath : unusedFilename.sync(path.join(remote.getGlobal('dir').downloads, name));
 
   var downloadItem = $(downloadItemTemplate);
-  downloadItem.find(".download-title").html(tempItem.getFilename());
-  var totalBytes = formatBytes(tempItem.getTotalBytes());
+  downloadItem.find(".download-title").html(filePath.replace(/^.*[\\\/]/, ''));
+  var totalBytes = formatBytes(item.getTotalBytes());
   downloadItem.find(".download-details").html("0.0/" + totalBytes);
   $("#download-manager").prepend(downloadItem);
   downloadState = "started";
@@ -940,18 +933,18 @@ remote.getCurrentWebContents().session.on('will-download', (event, item, webCont
   //show download bar
   $("#download-manager").show();
 
-  tempItem.on('updated', (event, state) => {
+  item.on('updated', (event, state) => {
     if (state === 'interrupted') {
       downloadItem.find(".download-details").html("Waiting for network");
       downloadState = "interrupted";
     } else if (state === 'progressing') {
       //TODO: check if object is destroyed; using empty catch is bad practice
       try {
-        if (tempItem.isPaused()) {
+        if (item.isPaused()) {
           downloadItem.find(".download-details").html("Paused");
           downloadState = "paused";
         } else {
-          downloadItem.find(".download-details").html(formatBytes(tempItem.getReceivedBytes()) + "/" + totalBytes);
+          downloadItem.find(".download-details").html(formatBytes(item.getReceivedBytes()) + "/" + totalBytes);
           downloadState = "downloading";
         }
       } catch (err) {
@@ -960,7 +953,7 @@ remote.getCurrentWebContents().session.on('will-download', (event, item, webCont
     }
   });
 
-  tempItem.once('done', (event, state) => {
+  item.once('done', (event, state) => {
     if (state === 'completed') {
       console.log('Download successfully')
       downloadItem.find(".download-details").html("");
@@ -983,17 +976,17 @@ remote.getCurrentWebContents().session.on('will-download', (event, item, webCont
 
   downloadItem.find(".download-content").click(function() {
     if (downloadState == "downloading") {
-      tempItem.pause();
+      item.pause();
     } else if (downloadState == "paused") {
-      tempItem.resume();
+      item.resume();
     } else if (downloadState == "completed") {
-      shell.openItem(savePath);
+      shell.openItem(filePath);
     }
   });
 
   downloadItem.find(".download-close").click(function() {
     if (downloadState == "downloading" || downloadState == "paused") {
-      tempItem.pause();
+      item.pause();
       var choice = dialog.showMessageBox(win, {
         type: 'question',
         buttons: ['Yes', 'No'],
@@ -1002,9 +995,9 @@ remote.getCurrentWebContents().session.on('will-download', (event, item, webCont
       });
 
       if (choice == 0) {
-        tempItem.cancel();
+        item.cancel();
       } else {
-        tempItem.resume();
+        item.resume();
         return;
       }
     }
@@ -1341,7 +1334,8 @@ function loadSettings() {
       //if not set, set to default downloads folder
       settings.set('downloadsDirectory', app.getPath('downloads'));
     }
-    dir = (value != "") ? value : app.getPath('downloads');
+    const dir = (value != "") ? value : app.getPath('downloads');
+    ipcRenderer.send('set-download-directory', dir)
   });
 
   settings.get('theme', (value) => {

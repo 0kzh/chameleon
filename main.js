@@ -1,10 +1,8 @@
-const fs = require('fs');
-// const { settings } = require('./js/settings-db.js');
+const path = require('path');
+const unusedFilename = require('unused-filename');
 const { app, BrowserWindow, ipcMain, webContents } = require('electron');
-require('electron-dl')();
 
-var os = process.platform;
-var downloadId = 0;
+let os = process.platform;
 global.draggingTab = { status: null,
                        createdTab: null, // windowID where tab was created
                        originWindowID: -1,
@@ -13,6 +11,8 @@ global.draggingTab = { status: null,
                        title: null,
                        favicon: null
                      };
+
+global.dir = { downloads: app.getPath('downloads'), saveImagePath: '' }
 
 app.on('window-all-closed', function() {
     app.quit();
@@ -33,6 +33,14 @@ ipcMain.on('broadcast', (event, message) => {
     })
 })
 
+ipcMain.on('set-downloads-directory', (event, path) => {
+    dir.downloads = path;
+})
+
+ipcMain.on('set-save-image-path', (event, path) => {
+    dir.saveImagePath = path;
+})
+
 function createNewWindow(private) {
     let window;
     if (os === "win32") {
@@ -44,6 +52,15 @@ function createNewWindow(private) {
     if (os === "darwin" && compareVersion(process.versions.electron, "4.0.0")) {
         window.setWindowButtonVisibility(false);
     }
+
+    window.webContents.session.on('will-download', (event, item, wc) => {
+        let filePath;
+        const filename = item.getFilename();
+        const name = path.extname(filename) ? filename : getFilenameFromMime(filename, item.getMimeType());
+        filePath = dir.saveImagePath != "" ? dir.saveImagePath : unusedFilename.sync(path.join(dir.downloads, name));
+        saveImagePath = "";
+        item.setSavePath(filePath);
+    });
 
     window.loadURL('file://' + __dirname + '/browser.html');
     require('./menu.js')(window);
