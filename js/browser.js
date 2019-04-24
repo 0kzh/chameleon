@@ -135,11 +135,6 @@ document.addEventListener("activeTabChange", function(e) {
     }
     $('#border-active').remove();
     $('#border-match-width').remove();
-    // $('#location').css("transition", "transform 0.5s");
-
-    // if ($("#add-tab").hasClass("no-border")) {
-    //     $(".ripple").css("border-right", "1px solid transparent");
-    // }
   }
 });
 
@@ -608,14 +603,6 @@ function setupWebview(webviewId) {
 
       if (menuTemplate.length > 0) {
         const menu = Menu.buildFromTemplate(menuTemplate);
-
-        /*
-        When `electron.remote`` is not available this runs in the browser process.
-        We can safely use `win`` in this case as it refers to the window the
-        context-menu should open in.
-        When this is being called from a webView, we can't use win as this
-        would refere to the webView which is not allowed to render a popup menu.
-        */
         menu.popup(remote.getCurrentWindow());
       }
     } else if (e.channel == "href-mouseover") {
@@ -1023,17 +1010,6 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
 $(".close-download").click(function() {
   $("#download-manager").hide();
 });
-
-// ipcRenderer.on("download", function(event, data){
-//   if(data.action == "start"){
-//     var downloadItem = $(downloadItemTemplate);
-//     downloadItem.find(".download-title").html(data.name);
-//     downloadItem.find(".download-details").html("0.0/"+formatBytes(data.totalSize));
-//     $("#download-manager").prepend(downloadItem);
-//   }else if(data.action == "progress"){
-
-//   }
-// });
 
 function handleKeyDown(event) {
   if (event.keyCode == 27) {
@@ -1550,7 +1526,6 @@ function selectNavbar(animate, event) {
       })
       .appendTo($("#location-form"));
     $("#location").css("transform", "translateX(0%)");
-    // $("#location").css("-webkit-app-region", "no-drag");
     $("#location").prop('disabled', false);
     $("#navbarIcon").css("opacity", "1");
     if (loadedSettings.theme == 'dark') {
