@@ -83,8 +83,8 @@ document.addEventListener("dragleave", (e) => {
 });
 
 document.addEventListener("mousemove", function(e) {
-  
-  // ipcRenderer.sendToHost("mousemove", e.pageX, e.pageY, e.clientX, e.clientY);
+  console.log("mousemove");
+  ipcRenderer.sendToHost("mousemove", e.pageX, e.pageY, e.clientX, e.clientY);
 
   var x = e.target;
   var found = false;

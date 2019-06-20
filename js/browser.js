@@ -209,9 +209,12 @@ $(".ripple, .titlebar").mousedown(function(e) {
     var mouseX;
     var mouseY;
 
-    $(window).mousemove(function(event) {
+    $(document).mousemove(function(event) {
+      console.log("mousemove")
       dragging = true;
       if (!snapped) {
+        console.log(event.screenX)
+        console.log(event.screenY)
         win.setBounds({
           width: winSize.width,
           height: winSize.height,
@@ -237,8 +240,8 @@ $(".ripple, .titlebar").mousedown(function(e) {
     });
 
     $(window).mouseup(function(event) {
-        $(window).unbind('mousemove');
-        $(window).unbind('mouseup');
+        $(document).unbind('mousemove');
+        $(document).unbind('mouseup');
         dragging = false;
 
         //implement custom window snapping
@@ -479,6 +482,11 @@ function setupWebview(webviewId) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
     } else if (e.channel == "mousemove" || e.channel == "dragover" || e.channel == "mouseup" || e.channel == "dragend" || e.channel == "dragenter" || e.channel == "dragleave") { 
+      if (e.channel == "mousemove") {
+        e.args[0] = e.args[0] + win.getBounds().x;
+        e.args[1] = e.args[1] + win.getBounds().y + $("#controls").height();
+      }
+
       if (e.args[0] != null && e.args[1] != null) {
         var event = new MouseEvent(e.channel, {
           view: window,
