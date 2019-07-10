@@ -20,6 +20,7 @@ const bufferPixels = 5;
 var snapped = false;
 var counter = 0;
 var oobTimer;
+var color;
 var pendingRefreshOnConnect;
 var pendingReload = false;
 const downloadItemTemplate = `<div class="download-item">
@@ -1098,6 +1099,25 @@ function handleKeyDown(event) {
 
 function handleLoadCommit(webview) {
   resetExitedState();
+  // capture page and extract first line of pixels
+  // page contents start at navbar height
+  remote.getCurrentWebContents().capturePage({x: 0, y: $("#controls").height(), width: $("#controls").width(), height: 1}, (img) => {
+    var source = new Image
+    source.src = img.toDataURL()
+    var img = $(source, { attr: { src: el.path }}).on('load', function(){
+      var palette = _getPalette(source)
+      color = palette[0]
+
+      // console.log(palette)
+      $("#controls, .titlebar, #back, #refresh, .ripple").css("background", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+      $("#controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons)").css("fill", pSCB(0.3, getContrast(color[0], color[1], color[2])))
+      $("#location").css("color", pSCB(0.3, getContrast(color[0], color[1], color[2])))
+      $("#add-tab").css("background-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
+      $(".ripple").data("ripple-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
+    });
+    $("body").append(img);
+  })
+
   setFavicon(webview, webview.getTitle(), webview.getURL());
   var selected = getCurrentWebview();
   //only update location if webview in focus
@@ -1608,6 +1628,97 @@ const removeUnusedMenuItems = menuTemplate => {
 			return !toDelete;
 		});
 };
+
+function pSCB (p,c0,c1,l) {
+  let r,g,b,P,f,t,h,i=parseInt,m=Math.round,a=typeof(c1)=="string";
+  if(typeof(p)!="number"||p<-1||p>1||typeof(c0)!="string"||(c0[0]!='r'&&c0[0]!='#')||(c1&&!a))return null;
+  if(!this.pSBCr)this.pSBCr=(d)=>{
+      let n=d.length,x={};
+      if(n>9){
+          [r,g,b,a]=d=d.split(","),n=d.length;
+          if(n<3||n>4)return null;
+          x.r=i(r[3]=="a"?r.slice(5):r.slice(4)),x.g=i(g),x.b=i(b),x.a=a?parseFloat(a):-1
+      }else{
+          if(n==8||n==6||n<4)return null;
+          if(n<6)d="#"+d[1]+d[1]+d[2]+d[2]+d[3]+d[3]+(n>4?d[4]+d[4]:"");
+          d=i(d.slice(1),16);
+          if(n==9||n==5)x.r=d>>24&255,x.g=d>>16&255,x.b=d>>8&255,x.a=m((d&255)/0.255)/1000;
+          else x.r=d>>16,x.g=d>>8&255,x.b=d&255,x.a=-1
+      }return x};
+  h=c0.length>9,h=a?c1.length>9?true:c1=="c"?!h:false:h,f=pSBCr(c0),P=p<0,t=c1&&c1!="c"?pSBCr(c1):P?{r:0,g:0,b:0,a:-1}:{r:255,g:255,b:255,a:-1},p=P?p*-1:p,P=1-p;
+  if(!f||!t)return null;
+  if(l)r=m(P*f.r+p*t.r),g=m(P*f.g+p*t.g),b=m(P*f.b+p*t.b);
+  else r=m((P*f.r**2+p*t.r**2)**0.5),g=m((P*f.g**2+p*t.g**2)**0.5),b=m((P*f.b**2+p*t.b**2)**0.5);
+  a=f.a,t=t.a,f=a>=0||t>=0,a=f?a<0?t:t<0?a:a*P+t*p:0;
+  if(h)return"rgb"+(f?"a(":"(")+r+","+g+","+b+(f?","+m(a*1000)/1000:"")+")";
+  else return"#"+(4294967296+r*16777216+g*65536+b*256+(f?m(a*255):0)).toString(16).slice(1,f?undefined:-2)
+}
+
+_getPalette = (image) => {
+  const canvas = document.createElement('canvas');
+  const size = 16;
+  const maxPaletteSize = 10;
+  const context = canvas.getContext('2d');
+  const pixelArray = []; // Contains arrays of [red, green, blue, freqency]
+  const palette = []; // Contains arrays of [red, green, blue]
+
+  canvas.width = size;
+  canvas.height = size;
+  context.imageSmoothingEnabled = false;
+  context.drawImage(image, 0, 0, size, size);
+
+  // Format is [r,g,b,a,r,g,b,a,...]
+  const pixels = context.getImageData(0, 0, size, size).data;
+
+  for (let i = 0; i < pixels.length / 4; i++) {
+      const offset = i * 4;
+      const red = pixels[offset];
+      const green = pixels[offset + 1];
+      const blue = pixels[offset + 2];
+      const alpha = pixels[offset + 3];
+      let matchIndex = undefined;
+
+      // Skip this pixel if transparent or too close to white
+      if (alpha === 0) {
+        continue;
+      }
+
+      // See if the color is already stored
+      for (let j = 0; j < pixelArray.length; j ++) {
+        if (red === pixelArray[j][0] &&
+            green === pixelArray[j][1] &&
+            blue === pixelArray[j][2]) {
+          matchIndex = j;
+          break;
+        }
+      }
+
+      // Add the color if it doesn't exist, otherwise increment frequency
+      if (matchIndex === undefined) {
+        pixelArray.push([red, green, blue, 1]);
+      } else {
+        pixelArray[matchIndex][3]++;
+      }
+  }
+
+  // Sort pixelArray by color frequency
+  pixelArray.sort(function(a, b) {
+    return b[3] - a[3];
+  });
+
+  // Fill array with [red, green, blue] values until maxPaletteSize or
+  // until there are no more colors, whichever happens first
+  for (let i = 0; i < Math.min(maxPaletteSize, pixelArray.length); i++) {
+    palette.push([pixelArray[i][0], pixelArray[i][1], pixelArray[i][2]]);
+  }
+
+  return palette;
+};
+
+function getContrast(r, g, b) {
+  var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+  return (yiq >= 128) ? '#000000' : '#ffffff';
+}
 
 // set svgs
 $('#navbarIcon').html(svgSearch);

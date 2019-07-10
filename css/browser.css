@@ -59,7 +59,7 @@ input {
   /*border-bottom: 3px solid #F3F6F8;*/
 }
 
-#ripple-container:before {
+/* #ripple-container:before {
   content: '';
   display: block;
   height: 3px;
@@ -83,7 +83,7 @@ input {
   z-index: 999;
   clear: both;
   transition: background-color .5s ease;
-}
+} */
 
 #add-tab-container:after {
   content: '';
@@ -115,12 +115,12 @@ input {
 }
 
 #back, #refresh, .titlebar-windows .control, .titlebar-mac, #add-tab-container {
-  border-bottom: 3px solid #F3F6F8;
+  /* border-bottom: 3px solid #F3F6F8; */
   transition: all .5s ease;
 }
 
 #back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
-  border-bottom: 3px solid #dedede;
+  /* border-bottom: 3px solid #dedede; */
 }
 
 .titlebar-windows .control.close:hover {
@@ -159,7 +159,7 @@ compared to the back/forward buttons */
   display: flex;
   align-items: center;
   justify-content: center;
-  border-left: 3px solid #F3F6F8;
+  /* border-left: 3px solid #F3F6F8; */
 }
 
 #navbarIcon svg{
@@ -350,7 +350,7 @@ webview.hidden {
   bottom: 0;
   left: 0;
   background: #efefef;
-  border: 1px solid #dedede;
+  /* border: 1px solid #dedede; */
   border-top-right-radius: 5px;
   font-size: 12px;
   padding: 2px 5px;
