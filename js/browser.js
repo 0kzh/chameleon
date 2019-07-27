@@ -211,11 +211,8 @@ $(".ripple, .titlebar").mousedown(function(e) {
     var mouseY;
 
     $(document).mousemove(function(event) {
-      console.log("mousemove")
       dragging = true;
       if (!snapped) {
-        console.log(event.screenX)
-        console.log(event.screenY)
         win.setBounds({
           width: winSize.width,
           height: winSize.height,
@@ -1115,7 +1112,7 @@ function handleLoadCommit(webview) {
       $("#add-tab").css("background-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
       $(".ripple").data("ripple-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
     });
-    $("body").append(img);
+    $(".hidden").append(img);
   })
 
   setFavicon(webview, webview.getTitle(), webview.getURL());

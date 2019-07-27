@@ -303,6 +303,10 @@ webview.hidden {
   /*border-right: 1px solid #DAD9DA;*/
 }
 
+.hidden {
+  display: none;
+}
+
 .ripple-effect{
   position: absolute;
   border-radius: 50%;
