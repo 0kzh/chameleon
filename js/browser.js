@@ -1,26 +1,42 @@
 const path = require('path');
 const unusedFilename = require('unused-filename');
-const { ipcRenderer, shell, screen, clipboard } = window.require('electron');
-const { dialog } = window.require('electron').remote;
+const {
+  ipcRenderer,
+  shell,
+  screen,
+  clipboard
+} = window.require('electron');
+const {
+  dialog
+} = window.require('electron').remote;
 const app = window.require('electron').remote.app;
 const searchInPage = require('electron-in-page-search').default;
 const fs = require('fs');
-const { Menu } = remote
+const {
+  Menu
+} = remote
 
 window.onresize = doLayout;
-var isLoading = false;
 var el = document.querySelector('.chrome-tabs');
 var chromeTabs = new ChromeTabs();
 var win = remote.getCurrentWindow();
 var dragging = false;
-var offsets = { x: 0, y: 0 };
-var winSize = { width: win.getSize()[0], height: win.getSize()[1] };
-const { width, height } = remote.screen.getPrimaryDisplay().workAreaSize;
+var offsets = {
+  x: 0,
+  y: 0
+};
+var winSize = {
+  width: win.getSize()[0],
+  height: win.getSize()[1]
+};
+const {
+  width,
+  height
+} = remote.screen.getPrimaryDisplay().workAreaSize;
 const bufferPixels = 5;
 var snapped = false;
 var counter = 0;
 var oobTimer;
-var color;
 var pendingRefreshOnConnect;
 var pendingReload = false;
 const downloadItemTemplate = `<div class="download-item">
@@ -43,35 +59,39 @@ const defaultSettings = {
 };
 let loadedSettings;
 
-//load settings
+// load settings
 settings.onLoad(loadSettings);
 
 addBorder();
 
-chromeTabs.init(el, { tabOverlapDistance: 14, minWidth: 45, maxWidth: 248 });
+chromeTabs.init(el, {
+  tabOverlapDistance: 14,
+  minWidth: 45,
+  maxWidth: 248
+});
 
 const preloadURL = remote.getGlobal('draggingTab').url
 
-  if (preloadURL) {
-    chromeTabs.addTab({
-      title: 'New Tab',
-      favicon: 'img/default-favicon.png',
-      url: preloadURL
-    });
-    $('.ripple-effect').remove();
-    $("#location").val(stripURL(preloadURL));
-    $("#location").prop('disabled', true);
-    $('#border-active').remove();
-    $('#border-match-width').remove();
-    remote.getGlobal('draggingTab').url = null;
-  } else {
-    // don't load page
-    chromeTabs.addTab({
-      title: 'New Tab',
-      favicon: 'img/default-favicon.png',
-      url: remote.getGlobal('draggingTab').url ? remote.getGlobal('draggingTab').url : null
-    });
-  }
+if (preloadURL) {
+  chromeTabs.addTab({
+    title: 'New Tab',
+    favicon: 'img/default-favicon.png',
+    url: preloadURL
+  });
+  $('.ripple-effect').remove();
+  $("#location").val(stripURL(preloadURL));
+  $("#location").prop('disabled', true);
+  $('#border-active').remove();
+  $('#border-match-width').remove();
+  remote.getGlobal('draggingTab').url = null;
+} else {
+  // don't load page
+  chromeTabs.addTab({
+    title: 'New Tab',
+    favicon: 'img/default-favicon.png',
+    url: remote.getGlobal('draggingTab').url ? remote.getGlobal('draggingTab').url : null
+  });
+}
 
 if ($(".download-item:not(.last)").length == 0) {
   $("#download-manager").hide();
@@ -94,32 +114,33 @@ if (document.getElementById('download-manager').addEventListener) {
   document.getElementById('download-manager').attachEvent("onmousewheel", scrollHorizontally);
 }
 
-document.querySelector('#location-form').onsubmit = function(e) {
+document.querySelector('#location-form').onsubmit = function (e) {
   e.preventDefault();
-  //special redirects
+  // special redirects
   navigateTo(document.querySelector('#location').value);
 };
 
-document.addEventListener("tabAdd", function(e) {
+document.addEventListener("tabAdd", function (e) {
   setupWebview(e.detail.tabId);
 });
 
-document.addEventListener("activeTabChange", function(e) {
+document.addEventListener("activeTabChange", function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
-  $('.ripple-effect').remove();
-  $("#location").prop('disabled', true);
-  $('#border-active').remove();
-  //TODO: check if webContents ready; using empty catch is bad practice
+  changeNavbarColor(false)
+  $('.ripple-effect').remove()
+  $("#location").prop('disabled', true)
+  $('#border-active').remove()
+
   try {
-    //if page loaded, set omnibar url
+    // if page loaded, set omnibar url
     console.log("tab change:" + stripURL(webview.getURL()));
     document.querySelector('#location').value = stripURL(webview.getURL());
   } catch (err) {
-    //no page loaded
+    // no page loaded
     document.querySelector('#location').value = stripURL("about:blank");
   }
 
-  //TODO: check if webContents ready; using empty catch is bad practice
+  // TODO: check if webContents ready; using empty catch is bad practice
   try {
     updateBackButton(webview);
   } catch (err) {
@@ -139,7 +160,12 @@ document.addEventListener("activeTabChange", function(e) {
   }
 });
 
-document.addEventListener("closeWindow", function(e) {
+document.addEventListener("openOmnibar", function (e) {
+  console.log("asdf")
+  $("#ripple-container").show()
+})
+
+document.addEventListener("closeWindow", function (e) {
   window.close();
 });
 
@@ -166,16 +192,16 @@ function unmaximizeWindow(fullscreen) {
   $(".icon-maximize").show();
 }
 
-//titlebar actions
-$(".titlebar-close, .close").click(function() {
+// titlebar actions
+$(".titlebar-close, .close").click(function () {
   win.close();
 });
 
-$(".titlebar-minimize, .minimize").click(function() {
+$(".titlebar-minimize, .minimize").click(function () {
   win.minimize();
 });
 
-$(".titlebar-fullscreen, .maximize").click(function() {
+$(".titlebar-fullscreen, .maximize").click(function () {
   if (win.isMaximized()) {
     unmaximizeWindow(true);
   } else {
@@ -183,7 +209,7 @@ $(".titlebar-fullscreen, .maximize").click(function() {
   }
 });
 
-$(".titlebar-mac").dblclick(function() {
+$(".titlebar-mac").dblclick(function () {
   if (win.isMaximized()) {
     unmaximizeWindow(true);
   } else {
@@ -191,10 +217,10 @@ $(".titlebar-mac").dblclick(function() {
   }
 });
 
-$(".ripple, .titlebar").mousedown(function(e) {
+$(".ripple, .titlebar").mousedown(function (e) {
   if ($(this).find(".ripple-effect").length == 0) {
     if (Math.abs(win.getSize()[0] - width) < bufferPixels || Math.abs(win.getSize()[1] - height) < bufferPixels) {
-      //if maximized, take percentage offset
+      // if maximized, take percentage offset
       offsets.x = Math.ceil(e.clientX * (winSize.width / width));
       offsets.y = Math.ceil(e.clientY * (winSize.height / height));
       $('#location').css("transition", "transform 0s");
@@ -210,7 +236,7 @@ $(".ripple, .titlebar").mousedown(function(e) {
     var mouseX;
     var mouseY;
 
-    $(document).mousemove(function(event) {
+    $(document).mousemove(function (event) {
       dragging = true;
       if (!snapped) {
         win.setBounds({
@@ -237,48 +263,48 @@ $(".ripple, .titlebar").mousedown(function(e) {
       }
     });
 
-    $(window).mouseup(function(event) {
-        $(document).unbind('mousemove');
-        $(document).unbind('mouseup');
-        dragging = false;
+    $(window).mouseup(function (event) {
+      $(document).unbind('mousemove');
+      $(document).unbind('mouseup');
+      dragging = false;
 
-        //implement custom window snapping
-        if (Math.abs(event.screenX - width) < bufferPixels) {
-          //right snap
-          win.setPosition(width / 2, 0);
-          win.setSize(width / 2, height);
-          snapped = true;
-        } else if (Math.abs(event.screenX - 0) < bufferPixels) {
-          //left snap
-          win.setPosition(0, 0);
-          win.setSize(width / 2, height);
-          snapped = true;
-        } else if (Math.abs(event.screenY - 0) < bufferPixels) {
-          //top snap
-          maximizeWindow(false);
-          snapped = true;
-          removeBorder();
-        }
-      });
+      // implement custom window snapping
+      if (Math.abs(event.screenX - width) < bufferPixels) {
+        // right snap
+        win.setPosition(width / 2, 0);
+        win.setSize(width / 2, height);
+        snapped = true;
+      } else if (Math.abs(event.screenX - 0) < bufferPixels) {
+        // left snap
+        win.setPosition(0, 0);
+        win.setSize(width / 2, height);
+        snapped = true;
+      } else if (Math.abs(event.screenY - 0) < bufferPixels) {
+        // top snap
+        maximizeWindow(false);
+        snapped = true;
+        removeBorder();
+      }
+    });
   }
 });
 
-$(".ripple").mouseup(function() {
+$(".ripple").mouseup(function () {
   selectNavbar(true, event);
 });
 
-$(document).mouseleave(function() {
+$(document).mouseleave(function () {
   $("#href-dest").hide();
 });
 
-$("#add-tab").click(function() {
+$("#add-tab").click(function () {
   chromeTabs.addTab({
     title: 'New Tab',
     favicon: 'img/default-favicon.png'
   });
 });
 
-$("#back").click(function() {
+$("#back").click(function () {
   var webview = getCurrentWebview();
   if (webview.canGoBack()) {
     webview.goBack();
@@ -286,14 +312,14 @@ $("#back").click(function() {
   }
 });
 
-$("#refresh").click(function() {
+$("#refresh").click(function () {
   getCurrentWebview().reload();
 });
 
-$(document).on("dragenter", function(e) {
+$(document).on("dragenter", function (e) {
   e.preventDefault();
   const windowID = remote.getCurrentWindow().id
-  let status = remote.getGlobal('draggingTab').status
+  const status = remote.getGlobal('draggingTab').status
   console.log("enter:" + status)
   // if a tab is being dragged to a different window and a new tab isn't created yet
   console.log(windowID != remote.getGlobal('draggingTab').originWindowID)
@@ -326,7 +352,7 @@ $(document).on("dragenter", function(e) {
       }, 100)
     }
   } else {
-    if (status == "exited") {
+    if (status === "exited") {
       remote.getGlobal('draggingTab').status = "dragging"
     }
   }
@@ -335,20 +361,22 @@ $(document).on("dragenter", function(e) {
   $(this).addClass('in-bounds');
 
   // mouse re-entered
-  if (counter == 1) {
-    $(".is-dragging").animate({ top: 0 }, "fast")
+  if (counter === 1) {
+    $(".is-dragging").animate({
+      top: 0
+    }, "fast")
     // remote.getGlobal('draggingTab').status = "returned"
   }
 })
 
-$(document).on("dragleave", function(e) {
+$(document).on("dragleave", function (e) {
   counter--;
-  
+
   clearInterval(oobTimer)
   oobTimer = setTimeout(() => {
     if (counter == 0 && !isMouseInWindow()) {
       // drag tab to new window
-      let status = remote.getGlobal('draggingTab').status;
+      const status = remote.getGlobal('draggingTab').status;
       if (status == "entered") {
         ipcRenderer.send('broadcast', 'removetab');
       }
@@ -358,15 +386,17 @@ $(document).on("dragleave", function(e) {
       remote.getGlobal('draggingTab').title = getCurrentWebview().getTitle();
       remote.getGlobal('draggingTab').favicon = "https://www.google.com/s2/favicons?domain=" + stripURL(getCurrentWebview().getURL());
       $(this).removeClass('in-bounds');
-      $(".is-dragging").animate({ top: -50 }, "fast")
+      $(".is-dragging").animate({
+        top: -50
+      }, "fast")
     }
   }, 100)
 });
 
-$(window).on("dragend", function() {
+$(window).on("dragend", function () {
 
   const status = remote.getGlobal('draggingTab').status
-  
+
 
   if (status == "entered" || status == "exited") {
     const options = {
@@ -378,7 +408,7 @@ $(window).on("dragend", function() {
       checkboxLabel: 'Do not show this message again',
       checkboxChecked: false,
     };
-    
+
     settings.get('tabMoveConfirmation', (shouldShow) => {
       if (pendingReload || shouldShow == false) {
         if (status == "exited") {
@@ -386,12 +416,14 @@ $(window).on("dragend", function() {
         } else if (status == "entered") {
           ipcRenderer.send('broadcast', 'dragend');
         }
-    
+
         chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
       } else {
         dialog.showMessageBox(null, options, (response, checkboxChecked) => {
           if (response == 0) {
-            $(".chrome-tab-current").animate({ top: 0 }, "fast")
+            $(".chrome-tab-current").animate({
+              top: 0
+            }, "fast")
             if (status == "entered") {
               ipcRenderer.send('broadcast', 'removetab');
             }
@@ -401,10 +433,10 @@ $(window).on("dragend", function() {
             } else if (status == "entered") {
               ipcRenderer.send('broadcast', 'dragend');
             }
-    
+
             chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
           }
-          
+
           if (response == 1 && checkboxChecked) {
             // save response
             settings.set('tabMoveConfirmation', false);
@@ -428,16 +460,22 @@ function setupWebview(webviewId) {
   var webview = document.querySelector('webview[tab-id="' + webviewId + '"]');
 
   webview.addEventListener('close', handleExit);
-  webview.addEventListener('did-start-loading', function(e) { handleLoadStart(e, webview) });
+  webview.addEventListener('did-start-loading', function (e) {
+    handleLoadStart(e, webview)
+  });
   webview.addEventListener('did-stop-loading', handleLoadStop);
   webview.addEventListener('did-fail-load', handleLoadError);
   webview.addEventListener('did-get-redirect-request', handleLoadRedirect);
-  webview.addEventListener('did-finish-load', function() { handleLoadCommit(webview) });
-  webview.addEventListener('page-title-updated', function(e) { handleTitleUpdate(e, webview) }); //this is when the DOM becomes visible
+  webview.addEventListener('did-finish-load', function () {
+    handleLoadCommit(webview)
+  });
+  webview.addEventListener('page-title-updated', function (e) {
+    handleTitleUpdate(e, webview)
+  }); // this is when the DOM becomes visible
   webview.addEventListener('enter-html-full-screen', handleEnterHTMLFullscreen);
   webview.addEventListener('leave-html-full-screen', handleLeaveHTMLFullscreen);
   webview.addEventListener('new-window', (e) => {
-    //get current tab index
+    // get current tab index
     var i = $('.chrome-tabs .chrome-tab-current').index();
 
     const protocol = require('url').parse(e.url).protocol
@@ -476,10 +514,12 @@ function setupWebview(webviewId) {
         $("#navbarIcon").css("opacity", "0");
       }
       $('#border-active').remove();
+      $('#ripple-container').hide()
+      $('body').off('click', '.chrome-tab')
       // if ($("#add-tab").hasClass("no-border")) {
       //     $(".ripple").css("border-right", "1px solid transparent");
       // }
-    } else if (e.channel == "mousemove" || e.channel == "dragover" || e.channel == "mouseup" || e.channel == "dragend" || e.channel == "dragenter" || e.channel == "dragleave") { 
+    } else if (e.channel == "mousemove" || e.channel == "dragover" || e.channel == "mouseup" || e.channel == "dragend" || e.channel == "dragenter" || e.channel == "dragleave") {
       if (e.channel == "mousemove") {
         e.args[0] = e.args[0] + win.getBounds().x;
         e.args[1] = e.args[1] + win.getBounds().y + $("#controls").height();
@@ -535,7 +575,7 @@ function setupWebview(webviewId) {
           enabled: cutpaste,
           visible: cutpaste,
           click(menuItem) {
-            let clipboardContent = clipboard.readText();
+            const clipboardContent = clipboard.readText();
             webview.insertText(clipboardContent);
           }
         }),
@@ -547,7 +587,9 @@ function setupWebview(webviewId) {
             webview.inspectElement(point.x, point.y);
           }
         }),
-        separator: () => ({type: 'separator'}),
+        separator: () => ({
+          type: 'separator'
+        }),
         saveImage: decorateMenuItem({
           id: 'save',
           label: 'Save Image',
@@ -642,7 +684,13 @@ function setupWebview(webviewId) {
     } else if (e.channel == "show-reader") {
       navigateTo("file://" + app.getAppPath() + "\\pages\\reader\\reader.html");
       const article = e.args[0];
-      db.articles.add({ title: article.title, byline: article.byline, content: article.content, length: article.length, url: getCurrentWebview().getURL() });
+      db.articles.add({
+        title: article.title,
+        byline: article.byline,
+        content: article.content,
+        length: article.length,
+        url: getCurrentWebview().getURL()
+      });
     } else if (e.channel == "show-back-arrow") {
       const percent = e.args[0];
       $("#back-indicator").css("display", "block");
@@ -650,7 +698,7 @@ function setupWebview(webviewId) {
     } else if (e.channel == "show-forward-arrow") {
       const percent = e.args[0];
       $("#forward-indicator").css("display", "block");
-      $("#forward-indicator").css("transform", "translateY(-50%) translateX(" + - (percent - 100) + "%)");
+      $("#forward-indicator").css("transform", "translateY(-50%) translateX(" + -(percent - 100) + "%)");
     } else if (e.channel == "go-back") {
       if (webview.canGoBack()) {
         webview.goBack();
@@ -679,8 +727,8 @@ function setupWebview(webviewId) {
   window.addEventListener('keydown', handleKeyDown);
 
   // Test for the presence of the experimental <webview> zoom and find APIs.
-  if (typeof(webview.setZoom) == "function" &&
-    typeof(webview.find) == "function") {
+  if (typeof (webview.setZoom) === "function" &&
+    typeof (webview.find) === "function") {
     var findMatchCase = false;
 
     // document.querySelector('#find-text').oninput = function(e) {
@@ -720,14 +768,14 @@ function setupWebview(webviewId) {
   }
 }
 
-onload = function() {
+onload = function () {
   setupWebview(0);
   doLayout();
 };
 
 function navigateTo(url) {
   resetExitedState();
-  //select current visible webview
+  // select current visible webview
   var webview = getCurrentWebview();
   webview.src = processURL(url);
 
@@ -750,17 +798,17 @@ function processURL(url) {
   var ipAddress = new RegExp(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]{1,4})?$/);
   var processedURL;
   if (ipAddress.test(url)) {
-    //if ip address, add port if necessary
+    // if ip address, add port if necessary
     if (!url.includes(":")) {
-      //add default port
+      // add default port
       processedURL += ":80";
     }
   }
 
-  if(url.startsWith("about://")) {
+  if (url.startsWith("about://")) {
     var target = url.split("about://")[1];
     console.log(target);
-    switch(target) {
+    switch (target) {
       case "settings":
         processedURL = app.getAppPath() + "\\pages\\settings\\settings.html";
         break;
@@ -783,7 +831,7 @@ function processURL(url) {
 
 function doLayout() {
 
-  document.querySelectorAll("webview").forEach(function(webview) {
+  document.querySelectorAll("webview").forEach(function (webview) {
     var controls = document.querySelector('#controls');
     var controlsHeight = controls.offsetHeight;
     var windowWidth = document.documentElement.clientWidth;
@@ -824,7 +872,7 @@ function resetExitedState() {
   document.body.classList.remove('killed');
 }
 
-ipcRenderer.on('shortcut', function(event, data) {
+ipcRenderer.on('shortcut', function (event, data) {
   if (data.action == "closeTab") {
     chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
     if ($('#location').val() != "") {
@@ -838,7 +886,7 @@ ipcRenderer.on('shortcut', function(event, data) {
       // }
     }
   } else if (data.action == "reloadPage") {
-    //TODO: check if webContents ready; using empty catch is bad practice
+    // TODO: check if webContents ready; using empty catch is bad practice
     try {
       getCurrentWebview().reload();
     } catch (exp) {
@@ -851,10 +899,10 @@ ipcRenderer.on('shortcut', function(event, data) {
     });
     // selectNavbar(false, null);
   } else if (data.action == "toggleDevTools") {
-    //get current webview
+    // get current webview
     getCurrentWebview().openDevTools();
   } else if (data.action == "savePage") {
-    //if pdf, download
+    // if pdf, download
     if (getCurrentWebview().getURL().endsWith(".pdf")) {
       const url = getCurrentWebview().getURL().replace("chrome://pdf-viewer/index.html?src=", "");
       getCurrentWebview().getWebContents().downloadURL(url);
@@ -863,12 +911,12 @@ ipcRenderer.on('shortcut', function(event, data) {
 
     var savePath = dialog.showSaveDialog(remote.getCurrentWindow(), {});
     if (savePath) {
-      //null if cancelled
+      // null if cancelled
       if (!savePath.endsWith('.html')) {
         savePath = savePath + '.html'
       }
 
-      getCurrentWebview().getWebContents().savePage(savePath, 'HTMLComplete', function() {});
+      getCurrentWebview().getWebContents().savePage(savePath, 'HTMLComplete', function () {});
     }
   } else if (data.action == "newWindow") {
     ipcRenderer.send('open-window', false);
@@ -881,7 +929,7 @@ ipcRenderer.on('shortcut', function(event, data) {
   }
 });
 
-ipcRenderer.on('dragend', function(event, data) {
+ipcRenderer.on('dragend', function (event, data) {
   // trigger dragend on all windows except origin
   if (remote.getCurrentWindow().id != remote.getGlobal('draggingTab').originWindowID) {
     var event = new MouseEvent("dragend", {
@@ -900,7 +948,7 @@ ipcRenderer.on('dragend', function(event, data) {
   }
 });
 
-ipcRenderer.on('removetab', function(event, data) {
+ipcRenderer.on('removetab', function (event, data) {
   if (remote.getCurrentWindow().id == remote.getGlobal('draggingTab').createdTab) {
     $(window).unbind('dragover');
     chromeTabs.removeTab(document.querySelector('.chrome-tab-current'));
@@ -928,7 +976,7 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
   $("#download-manager").prepend(downloadItem);
   downloadState = "started";
 
-  //show download bar
+  // show download bar
   $("#download-manager").show();
 
   item.on('updated', (event, state) => {
@@ -936,7 +984,7 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
       downloadItem.find(".download-details").html("Waiting for network");
       downloadState = "interrupted";
     } else if (state === 'progressing') {
-      //TODO: check if object is destroyed; using empty catch is bad practice
+      // TODO: check if object is destroyed; using empty catch is bad practice
       try {
         if (item.isPaused()) {
           downloadItem.find(".download-details").html("Paused");
@@ -959,10 +1007,12 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
     } else {
       if (state == "cancelled") {
         downloadItem.find(".download-details").html("Cancelled");
-        //delete file if still exists
-        setTimeout(function() {
+        // delete file if still exists
+        setTimeout(function () {
           if (fs.existsSync(filePath)) {
-            fs.unlink(filePath, (err) => { if (err) throw err; });
+            fs.unlink(filePath, (err) => {
+              if (err) throw err;
+            });
           }
         }, 10000);
       } else {
@@ -972,7 +1022,7 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
     }
   });
 
-  downloadItem.find(".download-content").click(function() {
+  downloadItem.find(".download-content").click(function () {
     if (downloadState == "downloading") {
       item.pause();
     } else if (downloadState == "paused") {
@@ -982,7 +1032,7 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
     }
   });
 
-  downloadItem.find(".download-close").click(function() {
+  downloadItem.find(".download-close").click(function () {
     if (downloadState == "downloading" || downloadState == "paused") {
       item.pause();
       var choice = dialog.showMessageBox(win, {
@@ -1000,20 +1050,20 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
       }
     }
 
-    //remove item from downloads bar
+    // remove item from downloads bar
     downloadItem.remove();
-    //hide downloads bar
+    // hide downloads bar
     if ($(".download-item").length == 1) {
       $("#download-manager").hide();
     }
   });
 
-  downloadItem.find(".download-folder").click(function() {
+  downloadItem.find(".download-folder").click(function () {
     shell.showItemInFolder(filePath);
   });
 });
 
-$(".close-download").click(function() {
+$(".close-download").click(function () {
   $("#download-manager").hide();
 });
 
@@ -1021,22 +1071,22 @@ function handleKeyDown(event) {
   if (event.keyCode == 27) {
     if (win.isFullScreen()) {
       win.setFullScreen(false);
-      //TODO: check if webContents ready; using empty catch is bad practice
+      // TODO: check if webContents ready; using empty catch is bad practice
       try {
-        //inject javascript to exit fullscreen
+        // inject javascript to exit fullscreen
         var id = el.querySelector('.chrome-tab-current').getAttribute("tab-id");
         var webview = document.querySelector('webview[tab-id="' + id + '"]');
         webview.executeJavaScript("document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?document.webkitExitFullscreen():document.mozCancelFullScreen?document.mozCancelFullScreen():document.msExitFullscreen&&document.msExitFullscreen();");
       } catch (err) {
-        //no page loaded
+        // no page loaded
       }
       return;
     } else {
-      //if navbar selected, deselect
+      // if navbar selected, deselect
       var selected = getCurrentWebview();
       $('.ripple-effect').remove();
       if ($(".ripple").find(".ripple-effect").length == 0) {
-        //TODO: check if webContents ready; using empty catch is bad practice
+        // TODO: check if webContents ready; using empty catch is bad practice
         try {
           console.log("title update:" + stripURL(selected.getURL()));
           document.querySelector('#location').value = stripURL(selected.getURL());
@@ -1073,7 +1123,7 @@ function handleKeyDown(event) {
         break;
 
         // Ctrl + Y
-      case 89: //87 for W
+      case 89: // 87 for W
         event.preventDefault();
         chromeTabs.removeTab(el.querySelector('.chrome-tab-current'));
         break;
@@ -1096,28 +1146,11 @@ function handleKeyDown(event) {
 
 function handleLoadCommit(webview) {
   resetExitedState();
-  // capture page and extract first line of pixels
-  // page contents start at navbar height
-  remote.getCurrentWebContents().capturePage({x: 0, y: $("#controls").height(), width: $("#controls").width(), height: 1}, (img) => {
-    var source = new Image
-    source.src = img.toDataURL()
-    var img = $(source, { attr: { src: el.path }}).on('load', function(){
-      var palette = _getPalette(source)
-      color = palette[0]
-
-      // console.log(palette)
-      $("#controls, .titlebar, #back, #refresh, .ripple").css("background", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-      $("#controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons)").css("fill", pSCB(0.3, getContrast(color[0], color[1], color[2])))
-      $("#location").css("color", pSCB(0.3, getContrast(color[0], color[1], color[2])))
-      $("#add-tab").css("background-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
-      $(".ripple").data("ripple-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
-    });
-    $(".hidden").append(img);
-  })
+  changeNavbarColor(true);
 
   setFavicon(webview, webview.getTitle(), webview.getURL());
   var selected = getCurrentWebview();
-  //only update location if webview in focus
+  // only update location if webview in focus
   if ($(".ripple").find(".ripple-effect").length == 0 && selected == webview) {
     console.log("finish load:" + stripURL(webview.getURL()));
     document.querySelector('#location').value = stripURL(webview.getURL());
@@ -1131,15 +1164,21 @@ function handleLoadCommit(webview) {
   }
   updateBackButton(webview);
 
-  //update history
-  //check if exists; if true, get numVisits
+  // update history
+  // check if exists; if true, get numVisits
   const protocol = require('url').parse(webview.getURL()).protocol;
   if (protocol == "https:" || protocol == "http:") {
     var fav = "https://www.google.com/s2/favicons?domain=" + stripURL(webview.getURL());
-    db.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function(site) {
+    db.sites.where("url").equalsIgnoreCase(webview.getURL()).first().then(function (site) {
       if (site == null) {
-        //doesn't exist, so add
-        db.sites.add({ url: webview.getURL(), favicon: fav, title: webview.getTitle(), lastVisit: Date.now(), numVisits: 1 });
+        // doesn't exist, so add
+        db.sites.add({
+          url: webview.getURL(),
+          favicon: fav,
+          title: webview.getTitle(),
+          lastVisit: Date.now(),
+          numVisits: 1
+        });
       } else {
         db.sites.where("url").equalsIgnoreCase(webview.getURL()).modify({
           url: webview.getURL(),
@@ -1170,16 +1209,59 @@ function handleLoadStart(event, webview) {
   isLoading = true;
   resetExitedState();
   if (!event.isTopLevel) {
-    return;
+    
   }
 }
 
+function changeNavbarColor(pageLoaded) {
+  var webview = getCurrentWebview()
+  console.log(webview.getAttribute("tab-id"))
+
+  if (webview.hasAttribute("color")) {
+    // extract color array from rgb string
+    var color = webview.getAttribute("color").match(/\d+/g);
+    setColor(color);
+  } else if (pageLoaded) {
+    // capture page and extract first line of pixels
+    // page contents start at navbar height
+    remote.getCurrentWebContents().capturePage({
+      x: 0,
+      y: $("#chrome").height() + 1,
+      width: $("#controls").width(),
+      height: 100
+    }, (img) => {
+      var source = new Image
+      source.src = img.toDataURL()
+      console.log(source.src)
+      var img = $(source, {
+        attr: {
+          src: el.path
+        }
+      }).on('load', function () {
+        var palette = _getPalette(source)
+        color = palette[0]
+        setColor(color);
+        webview.setAttribute("color", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+      });
+      $(".hidden").append(img);
+    })
+  }
+}
+
+function setColor(color) {
+  $("#controls, .titlebar, #back, #refresh, .ripple").css("background", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  $("#controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons)").css("fill", pSCB(0.3, getContrast(color[0], color[1], color[2])))
+  $("#location").css("color", pSCB(0.3, getContrast(color[0], color[1], color[2])))
+  $("#add-tab").css("background-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
+  $(".ripple").data("ripple-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
+}
+
 function updateNavbarIcon() {
-  //update icon if https
+  // update icon if https
   const protocol = require('url').parse(getCurrentWebview().getURL()).protocol
   if (protocol === 'https:') {
     $('#navbarIcon').html(httpsSecure);
-  } else if (protocol === 'http:'){
+  } else if (protocol === 'http:') {
     $('#navbarIcon').html(notSecure);
   } else {
     $('#navbarIcon').html(svgSearch);
@@ -1191,7 +1273,7 @@ function handleTitleUpdate(event, webview) {
   updateNavbarIcon();
 
   var selected = getCurrentWebview();
-  //only update location if webview in focus
+  // only update location if webview in focus
   if ($(".ripple").find(".ripple-effect").length == 0 && selected == webview) {
     console.log("title update:" + stripURL(webview.getURL()));
     document.querySelector('#location').value = stripURL(webview.getURL());
@@ -1260,7 +1342,7 @@ function handleLoadError(event) {
       }
       $('#border-active').remove();
     });
-  
+
     if (errorCodes[event.errorCode].retryOnReconnect) {
       pendingRefreshOnConnect = true;
     }
@@ -1276,7 +1358,7 @@ function handleLoadRedirect(event) {
 }
 
 function handleEnterHTMLFullscreen() {
-  //hide toolbar
+  // hide toolbar
   $("#controls").css("display", "none");
   $("#tab-bar").css("display", "none");
   $("#download-manager").css("display", "none");
@@ -1290,7 +1372,7 @@ function handleLeaveHTMLFullscreen() {
     $("#tab-bar").css("display", "");
   }
 
-  //todo: if not closed, show downloads
+  // todo: if not closed, show downloads
   $("#download-manager").css("display", "")
 }
 
@@ -1308,15 +1390,21 @@ function getNextPresetZoom(zoomFactor) {
     } else if (preset[mid] > zoomFactor) {
       high = mid;
     } else {
-      return { low: preset[mid - 1], high: preset[mid + 1] };
+      return {
+        low: preset[mid - 1],
+        high: preset[mid + 1]
+      };
     }
   }
-  return { low: preset[low], high: preset[high] };
+  return {
+    low: preset[low],
+    high: preset[high]
+  };
 }
 
 function increaseZoom() {
   var webview = document.querySelector('webview');
-  webview.getZoom(function(zoomFactor) {
+  webview.getZoom(function (zoomFactor) {
     var nextHigherZoom = getNextPresetZoom(zoomFactor).high;
     webview.setZoom(nextHigherZoom);
   });
@@ -1324,20 +1412,20 @@ function increaseZoom() {
 
 function decreaseZoom() {
   var webview = document.querySelector('webview');
-  webview.getZoom(function(zoomFactor) {
+  webview.getZoom(function (zoomFactor) {
     var nextLowerZoom = getNextPresetZoom(zoomFactor).low;
     webview.setZoom(nextLowerZoom);
   });
 }
 
 function loadSettings() {
-  //if required, set default settings
+  // if required, set default settings
   setDefaultSettings();
   loadedSettings = settings.list;
 
   settings.get('downloadsDirectory', (value) => {
     if (value == '') {
-      //if not set, set to default downloads folder
+      // if not set, set to default downloads folder
       settings.set('downloadsDirectory', app.getPath('downloads'));
     }
     const dir = (value != "") ? value : app.getPath('downloads');
@@ -1358,7 +1446,7 @@ function loadSettings() {
   });
 
   settings.get('controlsStyle', (value) => {
-    switch(value) {
+    switch (value) {
       case "mac":
         $(".titlebar-windows").hide();
         $(".titlebar-mac").show();
@@ -1376,6 +1464,7 @@ function loadSettings() {
           $(".titlebar-mac").show();
         }
     }
+    chromeTabs.layoutTabs();
   });
 
   doLayout();
@@ -1399,14 +1488,17 @@ function setFavicon(webview, title, url) {
     fav = "img/default-favicon.png";
   }
 
-  var tabProperties = { title: title, favicon: fav };
+  var tabProperties = {
+    title: title,
+    favicon: fav
+  };
   var id = webview.getAttribute("tab-id");
   chromeTabs.updateTab(el.querySelector('.chrome-tab[tab-id="' + id + '"]'), tabProperties);
 }
 
 function extractHostname(url) {
   var hostname;
-  //find & remove protocol (http, ftp, etc.) and get hostname
+  // find & remove protocol (http, ftp, etc.) and get hostname
 
   if (url.indexOf("://") > -1) {
     hostname = url.split('/')[2];
@@ -1414,9 +1506,9 @@ function extractHostname(url) {
     hostname = url.split('/')[0];
   }
 
-  //find & remove port number
+  // find & remove port number
   hostname = hostname.split(':')[0];
-  //find & remove "?"
+  // find & remove "?"
   hostname = hostname.split('?')[0];
 
   return hostname;
@@ -1436,31 +1528,31 @@ function stripURL(url) {
     $(getCurrentWebview()).css('background', '');
   }
 
-  //if ip address, don't strip
+  // if ip address, don't strip
   var ipAddress = new RegExp(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]{1,4})?$/);
   if (ipAddress.test(extractHostname(url))) {
     return extractHostname(url);
   }
 
-  //if pdf or file, leave file name
+  // if pdf or file, leave file name
   if (url.startsWith("chrome://pdf-viewer/index.html?src=") || url.startsWith("file:///")) {
     return decodeURI(url.split("/")[url.split("/").length - 1]);
   }
 
-  //if search, leave search term
+  // if search, leave search term
 
 
-  var domain = extractHostname(url),
-    splitArr = domain.split('.'),
-    arrLen = splitArr.length;
+  var domain = extractHostname(url);
+    var splitArr = domain.split('.');
+    var arrLen = splitArr.length;
 
-  //extracting the root domain here
-  //if there is a subdomain
+  // extracting the root domain here
+  // if there is a subdomain
   if (arrLen > 2) {
     domain = splitArr[arrLen - 2] + '.' + splitArr[arrLen - 1];
-    //check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
+    // check to see if it's using a Country Code Top Level Domain (ccTLD) (i.e. ".me.uk")
     if (splitArr[arrLen - 2].length == 2 && splitArr[arrLen - 1].length == 2) {
-      //this is using a ccTLD
+      // this is using a ccTLD
       domain = splitArr[arrLen - 3] + '.' + domain;
     }
   }
@@ -1509,7 +1601,7 @@ function addBorder() {
   }
 }
 
-$.fn.textWidth = function(text, font) {
+$.fn.textWidth = function (text, font) {
   if (!$.fn.textWidth.fakeEl) $.fn.textWidth.fakeEl = $('<span>').hide().appendTo(document.body);
   $.fn.textWidth.fakeEl.text(text || this.val() || this.text()).css('font', font || this.css('font'));
   return $.fn.textWidth.fakeEl.width();
@@ -1541,7 +1633,10 @@ function selectNavbar(animate, event) {
     $ripple.css("width", $(this).height());
 
     if (!animate) {
-      $div.css({ animation: "ripple-animation 0s", animationFillMode: "forwards" });
+      $div.css({
+        animation: "ripple-animation 0s",
+        animationFillMode: "forwards"
+      });
     }
 
     $div.css({
@@ -1571,10 +1666,10 @@ function selectNavbar(animate, event) {
 
 function formatBytes(bytes, decimals) {
   if (bytes == 0) return '0 Bytes';
-  var k = 1024,
-    dm = decimals || 2,
-    sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'],
-    i = Math.floor(Math.log(bytes) / Math.log(k));
+  var k = 1024;
+    var dm = decimals || 2;
+    var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+    var i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
@@ -1601,54 +1696,72 @@ function getClientPos() {
   const cursorPos = screen.getCursorScreenPoint()
   const cursorX = cursorPos.x
   const cursorY = cursorPos.y
-  return { x: cursorX - window.screenX, y: cursorY - window.screenY }
+  return {
+    x: cursorX - window.screenX,
+    y: cursorY - window.screenY
+  }
 }
 
 const decorateMenuItem = menuItem => {
-	return (options = {}) => {
-		if (options.transform && !options.click) {
-			menuItem.transform = options.transform;
-		}
+  return (options = {}) => {
+    if (options.transform && !options.click) {
+      menuItem.transform = options.transform;
+    }
 
-		return menuItem;
-	};
+    return menuItem;
+  };
 };
 
 const removeUnusedMenuItems = menuTemplate => {
-	let notDeletedPreviousElement;
+  let notDeletedPreviousElement;
 
-	return menuTemplate
-		.filter(menuItem => menuItem !== undefined && menuItem.visible !== false)
-		.filter((menuItem, index, array) => {
-			const toDelete = menuItem.type === 'separator' && (!notDeletedPreviousElement || index === array.length - 1 || array[index + 1].type === 'separator');
-			notDeletedPreviousElement = toDelete ? notDeletedPreviousElement : menuItem;
-			return !toDelete;
-		});
+  return menuTemplate
+    .filter(menuItem => menuItem !== undefined && menuItem.visible !== false)
+    .filter((menuItem, index, array) => {
+      const toDelete = menuItem.type === 'separator' && (!notDeletedPreviousElement || index === array.length - 1 || array[index + 1].type === 'separator');
+      notDeletedPreviousElement = toDelete ? notDeletedPreviousElement : menuItem;
+      return !toDelete;
+    });
 };
 
-function pSCB (p,c0,c1,l) {
-  let r,g,b,P,f,t,h,i=parseInt,m=Math.round,a=typeof(c1)=="string";
-  if(typeof(p)!="number"||p<-1||p>1||typeof(c0)!="string"||(c0[0]!='r'&&c0[0]!='#')||(c1&&!a))return null;
-  if(!this.pSBCr)this.pSBCr=(d)=>{
-      let n=d.length,x={};
-      if(n>9){
-          [r,g,b,a]=d=d.split(","),n=d.length;
-          if(n<3||n>4)return null;
-          x.r=i(r[3]=="a"?r.slice(5):r.slice(4)),x.g=i(g),x.b=i(b),x.a=a?parseFloat(a):-1
-      }else{
-          if(n==8||n==6||n<4)return null;
-          if(n<6)d="#"+d[1]+d[1]+d[2]+d[2]+d[3]+d[3]+(n>4?d[4]+d[4]:"");
-          d=i(d.slice(1),16);
-          if(n==9||n==5)x.r=d>>24&255,x.g=d>>16&255,x.b=d>>8&255,x.a=m((d&255)/0.255)/1000;
-          else x.r=d>>16,x.g=d>>8&255,x.b=d&255,x.a=-1
-      }return x};
-  h=c0.length>9,h=a?c1.length>9?true:c1=="c"?!h:false:h,f=pSBCr(c0),P=p<0,t=c1&&c1!="c"?pSBCr(c1):P?{r:0,g:0,b:0,a:-1}:{r:255,g:255,b:255,a:-1},p=P?p*-1:p,P=1-p;
-  if(!f||!t)return null;
-  if(l)r=m(P*f.r+p*t.r),g=m(P*f.g+p*t.g),b=m(P*f.b+p*t.b);
-  else r=m((P*f.r**2+p*t.r**2)**0.5),g=m((P*f.g**2+p*t.g**2)**0.5),b=m((P*f.b**2+p*t.b**2)**0.5);
-  a=f.a,t=t.a,f=a>=0||t>=0,a=f?a<0?t:t<0?a:a*P+t*p:0;
-  if(h)return"rgb"+(f?"a(":"(")+r+","+g+","+b+(f?","+m(a*1000)/1000:"")+")";
-  else return"#"+(4294967296+r*16777216+g*65536+b*256+(f?m(a*255):0)).toString(16).slice(1,f?undefined:-2)
+function pSCB(p, c0, c1, l) {
+  let r; let g; let b; let P; let f; let t; let h; const i = parseInt;
+    const m = Math.round;
+    let a = typeof (c1) === "string";
+  if (typeof (p) !== "number" || p < -1 || p > 1 || typeof (c0) !== "string" || (c0[0] != 'r' && c0[0] != '#') || (c1 && !a)) return null;
+  if (!this.pSBCr) this.pSBCr = (d) => {
+    let n = d.length;
+      const x = {};
+    if (n > 9) {
+      [r, g, b, a] = d = d.split(","), n = d.length;
+      if (n < 3 || n > 4) return null;
+      x.r = i(r[3] == "a" ? r.slice(5) : r.slice(4)), x.g = i(g), x.b = i(b), x.a = a ? parseFloat(a) : -1
+    } else {
+      if (n == 8 || n == 6 || n < 4) return null;
+      if (n < 6) d = "#" + d[1] + d[1] + d[2] + d[2] + d[3] + d[3] + (n > 4 ? d[4] + d[4] : "");
+      d = i(d.slice(1), 16);
+      if (n == 9 || n == 5) x.r = d >> 24 & 255, x.g = d >> 16 & 255, x.b = d >> 8 & 255, x.a = m((d & 255) / 0.255) / 1000;
+      else x.r = d >> 16, x.g = d >> 8 & 255, x.b = d & 255, x.a = -1
+    }
+    return x
+  };
+  h = c0.length > 9, h = a ? c1.length > 9 ? true : c1 == "c" ? !h : false : h, f = pSBCr(c0), P = p < 0, t = c1 && c1 != "c" ? pSBCr(c1) : P ? {
+    r: 0,
+    g: 0,
+    b: 0,
+    a: -1
+  } : {
+    r: 255,
+    g: 255,
+    b: 255,
+    a: -1
+  }, p = P ? p * -1 : p, P = 1 - p;
+  if (!f || !t) return null;
+  if (l) r = m(P * f.r + p * t.r), g = m(P * f.g + p * t.g), b = m(P * f.b + p * t.b);
+  else r = m((P * f.r ** 2 + p * t.r ** 2) ** 0.5), g = m((P * f.g ** 2 + p * t.g ** 2) ** 0.5), b = m((P * f.b ** 2 + p * t.b ** 2) ** 0.5);
+  a = f.a, t = t.a, f = a >= 0 || t >= 0, a = f ? a < 0 ? t : t < 0 ? a : a * P + t * p : 0;
+  if (h) return "rgb" + (f ? "a(" : "(") + r + "," + g + "," + b + (f ? "," + m(a * 1000) / 1000 : "") + ")";
+  else return "#" + (4294967296 + r * 16777216 + g * 65536 + b * 256 + (f ? m(a * 255) : 0)).toString(16).slice(1, f ? undefined : -2)
 }
 
 _getPalette = (image) => {
@@ -1668,38 +1781,38 @@ _getPalette = (image) => {
   const pixels = context.getImageData(0, 0, size, size).data;
 
   for (let i = 0; i < pixels.length / 4; i++) {
-      const offset = i * 4;
-      const red = pixels[offset];
-      const green = pixels[offset + 1];
-      const blue = pixels[offset + 2];
-      const alpha = pixels[offset + 3];
-      let matchIndex = undefined;
+    const offset = i * 4;
+    const red = pixels[offset];
+    const green = pixels[offset + 1];
+    const blue = pixels[offset + 2];
+    const alpha = pixels[offset + 3];
+    let matchIndex;
 
-      // Skip this pixel if transparent or too close to white
-      if (alpha === 0) {
-        continue;
-      }
+    // Skip this pixel if transparent or too close to white
+    if (alpha === 0) {
+      continue;
+    }
 
-      // See if the color is already stored
-      for (let j = 0; j < pixelArray.length; j ++) {
-        if (red === pixelArray[j][0] &&
-            green === pixelArray[j][1] &&
-            blue === pixelArray[j][2]) {
-          matchIndex = j;
-          break;
-        }
+    // See if the color is already stored
+    for (let j = 0; j < pixelArray.length; j++) {
+      if (red === pixelArray[j][0] &&
+        green === pixelArray[j][1] &&
+        blue === pixelArray[j][2]) {
+        matchIndex = j;
+        break;
       }
+    }
 
-      // Add the color if it doesn't exist, otherwise increment frequency
-      if (matchIndex === undefined) {
-        pixelArray.push([red, green, blue, 1]);
-      } else {
-        pixelArray[matchIndex][3]++;
-      }
+    // Add the color if it doesn't exist, otherwise increment frequency
+    if (matchIndex === undefined) {
+      pixelArray.push([red, green, blue, 1]);
+    } else {
+      pixelArray[matchIndex][3]++;
+    }
   }
 
   // Sort pixelArray by color frequency
-  pixelArray.sort(function(a, b) {
+  pixelArray.sort(function (a, b) {
     return b[3] - a[3];
   });
 

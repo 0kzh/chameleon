@@ -46,16 +46,26 @@ input {
   outline: none;
 }
 
+#navigation {
+  width: 100%;
+  position: relative;
+  display: inline-block;
+}
+
 #tab-bar{
   width: 100%;
   display: flex;
-  border-top: 1px solid #DAD9DA;
-  border-bottom: 1px solid #DAD9DA;
+  /* border-top: 1px solid #DAD9DA;
+  border-bottom: 1px solid #DAD9DA; */
 }
 
 #ripple-container{
-  position: relative;
-  width: 100%;
+  position: absolute;
+  height: 3.8em;
+  z-index: 999;
+  top: 0;
+  left:0;
+  right:0;
   /*border-bottom: 3px solid #F3F6F8;*/
 }
 
@@ -106,7 +116,7 @@ input {
   font-size: 10px;
   height: 3.8em;
   overflow: hidden;
-  /*border-bottom: 1px solid #DAD9DA;*/
+  border-bottom: 1px solid #DAD9DA;
 }
 
 #controls button,
@@ -115,12 +125,12 @@ input {
 }
 
 #back, #refresh, .titlebar-windows .control, .titlebar-mac, #add-tab-container {
-  /* border-bottom: 3px solid #F3F6F8; */
+  border-bottom: 3px solid #F3F6F8;
   transition: all .5s ease;
 }
 
 #back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
-  /* border-bottom: 3px solid #dedede; */
+  border-bottom: 3px solid #dedede;
 }
 
 .titlebar-windows .control.close:hover {

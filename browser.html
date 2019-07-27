@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" href="css/browser.css">
-    <link rel="stylesheet" href="css/titlebar.css">
-    <link rel="stylesheet" href="css/chrome-tabs.css">
-    <link rel="stylesheet" href="css/chrome-tabs-dark-theme.css">
-    <link rel="stylesheet" href="css/download-manager.css">
 
-  <body>
-     <div id="controls">
+<head>
+  <link rel="stylesheet" href="css/browser.css">
+  <link rel="stylesheet" href="css/titlebar.css">
+  <link rel="stylesheet" href="css/chrome-tabs.css">
+  <link rel="stylesheet" href="css/chrome-tabs-dark-theme.css">
+  <link rel="stylesheet" href="css/download-manager.css">
+
+<body>
+  <div id="chrome">
+    <div id="controls">
       <div class="titlebar titlebar-mac">
         <div class="titlebar-stoplight">
           <div class="titlebar-close">
             <svg x="0px" y="0px" viewBox="0 0 6.4 6.4" class="stoplight-buttons">
-              <polygon fill="#4d0000" points="6.4,0.8 5.6,0 3.2,2.4 0.8,0 0,0.8 2.4,3.2 0,5.6 0.8,6.4 3.2,4 5.6,6.4 6.4,5.6 4,3.2"></polygon>
+              <polygon fill="#4d0000"
+                points="6.4,0.8 5.6,0 3.2,2.4 0.8,0 0,0.8 2.4,3.2 0,5.6 0.8,6.4 3.2,4 5.6,6.4 6.4,5.6 4,3.2"></polygon>
             </svg>
           </div>
           <div class="titlebar-minimize">
@@ -27,7 +30,9 @@
               <path fill="#006400" d="M0.6,5.9h4L0,1.4l0,3.9C0.3,5.3,0.6,5.6,0.6,5.9z"></path>
             </svg>
             <svg class="maximize-svg stoplight-buttons" x="0px" y="0px" viewBox="0 0 7.9 7.9">
-              <polygon fill="#006400" points="7.9,4.5 7.9,3.4 4.5,3.4 4.5,0 3.4,0 3.4,3.4 0,3.4 0,4.5 3.4,4.5 3.4,7.9 4.5,7.9 4.5,4.5"></polygon>
+              <polygon fill="#006400"
+                points="7.9,4.5 7.9,3.4 4.5,3.4 4.5,0 3.4,0 3.4,3.4 0,3.4 0,4.5 3.4,4.5 3.4,7.9 4.5,7.9 4.5,4.5">
+              </polygon>
             </svg>
           </div>
         </div>
@@ -36,19 +41,28 @@
       <button id="back"></button>
       <button id="refresh"></button>
 
-      <div id="ripple-container" class="ripple">
-        <span id="navbarIcon"></span>
-        <form id="location-form">
-          <span id="input-span"><input id="location" type="text" disabled><span>
-        </form>
+      <div id="navigation">
+        <div id="tab-bar">
+          <div class="chrome-tabs">
+            <div class="chrome-tabs-content"></div>
+            <div class="chrome-tabs-bottom-bar"></div>
+          </div>
+        </div>
+
+        <div id="ripple-container" class="ripple" style="display: none">
+          <span id="navbarIcon"></span>
+          <form id="location-form">
+            <span id="input-span"><input id="location" type="text" disabled><span>
+          </form>
+        </div>
       </div>
       <!-- <button id="bookmark" title="Bookmark"></button>
-      <button id="settings" title="Settings"></button> -->
+        <button id="settings" title="Settings"></button> -->
       <div id="add-tab-container">
         <button id="add-tab"></button>
       </div>
       <!-- <button id="zoom" title="Change Zoom">&#128270;</button>
-      <button id="find" title="Find in Page">&#128294;</button> -->
+        <button id="find" title="Find in Page">&#128294;</button> -->
       <div class="titlebar titlebar-windows">
         <div class="control minimize">
           <svg aria-hidden="true" version="1.1" viewBox="0 0 10 14">
@@ -57,53 +71,57 @@
         </div>
         <div class="control maximize">
           <svg aria-hidden="true" version="1.1" viewBox="0 0 10 14">
-            <path class="icon-unmaximize" d="m 2,1e-5 0,2 -2,0 0,8 8,0 0,-2 2,0 0,-8 z m 1,1 6,0 0,6 -1,0 0,-5 -5,0 z m -2,2 6,0 0,6 -6,0 z" />
+            <path class="icon-unmaximize"
+              d="m 2,1e-5 0,2 -2,0 0,8 8,0 0,-2 2,0 0,-8 z m 1,1 6,0 0,6 -1,0 0,-5 -5,0 z m -2,2 6,0 0,6 -6,0 z" />
             <path class="icon-maximize" d="M 0,0 0,10 10,10 10,0 Z M 1,1 9,1 9,9 1,9 Z" />
           </svg>
         </div>
         <div class="control close">
           <svg aria-hidden="true" version="1.1" viewBox="0 0 10 14">
-            <path d="M 0,0 0,0.7 4.3,5 0,9.3 0,10 0.7,10 5,5.7 9.3,10 10,10 10,9.3 5.7,5 10,0.7 10,0 9.3,0 5,4.3 0.7,0 Z" />
+            <path
+              d="M 0,0 0,0.7 4.3,5 0,9.3 0,10 0.7,10 5,5.7 9.3,10 10,10 10,9.3 5.7,5 10,0.7 10,0 9.3,0 5,4.3 0.7,0 Z" />
           </svg>
         </div>
       </div>
     </div>
+  </div>
 
-    <div id="tab-bar">
-      <div class="chrome-tabs">
-        <div class="chrome-tabs-content"></div>
-        <div class="chrome-tabs-bottom-bar"></div>
-      </div>
+  <div id="tabs-content"></div>
+
+  <div id="webview-overlay">
+    <object data="pages/error/error.html"></object>
+  </div>
+
+  <div id="download-manager">
+    <div class="download-item last"></div>
+    <div id="download-controls">
+      <div class="close-download action"></div>
     </div>
+  </div>
 
-    <div id="tabs-content"></div>
+  <div id="back-indicator"></div>
+  <div id="forward-indicator"></div>
+  <div id="href-dest"></div>
+  <div id="hidden"></div>
 
-    <div id="webview-overlay">
-      <object data="pages/error/error.html"></object>
-    </div>
+  <script>
+    if (typeof module === 'object') {
+      window.module = module;
+      module = undefined;
+    }
+  </script>
+  <script src="vendor/jquery.min.js"></script>
+  <script src="https://unpkg.com/draggabilly@2.1.1/dist/draggabilly.pkgd.min.js"></script>
+  <script src="js/history-db.js"></script>
+  <script src="js/settings-db.js"></script>
+  <script src="js/svgs.js"></script>
+  <script src="js/chrome-tabs.js"></script>
+  <script src="js/browser.js"></script>
+  <script src="constants/error.js"></script>
 
-    <div id="download-manager">
-        <div class="download-item last"></div>
-        <div id="download-controls">
-            <div class="close-download action"></div>
-        </div>
-    </div>
+  <script>
+    if (window.module) module = window.module;
+  </script>
+</body>
 
-    <div id="back-indicator"></div>
-    <div id="forward-indicator"></div>
-    <div id="href-dest"></div>
-    <div id="hidden"></div>
-
-    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
-    <script src="vendor/jquery.min.js"></script>
-    <script src="https://unpkg.com/draggabilly@2.1.1/dist/draggabilly.pkgd.min.js"></script>
-    <script src="js/history-db.js"></script>
-    <script src="js/settings-db.js"></script>
-    <script src="js/svgs.js"></script>
-    <script src="js/chrome-tabs.js"></script>
-    <script src="js/browser.js"></script>
-    <script src="constants/error.js"></script>
-
-    <script>if (window.module) module = window.module;</script>
-  </body>
 </html>
