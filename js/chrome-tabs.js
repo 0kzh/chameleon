@@ -5,7 +5,7 @@ const $ = require('jquery')
 const tabTemplate = `
   <div class="chrome-tab" draggable="true">
     <div class="chrome-tab-background">
-    <svg x="0" y="0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 38" preserveAspectRatio="none"> <defs> <symbol id="topleft"> <path d="M0 0.0 L500 0.0 500 38 0 38"/> </symbol> <symbol id="topright" viewBox="0 0 500 38"> <use xlink:href="#topleft"/> </symbol> <clipPath id="crop"> <rect class="mask" width="100%" height="100%" x="0"/> </clipPath> </defs> <svg x="0" y="0" width="50%" height="100%" transfrom="scale(-1, 1)" preserveAspectRatio="none"> <use xlink:href="#topleft" width="500" height="38" class="chrome-tab-background"/> </svg> <g transform="scale(-1, 1)"> <svg width="50%" height="100%" x="-100%" y="0" preserveAspectRatio="none"> <use xlink:href="#topright" width="500" height="38" class="chrome-tab-background"/> </svg> </g> </svg>    </div>
+    <svg x="0" y="0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 38" preserveAspectRatio="none"> <defs> <symbol id="topleft"> <path d="M0 0.0 L500 0.0 500 38 0 38"/> </symbol> <symbol id="topright" viewBox="0 0 500 38"> <use xlink:href="#topleft"/> </symbol> <clipPath id="crop"> <rect class="mask" width="100%" height="100%" x="0"/> </clipPath> </defs> <svg x="0" y="0" width="100%" height="100%" transfrom="scale(-1, 1)" preserveAspectRatio="none"> <use xlink:href="#topleft" width="500" height="38" class="chrome-tab-background"/> </svg> </svg>    </div>
     <div class="chrome-tab-favicon"></div>
     <div class="chrome-tab-title"></div>
     <div class="chrome-tab-close"></div>
@@ -54,13 +54,13 @@ class ChromeTabs {
   setupEvents() {
     window.addEventListener('resize', event => this.layoutTabs())
 
-    this.el.addEventListener('click', ({ target }) => {
-      if (target.classList.contains('chrome-tab')) {
-        this.setCurrentTab(target)
-      } else if (target.classList.contains('chrome-tab-close')) {
-        this.removeTab(target.parentNode)
-      } else if (target.classList.contains('chrome-tab-title') || target.classList.contains('chrome-tab-favicon')) {
-        this.setCurrentTab(target.parentNode)
+    $(this.el).on('click', (e) => {
+      if (e.target.classList.contains('chrome-tab')) {
+        this.setCurrentTab(e.target, { x: e.pageX, y: e.pageY })
+      } else if (e.target.classList.contains('chrome-tab-close')) {
+        this.removeTab(e.target.parentNode)
+      } else if (e.target.classList.contains('chrome-tab-title') || e.target.classList.contains('chrome-tab-favicon')) {
+        this.setCurrentTab(e.target.parentNode, { x: e.pageX, y: e.pageY })
       }
     })
   }
@@ -167,7 +167,7 @@ class ChromeTabs {
     this.updateTab(tabEl, tabProperties)
     this.emit('tabAdd', { tabId })
     this.emit('activeTabChange', { tabEl })
-    this.setCurrentTab(tabEl)
+    this.setCurrentTab(tabEl, { x: 0, y: 0 })
     this.layoutTabs()
     this.fixZIndexes()
     this.setupDrag()
@@ -198,14 +198,14 @@ class ChromeTabs {
     }
   }
 
-  setCurrentTab(tabEl) {
+  setCurrentTab(tabEl, coords) {
     const currentTab = this.el.querySelector('.chrome-tab-current')
     if (!$(tabEl).hasClass("chrome-tab-current")) {
       if (currentTab) currentTab.classList.remove('chrome-tab-current')
       tabEl.classList.add('chrome-tab-current')
     } else if (remote.getGlobal('draggingTab').status !== "dragging") {
       // second click, trigger event to open omnibar
-      this.emit('openOmnibar', null)
+      this.emit('openOmnibar', { x: coords.x, y: coords.y })
     }
     
 
@@ -232,9 +232,9 @@ class ChromeTabs {
   removeTab(tabEl) {
     if (tabEl.classList.contains('chrome-tab-current')) {
       if (tabEl.previousElementSibling) {
-        this.setCurrentTab(tabEl.previousElementSibling)
+        this.setCurrentTab(tabEl.previousElementSibling, { x: 0, y: 0 })
       } else if (tabEl.nextElementSibling) {
-        this.setCurrentTab(tabEl.nextElementSibling)
+        this.setCurrentTab(tabEl.nextElementSibling, { x: 0, y: 0 })
       }
     }
     tabEl.parentNode.removeChild(tabEl)
@@ -365,7 +365,7 @@ class ChromeTabs {
           tabEl.classList.remove('chrome-tab-currently-dragged')
           this.el.classList.remove('chrome-tabs-sorting')
   
-          this.setCurrentTab(tabEl)
+          this.setCurrentTab(tabEl, { x: 0, y: 0 })
           tabEl.classList.add('chrome-tab-just-dragged')
 
           setTimeout(() => {

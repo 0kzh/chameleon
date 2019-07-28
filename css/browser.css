@@ -66,6 +66,7 @@ input {
   top: 0;
   left:0;
   right:0;
+  transition: clip-path 1s;
   /*border-bottom: 3px solid #F3F6F8;*/
 }
 
@@ -315,28 +316,6 @@ webview.hidden {
 
 .hidden {
   display: none;
-}
-
-.ripple-effect{
-  position: absolute;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  background: #F3F6F8;
-  animation: ripple-animation 1s;
-  animation-fill-mode: forwards;
-  pointer-events: none;
-}
-
-@keyframes ripple-animation {
-    from {
-      transform: scale(1);
-      opacity: 1.0;
-    }
-    to {
-      transform: scale(100);
-      opacity: 1.0;
-    }
 }
 
 #back-indicator {

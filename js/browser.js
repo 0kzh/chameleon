@@ -78,7 +78,7 @@ if (preloadURL) {
     favicon: 'img/default-favicon.png',
     url: preloadURL
   });
-  $('.ripple-effect').remove();
+  $("#ripple-container").css("clip-path", "")
   $("#location").val(stripURL(preloadURL));
   $("#location").prop('disabled', true);
   $('#border-active').remove();
@@ -117,6 +117,7 @@ if (document.getElementById('download-manager').addEventListener) {
 document.querySelector('#location-form').onsubmit = function (e) {
   e.preventDefault();
   // special redirects
+  $("#ripple-container").hide()
   navigateTo(document.querySelector('#location').value);
 };
 
@@ -127,8 +128,7 @@ document.addEventListener("tabAdd", function (e) {
 document.addEventListener("activeTabChange", function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
   changeNavbarColor(false)
-  $('.ripple-effect').remove()
-  $("#location").prop('disabled', true)
+  // $("#location").prop('disabled', true)
   $('#border-active').remove()
 
   try {
@@ -147,8 +147,8 @@ document.addEventListener("activeTabChange", function (e) {
 
   }
 
-  if ($("#location").val() == "Search or enter address") {
-    selectNavbar(false, null);
+  if ($("#location").val() === "Search or enter address") {
+    // selectNavbar(false, null);
   } else {
     if (loadedSettings.navbarAlign === 'center') {
       $('#location').css("transition", "none");
@@ -161,8 +161,7 @@ document.addEventListener("activeTabChange", function (e) {
 });
 
 document.addEventListener("openOmnibar", function (e) {
-  console.log("asdf")
-  $("#ripple-container").show()
+  selectNavbar(true, e);
 })
 
 document.addEventListener("closeWindow", function (e) {
@@ -217,80 +216,74 @@ $(".titlebar-mac").dblclick(function () {
   }
 });
 
-$(".ripple, .titlebar").mousedown(function (e) {
-  if ($(this).find(".ripple-effect").length == 0) {
-    if (Math.abs(win.getSize()[0] - width) < bufferPixels || Math.abs(win.getSize()[1] - height) < bufferPixels) {
-      // if maximized, take percentage offset
-      offsets.x = Math.ceil(e.clientX * (winSize.width / width));
-      offsets.y = Math.ceil(e.clientY * (winSize.height / height));
-      $('#location').css("transition", "transform 0s");
-    } else {
-      offsets.x = e.clientX;
-      offsets.y = e.clientY;
-    }
-    if (!snapped && !win.isMaximized()) {
-      winSize.width = win.getSize()[0];
-      winSize.height = win.getSize()[1];
-    }
-
-    var mouseX;
-    var mouseY;
-
-    $(document).mousemove(function (event) {
-      dragging = true;
-      if (!snapped) {
-        win.setBounds({
-          width: winSize.width,
-          height: winSize.height,
-          x: event.screenX - offsets.x,
-          y: event.screenY - offsets.y
-        });
-      }
-
-      if (snapped) {
-        mouseX = mouseX || event.screenX;
-        mouseY = mouseY || event.screenY;
-        const deltaX = event.screenX - mouseX;
-        const deltaY = event.screenY - mouseY;
-        // Add buffer so that screen doesn't unsnap when mouse if moved 1px
-        if (Math.sqrt(deltaX * deltaX + deltaY * deltaY) > 25) {
-          snapped = false;
-          addBorder();
-        }
-        unmaximizeWindow(false);
-        $(".icon-maximize").show();
-        $(".icon-unmaximize").hide();
-      }
-    });
-
-    $(window).mouseup(function (event) {
-      $(document).unbind('mousemove');
-      $(document).unbind('mouseup');
-      dragging = false;
-
-      // implement custom window snapping
-      if (Math.abs(event.screenX - width) < bufferPixels) {
-        // right snap
-        win.setPosition(width / 2, 0);
-        win.setSize(width / 2, height);
-        snapped = true;
-      } else if (Math.abs(event.screenX - 0) < bufferPixels) {
-        // left snap
-        win.setPosition(0, 0);
-        win.setSize(width / 2, height);
-        snapped = true;
-      } else if (Math.abs(event.screenY - 0) < bufferPixels) {
-        // top snap
-        maximizeWindow(false);
-        snapped = true;
-        removeBorder();
-      }
-    });
+$(".titlebar").mousedown(function (e) {
+  if (Math.abs(win.getSize()[0] - width) < bufferPixels || Math.abs(win.getSize()[1] - height) < bufferPixels) {
+    // if maximized, take percentage offset
+    offsets.x = Math.ceil(e.clientX * (winSize.width / width));
+    offsets.y = Math.ceil(e.clientY * (winSize.height / height));
+    $('#location').css("transition", "transform 0s");
+  } else {
+    offsets.x = e.clientX;
+    offsets.y = e.clientY;
   }
-});
+  if (!snapped && !win.isMaximized()) {
+    winSize.width = win.getSize()[0];
+    winSize.height = win.getSize()[1];
+  }
 
-$(".ripple").mouseup(function () {
-  selectNavbar(true, event);
+  var mouseX;
+  var mouseY;
+
+  $(document).mousemove(function (event) {
+    dragging = true;
+    if (!snapped) {
+      win.setBounds({
+        width: winSize.width,
+        height: winSize.height,
+        x: event.screenX - offsets.x,
+        y: event.screenY - offsets.y
+      });
+    }
+
+    if (snapped) {
+      mouseX = mouseX || event.screenX;
+      mouseY = mouseY || event.screenY;
+      const deltaX = event.screenX - mouseX;
+      const deltaY = event.screenY - mouseY;
+      // Add buffer so that screen doesn't unsnap when mouse if moved 1px
+      if (Math.sqrt(deltaX * deltaX + deltaY * deltaY) > 25) {
+        snapped = false;
+        addBorder();
+      }
+      unmaximizeWindow(false);
+      $(".icon-maximize").show();
+      $(".icon-unmaximize").hide();
+    }
+  });
+
+  $(window).mouseup(function (event) {
+    $(document).unbind('mousemove');
+    $(document).unbind('mouseup');
+    dragging = false;
+
+    // implement custom window snapping
+    if (Math.abs(event.screenX - width) < bufferPixels) {
+      // right snap
+      win.setPosition(width / 2, 0);
+      win.setSize(width / 2, height);
+      snapped = true;
+    } else if (Math.abs(event.screenX - 0) < bufferPixels) {
+      // left snap
+      win.setPosition(0, 0);
+      win.setSize(width / 2, height);
+      snapped = true;
+    } else if (Math.abs(event.screenY - 0) < bufferPixels) {
+      // top snap
+      maximizeWindow(false);
+      snapped = true;
+      removeBorder();
+    }
+  });
 });
 
 $(document).mouseleave(function () {
@@ -486,7 +479,7 @@ function setupWebview(webviewId) {
         url: e.url,
         index: i
       });
-      $('.ripple-effect').remove();
+      $("#ripple-container").css("clip-path", "")
       $("#location").val(stripURL(e.url));
       // $("#location").css("-webkit-app-region", "drag");
       $("#location").prop('disabled', true);
@@ -504,7 +497,7 @@ function setupWebview(webviewId) {
 
   webview.addEventListener('ipc-message', (e) => {
     if (e.channel == "click") {
-      $('.ripple-effect').remove();
+      $("#ripple-container").css("clip-path", "")
       console.log("click:" + stripURL(webview.getURL()));
       $("#location").val(stripURL(webview.getURL()));
       // $("#location").css("-webkit-app-region", "drag");
@@ -779,7 +772,7 @@ function navigateTo(url) {
   var webview = getCurrentWebview();
   webview.src = processURL(url);
 
-  $('.ripple-effect').remove();
+  $("#ripple-container").css("clip-path", "")
   // $("#location").css("-webkit-app-region", "drag");
   $("#location").prop('disabled', true);
   if (loadedSettings.navbarAlign === 'center') {
@@ -848,7 +841,7 @@ function doLayout() {
 
     // settings not loaded yet, use callback
     settings.get('navbarAlign', (value) => {
-      if (value === 'center' && $(".ripple").find(".ripple-effect").length === 0) {
+      if (value === 'center' && $("#ripple-effect").css("clip-path") != null) {
         $("#navbarIcon").css("opacity", "0");
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
       }
@@ -1084,27 +1077,25 @@ function handleKeyDown(event) {
     } else {
       // if navbar selected, deselect
       var selected = getCurrentWebview();
-      $('.ripple-effect').remove();
-      if ($(".ripple").find(".ripple-effect").length == 0) {
-        // TODO: check if webContents ready; using empty catch is bad practice
-        try {
-          console.log("title update:" + stripURL(selected.getURL()));
-          document.querySelector('#location').value = stripURL(selected.getURL());
-        } catch (err) {
-          document.querySelector('#location').value = stripURL("about:blank");
-        }
-        // $("#location").css("-webkit-app-region", "drag");
-        $("#location").prop('disabled', true);
-        if (loadedSettings.navbarAlign === 'center') {
-          $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
-          $("#navbarIcon").css("opacity", "0");
-        }
-        $('#border-active').remove();
-        $('#border-match-width').remove();
-        // if ($("#add-tab").hasClass("no-border")) {
-        //     $(".ripple").css("border-right", "1px solid transparent");
-        // }
+      $("#ripple-container").css("clip-path", "")
+      // TODO: check if webContents ready; using empty catch is bad practice
+      try {
+        console.log("title update:" + stripURL(selected.getURL()));
+        document.querySelector('#location').value = stripURL(selected.getURL());
+      } catch (err) {
+        document.querySelector('#location').value = stripURL("about:blank");
       }
+      // $("#location").css("-webkit-app-region", "drag");
+      $("#location").prop('disabled', true);
+      if (loadedSettings.navbarAlign === 'center') {
+        $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+        $("#navbarIcon").css("opacity", "0");
+      }
+      $('#border-active').remove();
+      $('#border-match-width').remove();
+      // if ($("#add-tab").hasClass("no-border")) {
+      //     $(".ripple").css("border-right", "1px solid transparent");
+      // }
     }
   }
 
@@ -1151,7 +1142,7 @@ function handleLoadCommit(webview) {
   setFavicon(webview, webview.getTitle(), webview.getURL());
   var selected = getCurrentWebview();
   // only update location if webview in focus
-  if ($(".ripple").find(".ripple-effect").length == 0 && selected == webview) {
+  if ($("#ripple-container").css("clip-path") != null && selected == webview) {
     console.log("finish load:" + stripURL(webview.getURL()));
     document.querySelector('#location').value = stripURL(webview.getURL());
     updateNavbarIcon();
@@ -1226,9 +1217,9 @@ function changeNavbarColor(pageLoaded) {
     // page contents start at navbar height
     remote.getCurrentWebContents().capturePage({
       x: 0,
-      y: $("#chrome").height() + 1,
+      y: $("#controls").height() + 1,
       width: $("#controls").width(),
-      height: 100
+      height: 1
     }, (img) => {
       var source = new Image
       source.src = img.toDataURL()
@@ -1254,6 +1245,9 @@ function setColor(color) {
   $("#location").css("color", pSCB(0.3, getContrast(color[0], color[1], color[2])))
   $("#add-tab").css("background-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
   $(".ripple").data("ripple-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
+  $(".chrome-tabs .chrome-tab .chrome-tab-background > svg .chrome-tab-background ").css("fill", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
+  $(".chrome-tab-current .chrome-tab-background > svg .chrome-tab-background").css("fill", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  $(".chrome-tab-title").css("color", getContrast(color[0], color[1], color[2]))
 }
 
 function updateNavbarIcon() {
@@ -1274,7 +1268,7 @@ function handleTitleUpdate(event, webview) {
 
   var selected = getCurrentWebview();
   // only update location if webview in focus
-  if ($(".ripple").find(".ripple-effect").length == 0 && selected == webview) {
+  if ($("#ripple-container").css("clip-path") != null && selected == webview) {
     console.log("title update:" + stripURL(webview.getURL()));
     document.querySelector('#location').value = stripURL(webview.getURL());
     // $("#location").css("-webkit-app-region", "drag");
@@ -1332,7 +1326,7 @@ function handleLoadError(event) {
     innerDoc.find("body").on('click', () => {
       // from ipc-message click
       var webview = getCurrentWebview();
-      $('.ripple-effect').remove();
+      $("#ripple-container").css("clip-path", "")
       console.log("click:" + stripURL(webview.getURL()));
       $("#location").val(stripURL(webview.getURL()));
       $("#location").prop('disabled', true);
@@ -1517,12 +1511,7 @@ function extractHostname(url) {
 function stripURL(url) {
   if (url.startsWith("about:blank")) {
     document.documentElement.classList.add('home');
-    if ($(".ripple").find(".ripple-effect").length == 0) {
-      $("#navbarIcon").html(svgSearch);
-      return "Search or enter address";
-    } else {
-      return "";
-    }
+    return ""
   } else {
     document.documentElement.classList.remove('home');
     $(getCurrentWebview()).css('background', '');
@@ -1573,7 +1562,7 @@ function getNavbarOffset() {
   var location_x = document.querySelector("#location-form").getBoundingClientRect().left;
   var text_width = $("#location").textWidth() / 2;
   if (text_width == 0) {
-    $("#location").val("Search or enter address");
+    $("#location").val("");
     text_width = $("#location").textWidth() / 2;
   }
   var offset_width = controls_x - location_x - text_width;
@@ -1613,38 +1602,26 @@ function selectNavbar(animate, event) {
   } else {
     $('#location').css("transition", "transform 0s");
   }
-  if ($(".ripple").find(".ripple-effect").length == 0 && !dragging) {
-    var $div = $('<div/>');
+  if ($("#ripple-container").css('clip-path') != null && !dragging) {
+    
+    // var $div = $('<div/>');
     var btnOffset = $(".ripple").offset();
     var xPos, yPos;
     if (event != null) {
       event.preventDefault();
-      xPos = event.pageX - btnOffset.left;
-      yPos = event.pageY - btnOffset.top;
+      xPos = event.detail.x - btnOffset.left - $("#navigation").offset().left;
+      yPos = event.detail.y - btnOffset.top;
     } else {
       xPos = 0;
       yPos = 0;
     }
+    $("#ripple-container").show()
+    $("#ripple-container").css("clip-path", `circle(0px at ${xPos}px ${yPos}px)`)
+    setTimeout(() => {
+      $("#ripple-container").css("clip-path", `circle(1000px at ${xPos}px ${yPos}px)`)
+      $("#location").select();
+    }, 100)
 
-    $div.addClass('ripple-effect');
-    var $ripple = $(".ripple-effect");
-
-    $ripple.css("height", $(this).height());
-    $ripple.css("width", $(this).height());
-
-    if (!animate) {
-      $div.css({
-        animation: "ripple-animation 0s",
-        animationFillMode: "forwards"
-      });
-    }
-
-    $div.css({
-        top: yPos - ($ripple.height() / 2),
-        left: xPos - ($ripple.width() / 2),
-        background: $(".ripple").data("ripple-color")
-      })
-      .appendTo($("#location-form"));
     $("#location").css("transform", "translateX(0%)");
     $("#location").prop('disabled', false);
     $("#navbarIcon").css("opacity", "1");
@@ -1655,12 +1632,10 @@ function selectNavbar(animate, event) {
     }
 
     var webview = getCurrentWebview();
-    if ($('#location').val() == "Search or enter address") {
-      $('#location').val("");
-    } else {
+    if ($('#location').val() !== "") {
       $('#location').val(webview.getURL());
     }
-    $("#location").select();
+    
   }
 }
 
