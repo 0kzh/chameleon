@@ -756,6 +756,7 @@ function navigateTo(url) {
   var webview = getCurrentWebview();
   webview.src = processURL(url);
 
+  webview.removeAttribute("color")
   $("#ripple-container").css("clip-path", "")
   // $("#location").css("-webkit-app-region", "drag");
   $("#location").prop('disabled', true);
@@ -1224,8 +1225,12 @@ function setColor(color) {
 
   const style = `
   <style id="chameleon">
-    #controls, .titlebar, #back, #refresh, .ripple {
+    #controls, .titlebar, #back, #refresh {
       background: ${regular}
+    }
+
+    #ripple-container.ripple {
+      background: ${darker}
     }
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
