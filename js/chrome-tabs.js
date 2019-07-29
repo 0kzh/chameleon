@@ -179,17 +179,9 @@ class ChromeTabs {
     if (tabEls.length == 0) {
       // close window if last tab closed
       this.emit('closeWindow', null)
-    } else if (tabEls.length == 1) {
-      $("#add-tab").detach().removeClass("no-border").appendTo("#add-tab-container")
-      $(".ripple").css("margin-right", "0")
-      // if (settings.darkMode) {
-      //     $(".ripple").css("border-right", "1px solid #121212");
-      // } else {
-      //     $(".ripple").css("border-right", "1px solid #DAD9DA");
-      // }
     } else {
-      var element = $('#add-tab').detach().addClass("no-border")
-      $('.chrome-tabs').after(element)
+      // var element = $('#add-tab').detach().addClass("no-border")
+      // $('.chrome-tabs').after(element)
       document.querySelector("#tab-bar").style.display = ""
       $(".ripple").css("margin-right", "-1px")
       this.layoutTabs()
@@ -253,20 +245,10 @@ class ChromeTabs {
     if (tabEls.length == 0) {
       // close window if last tab closed
       this.emit('closeWindow', null)
-    } else if (tabEls.length == 1) {
-      $("#add-tab").detach().removeClass("no-border").appendTo("#add-tab-container")
-      $(".ripple").css("margin-right", "0")
-      // if (settings != null) {
-      //     if (settings.darkMode) {
-      //         $(".ripple").css("border-right", "1px solid #121212");
-      //     } else {
-      //         $(".ripple").css("border-right", "1px solid #DAD9DA");
-      //     }
-      // }
     } else {
       // move add tab button to chrome-tabs
-      var element = $('#add-tab').detach().addClass("no-border")
-      $('.chrome-tabs').after(element)
+      // var element = $('#add-tab').detach().addClass("no-border")
+      // $('.chrome-tabs').after(element)
       document.querySelector("#tab-bar").style.display = ""
       $(".ripple").css("margin-right", "-1px")
       this.layoutTabs()

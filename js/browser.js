@@ -62,6 +62,7 @@ let loadedSettings;
 // load settings
 settings.onLoad(loadSettings);
 
+
 addBorder();
 
 chromeTabs.init(el, {
@@ -81,7 +82,6 @@ if (preloadURL) {
   $("#ripple-container").css("clip-path", "")
   $("#location").val(stripURL(preloadURL));
   $("#location").prop('disabled', true);
-  $('#border-active').remove();
   $('#border-match-width').remove();
   remote.getGlobal('draggingTab').url = null;
 } else {
@@ -92,6 +92,9 @@ if (preloadURL) {
     url: remote.getGlobal('draggingTab').url ? remote.getGlobal('draggingTab').url : null
   });
 }
+
+// setup webview
+setupWebview(0);
 
 if ($(".download-item:not(.last)").length == 0) {
   $("#download-manager").hide();
@@ -129,7 +132,6 @@ document.addEventListener("activeTabChange", function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
   changeNavbarColor(false)
   // $("#location").prop('disabled', true)
-  $('#border-active').remove()
 
   try {
     // if page loaded, set omnibar url
@@ -147,17 +149,13 @@ document.addEventListener("activeTabChange", function (e) {
 
   }
 
-  if ($("#location").val() === "Search or enter address") {
-    // selectNavbar(false, null);
-  } else {
-    if (loadedSettings.navbarAlign === 'center') {
-      $('#location').css("transition", "none");
-      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
-      $("#navbarIcon").css("opacity", "0");
-    }
-    $('#border-active').remove();
-    $('#border-match-width').remove();
+  if (loadedSettings.navbarAlign === 'center') {
+    $('#location').css("transition", "none");
+    $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+    $("#navbarIcon").css("opacity", "0");
   }
+  $('#border-match-width').remove();
+
 });
 
 document.addEventListener("openOmnibar", function (e) {
@@ -487,11 +485,7 @@ function setupWebview(webviewId) {
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
         $("#navbarIcon").css("opacity", "0");
       }
-      $('#border-active').remove();
       $('#border-match-width').remove();
-      // if ($("#add-tab").hasClass("no-border")) {
-      //     $(".ripple").css("border-right", "1px solid transparent");
-      // }
     }
   });
 
@@ -506,12 +500,8 @@ function setupWebview(webviewId) {
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
         $("#navbarIcon").css("opacity", "0");
       }
-      $('#border-active').remove();
       $('#ripple-container').hide()
       $('body').off('click', '.chrome-tab')
-      // if ($("#add-tab").hasClass("no-border")) {
-      //     $(".ripple").css("border-right", "1px solid transparent");
-      // }
     } else if (e.channel == "mousemove" || e.channel == "dragover" || e.channel == "mouseup" || e.channel == "dragend" || e.channel == "dragenter" || e.channel == "dragleave") {
       if (e.channel == "mousemove") {
         e.args[0] = e.args[0] + win.getBounds().x;
@@ -670,7 +660,6 @@ function setupWebview(webviewId) {
         setTimeout(() => {
           $('#border-match-width').remove();
           $('#border-fade-out').remove();
-          $('#border-active').remove();
         }, 500);
         updateNavbarIcon();
       }
@@ -761,11 +750,6 @@ function setupWebview(webviewId) {
   }
 }
 
-onload = function () {
-  setupWebview(0);
-  doLayout();
-};
-
 function navigateTo(url) {
   resetExitedState();
   // select current visible webview
@@ -779,11 +763,7 @@ function navigateTo(url) {
     $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
     $("#navbarIcon").css("opacity", "0");
   }
-  $('#border-active').remove();
   $('#border-match-width').remove();
-  // if ($("#add-tab").hasClass("no-border")) {
-  //     $(".ripple").css("border-right", "1px solid transparent");
-  // }
 }
 
 function processURL(url) {
@@ -874,9 +854,6 @@ ipcRenderer.on('shortcut', function (event, data) {
       if (loadedSettings.navbarAlign === 'center') {
         $("#navbarIcon").css("opacity", "0");
       }
-      // if ($("#add-tab").hasClass("no-border")) {
-      //     $(".ripple").css("border-right", "1px solid transparent");
-      // }
     }
   } else if (data.action == "reloadPage") {
     // TODO: check if webContents ready; using empty catch is bad practice
@@ -1091,11 +1068,7 @@ function handleKeyDown(event) {
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
         $("#navbarIcon").css("opacity", "0");
       }
-      $('#border-active').remove();
       $('#border-match-width').remove();
-      // if ($("#add-tab").hasClass("no-border")) {
-      //     $(".ripple").css("border-right", "1px solid transparent");
-      // }
     }
   }
 
@@ -1151,7 +1124,6 @@ function handleLoadCommit(webview) {
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
       $("#navbarIcon").css("opacity", "0");
     }
-    $('#border-active').remove();
   }
   updateBackButton(webview);
 
@@ -1232,6 +1204,9 @@ function changeNavbarColor(pageLoaded) {
         var palette = _getPalette(source)
         color = palette[0]
         setColor(color);
+        if (!color) {
+          color = [255, 255, 255]
+        }
         webview.setAttribute("color", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
       });
       $(".hidden").append(img);
@@ -1240,15 +1215,11 @@ function changeNavbarColor(pageLoaded) {
 }
 
 function setColor(color) {
-  if (!color) {
-    color = [255, 255, 255];
-  }
-
-
   const contrast = getContrast(color[0], color[1], color[2])
   const contrastLighter = pSCB(0.2, getContrast(color[0], color[1], color[2]))
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
   const darker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const evenDarker = pSCB(-0.4, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
 
 
   const style = `
@@ -1283,6 +1254,26 @@ function setColor(color) {
 
     #back, #refresh, .titlebar-windows .control, .titlebar-mac, #add-tab-container {
       border-bottom: ${'3px solid ' + darker}
+    }
+
+    #refresh:hover, #back:not([disabled]):hover {
+      background-color: ${darker};
+    }
+
+    #back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
+      border-bottom: 3px solid ${evenDarker};
+    }
+
+    #add-tab-container:after {
+      background: ${darker};
+    }
+
+    #add-tab:hover {
+      background-color: ${evenDarker};
+    }
+
+    #add-tab-container:hover:after {
+      background: ${evenDarker};
     }
   </style>
   `
@@ -1320,11 +1311,7 @@ function handleTitleUpdate(event, webview) {
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
       $("#navbarIcon").css("opacity", "0");
     }
-    $('#border-active').remove();
     $('#border-match-width').remove();
-    // if ($("#add-tab").hasClass("no-border")) {
-    //     $(".ripple").css("border-right", "1px solid transparent");
-    // }
   }
 
   updateBackButton(webview);
@@ -1377,7 +1364,6 @@ function handleLoadError(event) {
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
         $("#navbarIcon").css("opacity", "0");
       }
-      $('#border-active').remove();
     });
 
     if (errorCodes[event.errorCode].retryOnReconnect) {
@@ -1668,11 +1654,6 @@ function selectNavbar(animate, event) {
     $("#location").css("transform", "translateX(0%)");
     $("#location").prop('disabled', false);
     $("#navbarIcon").css("opacity", "1");
-    if (loadedSettings.theme == 'dark') {
-      $('<style id="border-active">#ripple-container:before, #add-tab-container:after{background:#222222}</style>').appendTo('head');
-    } else if (loadedSettings.theme == 'light') {
-      $('<style id="border-active">#ripple-container:before, #add-tab-container:after{background:#dedede}</style>').appendTo('head');
-    }
 
     var webview = getCurrentWebview();
     if ($('#location').val() !== "") {
