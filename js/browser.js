@@ -1204,10 +1204,10 @@ function changeNavbarColor(pageLoaded) {
       }).on('load', function () {
         var palette = _getPalette(source)
         color = palette[0]
-        setColor(color);
         if (!color) {
           color = [255, 255, 255]
         }
+        setColor(color);
         webview.setAttribute("color", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
       });
       $(".hidden").append(img);
@@ -1243,6 +1243,10 @@ function setColor(color) {
 
     #add-tab {
       background-color: ${darker}
+    }
+
+    .chrome-tabs {
+      background: ${evenDarker}
     }
 
     .chrome-tabs .chrome-tab .chrome-tab-background > svg .chrome-tab-background {
