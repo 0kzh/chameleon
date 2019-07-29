@@ -4,8 +4,6 @@ const $ = require('jquery')
 
 const tabTemplate = `
   <div class="chrome-tab" draggable="true">
-    <div class="chrome-tab-background">
-    <svg x="0" y="0" width="100%" height="100%" version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 38" preserveAspectRatio="none"> <defs> <symbol id="topleft"> <path d="M0 0.0 L500 0.0 500 38 0 38"/> </symbol> <symbol id="topright" viewBox="0 0 500 38"> <use xlink:href="#topleft"/> </symbol> <clipPath id="crop"> <rect class="mask" width="100%" height="100%" x="0"/> </clipPath> </defs> <svg x="0" y="0" width="100%" height="100%" transfrom="scale(-1, 1)" preserveAspectRatio="none"> <use xlink:href="#topleft" width="500" height="38" class="chrome-tab-background"/> </svg> </svg>    </div>
     <div class="chrome-tab-favicon"></div>
     <div class="chrome-tab-title"></div>
     <div class="chrome-tab-close"></div>

@@ -130,7 +130,7 @@ document.addEventListener("tabAdd", function (e) {
 
 document.addEventListener("activeTabChange", function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
-  changeNavbarColor(false)
+  changeNavbarColor(false, false)
   // $("#location").prop('disabled', true)
 
   try {
@@ -651,6 +651,7 @@ function setupWebview(webviewId) {
       $("#href-dest").html();
       $("#href-dest").hide();
     } else if (e.channel == "page-load-progress") {
+      
       const progress = e.args[0];
       const bottomBarWidth = $("#ripple-container").width();
       $('#border-match-width').remove();
@@ -673,6 +674,8 @@ function setupWebview(webviewId) {
         length: article.length,
         url: getCurrentWebview().getURL()
       });
+    } else if (e.channel == "dom-loaded") {
+      changeNavbarColor(true, false);
     } else if (e.channel == "show-back-arrow") {
       const percent = e.args[0];
       $("#back-indicator").css("display", "block");
@@ -1110,8 +1113,8 @@ function handleKeyDown(event) {
 }
 
 function handleLoadCommit(webview) {
+  changeNavbarColor(true, true);
   resetExitedState();
-  changeNavbarColor(true);
 
   setFavicon(webview, webview.getTitle(), webview.getURL());
   var selected = getCurrentWebview();
@@ -1177,11 +1180,11 @@ function handleLoadStart(event, webview) {
   }
 }
 
-function changeNavbarColor(pageLoaded) {
+function changeNavbarColor(pageLoaded, overwriteExisting) {
   var webview = getCurrentWebview()
   console.log(webview.getAttribute("tab-id"))
 
-  if (webview.hasAttribute("color")) {
+  if (webview.hasAttribute("color") && !overwriteExisting) {
     // extract color array from rgb string
     var color = webview.getAttribute("color").match(/\d+/g);
     setColor(color);
@@ -1192,7 +1195,7 @@ function changeNavbarColor(pageLoaded) {
       x: 0,
       y: $("#controls").height() + 1,
       width: $("#controls").width(),
-      height: 30
+      height: 1
     }, (img) => {
       var source = new Image
       source.src = img.toDataURL()
@@ -1226,43 +1229,44 @@ function setColor(color) {
   const style = `
   <style id="chameleon">
     #controls, .titlebar, #back, #refresh {
-      background: ${regular}
+      background: ${regular};
     }
 
     #ripple-container.ripple {
-      background: ${darker}
+      background: ${darker};
     }
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
-      fill: ${contrastLighter}
+      fill: ${contrastLighter};
     }
 
     #location {
-      color: ${contrastLighter}
+      color: ${contrastLighter};
     }
 
     #add-tab {
-      background-color: ${darker}
+      background-color: ${darker};
     }
 
     .chrome-tabs {
-      background: ${evenDarker}
+      background: ${evenDarker};
     }
 
-    .chrome-tabs .chrome-tab .chrome-tab-background > svg .chrome-tab-background {
-      fill: ${darker}
+    .chrome-tabs .chrome-tab {
+      background: ${darker};
+      border-bottom: ${'3px solid ' + darker};
     }
 
-    .chrome-tabs .chrome-tab.chrome-tab-current .chrome-tab-background > svg .chrome-tab-background {
-      fill: ${regular}
+    .chrome-tabs .chrome-tab.chrome-tab-current {
+      background: ${regular};
     }
 
     .chrome-tabs .chrome-tab-title {
-      color: ${contrast}
+      color: ${contrast};
     }
 
     #back, #refresh, .titlebar-windows .control, .titlebar-mac, #add-tab-container {
-      border-bottom: ${'3px solid ' + darker}
+      border-bottom: ${'3px solid ' + darker};
     }
 
     #refresh:hover, #back:not([disabled]):hover {
