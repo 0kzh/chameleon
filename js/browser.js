@@ -1219,7 +1219,7 @@ function changeNavbarColor(pageLoaded) {
       x: 0,
       y: $("#controls").height() + 1,
       width: $("#controls").width(),
-      height: 1
+      height: 30
     }, (img) => {
       var source = new Image
       source.src = img.toDataURL()
@@ -1240,14 +1240,57 @@ function changeNavbarColor(pageLoaded) {
 }
 
 function setColor(color) {
-  $("#controls, .titlebar, #back, #refresh, .ripple").css("background", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  $("#controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons)").css("fill", pSCB(0.3, getContrast(color[0], color[1], color[2])))
-  $("#location").css("color", pSCB(0.3, getContrast(color[0], color[1], color[2])))
-  $("#add-tab").css("background-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
-  $(".ripple").data("ripple-color", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
-  $(".chrome-tabs .chrome-tab .chrome-tab-background > svg .chrome-tab-background ").css("fill", pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
-  $(".chrome-tab-current .chrome-tab-background > svg .chrome-tab-background").css("fill", `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  $(".chrome-tab-title").css("color", getContrast(color[0], color[1], color[2]))
+  if (!color) {
+    color = [255, 255, 255];
+  }
+
+
+  const contrast = getContrast(color[0], color[1], color[2])
+  const contrastLighter = pSCB(0.2, getContrast(color[0], color[1], color[2]))
+  const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+  const darker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+
+
+  const style = `
+  <style id="chameleon">
+    #controls, .titlebar, #back, #refresh, .ripple {
+      background: ${regular}
+    }
+
+    #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
+      fill: ${contrastLighter}
+    }
+
+    #location {
+      color: ${contrastLighter}
+    }
+
+    #add-tab {
+      background-color: ${darker}
+    }
+
+    .chrome-tabs .chrome-tab .chrome-tab-background > svg .chrome-tab-background {
+      fill: ${darker}
+    }
+
+    .chrome-tabs .chrome-tab.chrome-tab-current .chrome-tab-background > svg .chrome-tab-background {
+      fill: ${regular}
+    }
+
+    .chrome-tabs .chrome-tab-title {
+      color: ${contrast}
+    }
+
+    #back, #refresh, .titlebar-windows .control, .titlebar-mac, #add-tab-container {
+      border-bottom: ${'3px solid ' + darker}
+    }
+  </style>
+  `
+
+  $(".ripple").data("ripple-color", pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`))
+  $("#chameleon").remove()
+  $(style).appendTo("head")
+
 }
 
 function updateNavbarIcon() {

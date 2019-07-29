@@ -70,32 +70,6 @@ input {
   /*border-bottom: 3px solid #F3F6F8;*/
 }
 
-/* #ripple-container:before {
-  content: '';
-  display: block;
-  height: 3px;
-  width: 100%;
-  position: absolute;
-  bottom: 0;
-  background: #F3F6F8;
-  z-index: 998;
-  clear: both;
-  transition: width .5s ease, background-color .5s ease;
-}
-
-#ripple-container:after {
-  content: '';
-  display: block;
-  height: 3px;
-  width: 0;
-  background: transparent;
-  position: absolute;
-  bottom: 0;
-  z-index: 999;
-  clear: both;
-  transition: background-color .5s ease;
-} */
-
 #add-tab-container:after {
   content: '';
   display: block;
@@ -117,7 +91,6 @@ input {
   font-size: 10px;
   height: 3.8em;
   overflow: hidden;
-  border-bottom: 1px solid #DAD9DA;
 }
 
 #controls button,
