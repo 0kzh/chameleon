@@ -131,7 +131,6 @@ document.addEventListener("tabAdd", function (e) {
 document.addEventListener("activeTabChange", function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
   changeNavbarColor(false, false)
-  // $("#location").prop('disabled', true)
 
   try {
     // if page loaded, set omnibar url
@@ -871,7 +870,7 @@ ipcRenderer.on('shortcut', function (event, data) {
       title: 'New Tab',
       favicon: 'img/default-favicon.png'
     });
-    // selectNavbar(false, null);
+    selectNavbar(false, null);
   } else if (data.action == "toggleDevTools") {
     // get current webview
     getCurrentWebview().openDevTools();
@@ -1119,7 +1118,7 @@ function handleLoadCommit(webview) {
   setFavicon(webview, webview.getTitle(), webview.getURL());
   var selected = getCurrentWebview();
   // only update location if webview in focus
-  if ($("#ripple-container").css("clip-path") != null && selected == webview) {
+  if ($("#ripple-container").css("clip-path") == null && selected == webview) {
     console.log("finish load:" + stripURL(webview.getURL()));
     document.querySelector('#location').value = stripURL(webview.getURL());
     updateNavbarIcon();
@@ -1658,14 +1657,19 @@ function selectNavbar(animate, event) {
       yPos = 0;
     }
     $("#ripple-container").show()
-    $("#ripple-container").css("clip-path", `circle(0px at ${xPos}px ${yPos}px)`)
-    setTimeout(() => {
+    $("#location").prop('disabled', false);
+    if (animate) {
+      $("#ripple-container").css("clip-path", `circle(0px at ${xPos}px ${yPos}px)`)
+      setTimeout(() => {
+        $("#ripple-container").css("clip-path", `circle(1000px at ${xPos}px ${yPos}px)`)
+        $("#location").select();
+      }, 100)
+    } else {
       $("#ripple-container").css("clip-path", `circle(1000px at ${xPos}px ${yPos}px)`)
       $("#location").select();
-    }, 100)
+    }
 
     $("#location").css("transform", "translateX(0%)");
-    $("#location").prop('disabled', false);
     $("#navbarIcon").css("opacity", "1");
 
     var webview = getCurrentWebview();
