@@ -25,6 +25,7 @@
   position: absolute;
   height: 3.8em;
   left: -1px;
+  bottom: 0;
   border: 0;
   z-index: 1;
 }

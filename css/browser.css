@@ -71,17 +71,6 @@ input {
   /*border-bottom: 3px solid #F3F6F8;*/
 }
 
-#add-tab-container:after {
-  content: '';
-  display: block;
-  height: 4px;
-  width: 100%;
-  background: #F3F6F8;
-  z-index: 998;
-  clear: both;
-  transition: width .2s ease, background-color .2s ease;
-}
-
 .chrome-tab:after {
   content: '';
   display: block;
@@ -112,14 +101,14 @@ input {
   font-size: 14px;
 }
 
-#back, #refresh, .titlebar-windows .control, .titlebar-mac, #add-tab-container {
+#back, #refresh, .titlebar-windows .control, .titlebar-mac {
   border-bottom: 3px solid #F3F6F8;
   transition: all .2s ease;
 }
 
 #add-tab-container {
   font-size: 10px;
-  height: 3.5em;
+  height: 3.8em;
 }
 
 #back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
@@ -185,14 +174,17 @@ compared to the back/forward buttons */
   font-size: 10px;
   height: 100%;
   background-color: #F3F6F8;
-  /*border-bottom-left-radius: 5px;*/
+  border-bottom-left-radius: 5px;
   padding: 0 12px 0 12px;
+  box-shadow: inset 5px 0 5px -5px rgba(0,0,0,0.3), inset 0px -5px 5px -5px rgba(0,0,0,0.3);
+  transition: box-shadow 0.5s ease;
   /*border-left: 1px solid #DAD9DA;*/
   /*border-right: 1px solid #DAD9DA;*/
 }
 
 #add-tab:hover{
   background-color: #e8e8e8;
+  box-shadow: inset 5px 0 10px -5px rgba(0,0,0,0.4), inset 0px -5px 10px -5px rgba(0,0,0,0.4);
 }
 
 #add-tab.no-border{

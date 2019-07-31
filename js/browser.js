@@ -131,6 +131,7 @@ document.addEventListener("tabAdd", function (e) {
 document.addEventListener("activeTabChange", function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
   changeNavbarColor(false, false)
+  changeAddTabColor();
 
   try {
     // if page loaded, set omnibar url
@@ -672,6 +673,7 @@ function setupWebview(webviewId) {
       });
     } else if (e.channel == "dom-loaded") {
       changeNavbarColor(true, false);
+      changeAddTabColor();
     } else if (e.channel == "show-back-arrow") {
       const percent = e.args[0];
       $("#back-indicator").css("display", "block");
@@ -1110,6 +1112,7 @@ function handleKeyDown(event) {
 
 function handleLoadCommit(webview) {
   changeNavbarColor(true, true);
+  changeAddTabColor();
   resetExitedState();
 
   setFavicon(webview, webview.getTitle(), webview.getURL());
@@ -1176,6 +1179,11 @@ function handleLoadStart(event, webview) {
   }
 }
 
+function changeAddTabColor() {
+  const color = $(".chrome-tab").last().css("background-color")
+  $("#add-tab-container").css("background", color)
+}
+
 function changeNavbarColor(pageLoaded, overwriteExisting) {
   var webview = getCurrentWebview()
   console.log(webview.getAttribute("tab-id"))
@@ -1216,10 +1224,10 @@ function changeNavbarColor(pageLoaded, overwriteExisting) {
 
 function setColor(color) {
   const contrast = getContrast(color[0], color[1], color[2])
-  const contrastLighter = pSCB(0.2, getContrast(color[0], color[1], color[2]))
+  const contrastLighter = pSCB(0.4, getContrast(color[0], color[1], color[2]))
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
-  const darker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  const evenDarker = pSCB(-0.4, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const darker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const evenDarker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
 
 
   const style = `
@@ -1241,7 +1249,7 @@ function setColor(color) {
     }
 
     #add-tab {
-      background-color: ${darker};
+      background-color: ${evenDarker};
     }
 
     .chrome-tabs {
@@ -1264,7 +1272,7 @@ function setColor(color) {
       color: ${contrast};
     }
 
-    #back, #refresh, .titlebar-windows .control, .titlebar-mac, #add-tab-container {
+    #back, #refresh, .titlebar-windows .control, .titlebar-mac {
       border-bottom: ${'3px solid ' + darker};
     }
 
@@ -1274,10 +1282,6 @@ function setColor(color) {
 
     #back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
       border-bottom: 3px solid ${evenDarker};
-    }
-
-    #add-tab-container:after {
-      background: ${darker};
     }
 
     #add-tab:hover {

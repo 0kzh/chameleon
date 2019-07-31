@@ -324,9 +324,12 @@ class ChromeTabs {
 
           const currentTabPositionX = originalTabPositionX + deltaX
           const destinationIndex = Math.max(0, Math.min(tabEls.length, Math.floor((currentTabPositionX + (tabEffectiveWidth / 2)) / tabEffectiveWidth)))
-
           if (currentIndex !== destinationIndex) {
             this.animateTabMove(tabEl, currentIndex, destinationIndex)
+
+            // set background of add tab container to color of last tab
+            const color = $(".chrome-tab").last().css("background-color")
+            $("#add-tab-container").css("background", color)
           }
         })
 
