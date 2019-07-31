@@ -292,6 +292,7 @@ $("#add-tab").click(function () {
     title: 'New Tab',
     favicon: 'img/default-favicon.png'
   });
+  selectNavbar(false, null);
 });
 
 $("#back").click(function () {
