@@ -82,7 +82,7 @@ if (preloadURL) {
   $("#ripple-container").css("clip-path", "")
   $("#location").val(stripURL(preloadURL));
   $("#location").prop('disabled', true);
-  $('#border-match-width').remove();
+  
   remote.getGlobal('draggingTab').url = null;
 } else {
   // don't load page
@@ -153,7 +153,7 @@ document.addEventListener("activeTabChange", function (e) {
     $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
     $("#navbarIcon").css("opacity", "0");
   }
-  $('#border-match-width').remove();
+  
 
 });
 
@@ -298,7 +298,7 @@ $("#back").click(function () {
   var webview = getCurrentWebview();
   if (webview.canGoBack()) {
     webview.goBack();
-    $('#border-match-width').remove();
+    
   }
 });
 
@@ -484,7 +484,7 @@ function setupWebview(webviewId) {
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
         $("#navbarIcon").css("opacity", "0");
       }
-      $('#border-match-width').remove();
+      
     }
   });
 
@@ -650,17 +650,13 @@ function setupWebview(webviewId) {
       $("#href-dest").html();
       $("#href-dest").hide();
     } else if (e.channel == "page-load-progress") {
-      
       const progress = e.args[0];
+      const tabId = $(e.target).attr("tab-id")
       const bottomBarWidth = $("#ripple-container").width();
-      $('#border-match-width').remove();
-      $('<style id="border-match-width">#ripple-container:after { width: ' + (progress / 100 * bottomBarWidth) + 'px; background:#117AF3; transition: width .5s ease, background-color .5s ease;}</style>').appendTo('head');
+      
+      
+      $(`<style id="border-match-width">.chrome-tab[tab-id="${tabId}"]:after { width: ${(progress / 100 * bottomBarWidth)}px; transition: width .5s ease, background-color .5s ease;}</style>`).appendTo('head');
       if (progress == 100) {
-        $('<style id="border-fade-out">#ripple-container:after { width: 100%; background:transparent; transition: background-color .5s ease;}</style>').appendTo('head');
-        setTimeout(() => {
-          $('#border-match-width').remove();
-          $('#border-fade-out').remove();
-        }, 500);
         updateNavbarIcon();
       }
     } else if (e.channel == "show-reader") {
@@ -686,12 +682,12 @@ function setupWebview(webviewId) {
     } else if (e.channel == "go-back") {
       if (webview.canGoBack()) {
         webview.goBack();
-        $('#border-match-width').remove();
+        
       }
     } else if (e.channel == "go-forward") {
       if (webview.canGoForward()) {
         webview.goForward();
-        $('#border-match-width').remove();
+        
       }
     } else if (e.channel == "hide-indicators") {
       $("#back-indicator").css("display", "none");
@@ -766,7 +762,7 @@ function navigateTo(url) {
     $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
     $("#navbarIcon").css("opacity", "0");
   }
-  $('#border-match-width').remove();
+  
 }
 
 function processURL(url) {
@@ -1071,7 +1067,7 @@ function handleKeyDown(event) {
         $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
         $("#navbarIcon").css("opacity", "0");
       }
-      $('#border-match-width').remove();
+      
     }
   }
 
@@ -1253,7 +1249,10 @@ function setColor(color) {
 
     .chrome-tabs .chrome-tab {
       background: ${darker};
-      border-bottom: ${'3px solid ' + darker};
+    }
+
+    .chrome-tab:after {
+      background: ${darker}
     }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
@@ -1323,7 +1322,7 @@ function handleTitleUpdate(event, webview) {
       $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
       $("#navbarIcon").css("opacity", "0");
     }
-    $('#border-match-width').remove();
+    
   }
 
   updateBackButton(webview);

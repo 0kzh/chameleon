@@ -82,6 +82,19 @@ input {
   transition: width .2s ease, background-color .2s ease;
 }
 
+.chrome-tab:after {
+  content: '';
+  display: block;
+  height: 3px;
+  width: 0;
+  background: transparent;
+  position: absolute;
+  bottom: 0;
+  z-index: 999;
+  clear: both;
+  transition: background-color .5s ease;
+}
+
 /*#ripple-container:hover:after {
   width: 100%;
   background: black;
