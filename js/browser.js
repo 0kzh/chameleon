@@ -131,7 +131,6 @@ document.addEventListener("tabAdd", function (e) {
 document.addEventListener("activeTabChange", function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute("tab-id") + '"]');
   changeNavbarColor(false, false)
-  changeAddTabColor();
 
   try {
     // if page loaded, set omnibar url
@@ -656,8 +655,7 @@ function setupWebview(webviewId) {
       const tabId = $(e.target).attr("tab-id")
       const bottomBarWidth = $("#ripple-container").width();
       
-      
-      $(`<style id="border-match-width">.chrome-tab[tab-id="${tabId}"]:after { width: ${(progress / 100 * bottomBarWidth)}px; transition: width .5s ease, background-color .5s ease;}</style>`).appendTo('head');
+      $(`<style id="border-match-width">.chrome-tab[tab-id="${tabId}"]:before { width: ${(progress / 100 * bottomBarWidth)}px; transition: width .5s ease, background-color .5s ease;}</style>`).appendTo('head');
       if (progress == 100) {
         updateNavbarIcon();
       }
@@ -673,7 +671,6 @@ function setupWebview(webviewId) {
       });
     } else if (e.channel == "dom-loaded") {
       changeNavbarColor(true, false);
-      changeAddTabColor();
     } else if (e.channel == "show-back-arrow") {
       const percent = e.args[0];
       $("#back-indicator").css("display", "block");
@@ -759,6 +756,7 @@ function navigateTo(url) {
 
   webview.removeAttribute("color")
   $("#ripple-container").css("clip-path", "")
+  $("#border-match-width").remove()
   // $("#location").css("-webkit-app-region", "drag");
   $("#location").prop('disabled', true);
   if (loadedSettings.navbarAlign === 'center') {
@@ -1112,7 +1110,6 @@ function handleKeyDown(event) {
 
 function handleLoadCommit(webview) {
   changeNavbarColor(true, true);
-  changeAddTabColor();
   resetExitedState();
 
   setFavicon(webview, webview.getTitle(), webview.getURL());
@@ -1179,11 +1176,6 @@ function handleLoadStart(event, webview) {
   }
 }
 
-function changeAddTabColor() {
-  const color = $(".chrome-tab").last().css("background-color")
-  $("#add-tab-container").css("background", color)
-}
-
 function changeNavbarColor(pageLoaded, overwriteExisting) {
   var webview = getCurrentWebview()
   console.log(webview.getAttribute("tab-id"))
@@ -1228,6 +1220,7 @@ function setColor(color) {
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
   const darker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
   const evenDarker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const superDark = pSCB(-0.4, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
 
 
   const style = `
@@ -1237,7 +1230,7 @@ function setColor(color) {
     }
 
     #ripple-container.ripple {
-      background: ${darker};
+      background: ${evenDarker};
     }
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
@@ -1260,8 +1253,8 @@ function setColor(color) {
       background: ${darker};
     }
 
-    .chrome-tab:after {
-      background: ${darker}
+    .chrome-tab:before {
+      background: ${superDark};
     }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
@@ -1282,6 +1275,10 @@ function setColor(color) {
 
     #back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
       border-bottom: 3px solid ${evenDarker};
+    }
+
+    #add-tab-container {
+      background: ${regular};
     }
 
     #add-tab:hover {
@@ -1665,11 +1662,11 @@ function selectNavbar(animate, event) {
     if (animate) {
       $("#ripple-container").css("clip-path", `circle(0px at ${xPos}px ${yPos}px)`)
       setTimeout(() => {
-        $("#ripple-container").css("clip-path", `circle(1000px at ${xPos}px ${yPos}px)`)
+        $("#ripple-container").css("clip-path", `circle(4000px at ${xPos}px ${yPos}px)`)
         $("#location").select();
       }, 100)
     } else {
-      $("#ripple-container").css("clip-path", `circle(1000px at ${xPos}px ${yPos}px)`)
+      $("#ripple-container").css("clip-path", `circle(4000px at ${xPos}px ${yPos}px)`)
       $("#location").select();
     }
 

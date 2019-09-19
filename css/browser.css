@@ -71,14 +71,14 @@ input {
   /*border-bottom: 3px solid #F3F6F8;*/
 }
 
-.chrome-tab:after {
+.chrome-tab:before {
   content: '';
   display: block;
   height: 3px;
   width: 0;
   background: transparent;
   position: absolute;
-  bottom: 0;
+  top: 0;
   z-index: 999;
   clear: both;
   transition: background-color .5s ease;
