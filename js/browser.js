@@ -283,6 +283,21 @@ $(".titlebar").mousedown(function (e) {
   });
 });
 
+function handleClick() {
+  $("#ripple-container").css("clip-path", "")
+    webview = getCurrentWebview();
+    console.log("click:" + stripURL(webview.getURL()));
+    $("#location").val(stripURL(webview.getURL()));
+    // $("#location").css("-webkit-app-region", "drag");
+    $("#location").prop('disabled', true);
+    if (loadedSettings.navbarAlign === 'center') {
+      $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
+      $("#navbarIcon").css("opacity", "0");
+    }
+    $('#ripple-container').hide()
+    $('body').off('click', '.chrome-tab')
+}
+
 $(document).mouseleave(function () {
   $("#href-dest").hide();
 });
@@ -491,17 +506,7 @@ function setupWebview(webviewId) {
 
   webview.addEventListener('ipc-message', (e) => {
     if (e.channel == "click") {
-      $("#ripple-container").css("clip-path", "")
-      console.log("click:" + stripURL(webview.getURL()));
-      $("#location").val(stripURL(webview.getURL()));
-      // $("#location").css("-webkit-app-region", "drag");
-      $("#location").prop('disabled', true);
-      if (loadedSettings.navbarAlign === 'center') {
-        $("#location").css("transform", "translateX(" + getNavbarOffset() + "px)");
-        $("#navbarIcon").css("opacity", "0");
-      }
-      $('#ripple-container').hide()
-      $('body').off('click', '.chrome-tab')
+      handleClick();
     } else if (e.channel == "mousemove" || e.channel == "dragover" || e.channel == "mouseup" || e.channel == "dragend" || e.channel == "dragenter" || e.channel == "dragleave") {
       if (e.channel == "mousemove") {
         e.args[0] = e.args[0] + win.getBounds().x;
@@ -1357,6 +1362,9 @@ function handleLoadError(event) {
     innerDoc.find("#title").html(errorCodes[event.errorCode].title);
     innerDoc.find("#description").html(errorCodes[event.errorCode].description.replace("%s", stripURL(currentUrl)));
     innerDoc.find("#error-code").html(event.errorDescription);
+    innerDoc.find("body").on('click', () => {
+      handleClick();
+    });
     innerDoc.find("#try-again").on('click', () => {
       if (event.errorCode == '-501') { // if trying to connect securely to a site without ssl certificate, use http instead
         navigateTo(currentUrl.replace('https://', 'http://'));
