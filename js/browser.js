@@ -1246,46 +1246,57 @@ function setColor(color) {
   <style id="chameleon">
     #controls, .titlebar, #back, #refresh {
       background: ${regular};
+      transition: none;
     }
 
     #ripple-container.ripple {
       background: ${evenDarker};
+      transition: none;
     }
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
       fill: ${contrastLighter};
+      transition: none;
     }
 
     #location {
       color: ${contrastLighter};
+      transition: none;
     }
 
     #add-tab {
       background-color: ${evenDarker};
+      transition: none;
     }
 
     .chrome-tabs {
       background: ${evenDarker};
+      transition: none;
     }
 
     .chrome-tabs .chrome-tab {
       background: ${darker};
+      transition: none;
     }
 
     .chrome-tab:before {
       background: ${superDark};
+      transition: none;
     }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
       background: ${regular};
+      transition: none;
     }
 
     .chrome-tabs .chrome-tab-title {
       color: ${contrast};
+      transition: none;
     }
 
     #back, #refresh, .titlebar-windows .control, .titlebar-mac {
       border-bottom: ${'3px solid ' + darker};
+      transition: none;
     }
 
     #refresh:hover, #back:not([disabled]):hover {
@@ -1298,14 +1309,17 @@ function setColor(color) {
 
     #add-tab-container {
       background: ${regular};
+      transition: none;
     }
 
     #add-tab:hover {
       background-color: ${evenDarker};
+      transition: none;
     }
 
     #add-tab-container:hover:after {
       background: ${evenDarker};
+      transition: none;
     }
   </style>
   `
