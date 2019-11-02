@@ -1236,6 +1236,9 @@ function changeNavbarColor(pageLoaded, overwriteExisting) {
 function setColor(color) {
   const contrast = getContrast(color[0], color[1], color[2])
   const contrastLighter = pSCB(0.2, getContrast(color[0], color[1], color[2]))
+  const c = hexToRGB(getContrast(color[0], color[1], color[2]))
+  const highlight = `rgba(${c.r}, ${c.g}, ${c.b}, 0.1)`
+  
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
   const darker = pSCB(-0.07, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
   const evenDarker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
@@ -1298,7 +1301,7 @@ function setColor(color) {
     }
 
     #refresh:hover, #back:not([disabled]):hover {
-      background-color: ${darker};
+      background-color: ${highlight};
     }
 
     #back:not([disabled]):hover, #refresh:hover, .titlebar-windows .control:hover {
@@ -1876,6 +1879,15 @@ _getPalette = (image) => {
 function getContrast(r, g, b) {
   var yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
   return (yiq >= 128) ? '#000000' : '#ffffff';
+}
+
+function hexToRGB(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
 }
 
 // set svgs
