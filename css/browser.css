@@ -71,7 +71,7 @@ input {
   /*border-bottom: 3px solid #F3F6F8;*/
 }
 
-.chrome-tab:before {
+/* .chrome-tab:before {
   content: '';
   display: block;
   height: 3px;
@@ -82,7 +82,7 @@ input {
   z-index: 999;
   clear: both;
   transition: background-color .5s ease;
-}
+} */
 
 /*#ripple-container:hover:after {
   width: 100%;

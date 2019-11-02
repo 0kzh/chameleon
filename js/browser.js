@@ -666,7 +666,7 @@ function setupWebview(webviewId) {
       const tabId = $(e.target).attr("tab-id")
       const bottomBarWidth = $("#ripple-container").width();
       
-      $(`<style id="border-match-width">.chrome-tab[tab-id="${tabId}"]:before { width: ${(progress / 100 * bottomBarWidth)}px; transition: width .5s ease, background-color .5s ease;}</style>`).appendTo('head');
+      // $(`<style id="border-match-width">.chrome-tab[tab-id="${tabId}"]:before { width: ${(progress / 100 * bottomBarWidth)}px; transition: width .5s ease, background-color .5s ease;}</style>`).appendTo('head');
       if (progress == 100) {
         updateNavbarIcon();
       }
@@ -1235,10 +1235,10 @@ function changeNavbarColor(pageLoaded, overwriteExisting) {
 
 function setColor(color) {
   const contrast = getContrast(color[0], color[1], color[2])
-  const contrastLighter = pSCB(0.4, getContrast(color[0], color[1], color[2]))
+  const contrastLighter = pSCB(0.2, getContrast(color[0], color[1], color[2]))
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
-  const darker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  const evenDarker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const darker = pSCB(-0.07, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const evenDarker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
   const superDark = pSCB(-0.4, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
 
 
@@ -1251,7 +1251,6 @@ function setColor(color) {
 
     #ripple-container.ripple {
       background: ${evenDarker};
-      transition: none;
     }
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
@@ -1260,13 +1259,12 @@ function setColor(color) {
     }
 
     #location {
-      color: ${contrastLighter};
+      color: ${contrast};
       transition: none;
     }
 
     #add-tab {
       background-color: ${evenDarker};
-      transition: none;
     }
 
     .chrome-tabs {
@@ -1279,10 +1277,10 @@ function setColor(color) {
       transition: none;
     }
 
-    .chrome-tab:before {
-      background: ${superDark};
-      transition: none;
-    }
+    // .chrome-tab:before {
+    //   background: ${superDark};
+    //   transition: none;
+    // }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
       background: ${regular};
@@ -1309,17 +1307,14 @@ function setColor(color) {
 
     #add-tab-container {
       background: ${regular};
-      transition: none;
     }
 
     #add-tab:hover {
       background-color: ${evenDarker};
-      transition: none;
     }
 
     #add-tab-container:hover:after {
       background: ${evenDarker};
-      transition: none;
     }
   </style>
   `
