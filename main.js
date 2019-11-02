@@ -1,6 +1,8 @@
 const path = require('path');
 const unusedFilename = require('unused-filename');
-const { app, BrowserWindow, ipcMain, webContents } = require('electron');
+const { app, BrowserWindow, ipcMain, webContents, session } = require('electron');
+const { ElectronBlocker } = require('@cliqz/adblocker-electron');
+const fetch = require('cross-fetch');
 
 let os = process.platform;
 global.draggingTab = { status: null,
@@ -14,6 +16,12 @@ global.draggingTab = { status: null,
 
 global.dir = { downloads: app.getPath('downloads'), saveImagePath: '' }
 
+app.on('before-quit', function() {
+    webContents.getAllWebContents().forEach(wc => {
+        wc.send("savestate")
+    })
+});
+
 app.on('window-all-closed', function() {
     app.quit();
 });
@@ -22,8 +30,8 @@ app.on('ready', function() {
     createNewWindow(false)
 });
 
-ipcMain.on('open-window', (event, private) => {
-    createNewWindow(private)
+ipcMain.on('open-window', (event, incog) => {
+    createNewWindow(incog)
 })
 
 // Sends an ipc message to all windows
@@ -52,6 +60,10 @@ function createNewWindow(private) {
     if (os === "darwin" && compareVersion(process.versions.electron, "4.0.0")) {
         window.setWindowButtonVisibility(false);
     }
+
+    ElectronBlocker.fromPrebuiltAdsAndTracking(fetch).then((blocker) => {
+        blocker.enableBlockingInSession(session.defaultSession);
+    });
 
     window.webContents.session.on('will-download', (event, item, wc) => {
         let filePath;

@@ -1,5 +1,8 @@
 const path = require('path');
 const unusedFilename = require('unused-filename');
+const Config = require('electron-config')
+const config = new Config()
+
 const {
   ipcRenderer,
   shell,
@@ -61,6 +64,9 @@ let loadedSettings;
 
 // load settings
 settings.onLoad(loadSettings);
+
+wins = config.get("state")
+console.log(wins)
 
 
 addBorder();
@@ -928,6 +934,14 @@ ipcRenderer.on('removetab', function (event, data) {
     $(window).unbind('dragover');
     chromeTabs.removeTab(document.querySelector('.chrome-tab-current'));
   }
+});
+
+ipcRenderer.on('savestate', function (event, data) {
+  urls = []
+  $('#tabs-content webview').each((e) => {
+    urls.push(e.attr("src"))
+  });
+  config.set('state', urls)
 });
 
 win.webContents.session.on('will-download', (event, item, webContents) => {
