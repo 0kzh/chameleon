@@ -11,8 +11,8 @@ const connectionFailError = {
 }
 
 const sslError = {
-  title: "Your connection is not private",
-  description: "Attackers could be trying to steal your information from %s <br>(ex. passwords, messages, credit cards)."
+  title: 'Your connection is not private',
+  description: 'Attackers could be trying to steal your information from %s <br>(ex. passwords, messages, credit cards).'
 }
 
 const dnsError = {
@@ -21,8 +21,8 @@ const dnsError = {
 }
 
 const offlineError = {
-  title: "Unable to connect to the internet",
-  description: "This website cannot be displayed because your computer is not connected to the internet.",
+  title: 'Unable to connect to the internet',
+  description: 'This website cannot be displayed because your computer is not connected to the internet.',
   retryOnReconnect: true
 }
 

@@ -23,8 +23,7 @@ let mouseDownX = 0
 let mouseDownOffsetLeft = 0
 
 class ChromeTabs {
-
-  init(el, options) {
+  init (el, options) {
     this.el = el
     this.options = options
     this.instanceId = instanceId
@@ -40,16 +39,16 @@ class ChromeTabs {
     this.setupDrag()
   }
 
-  emit(eventName, data) {
+  emit (eventName, data) {
     document.dispatchEvent(new CustomEvent(eventName, { detail: data }))
   }
 
-  setupStyleEl() {
+  setupStyleEl () {
     this.animationStyleEl = document.createElement('style')
     this.el.appendChild(this.animationStyleEl)
   }
 
-  setupEvents() {
+  setupEvents () {
     window.addEventListener('resize', event => this.layoutTabs())
 
     $(this.el).on('click', (e) => {
@@ -63,25 +62,25 @@ class ChromeTabs {
     })
   }
 
-  get tabEls() {
+  get tabEls () {
     return Array.prototype.slice.call(this.el.querySelectorAll('.chrome-tab'))
   }
 
-  get tabContentEl() {
+  get tabContentEl () {
     return this.el.querySelector('.chrome-tabs-content')
   }
 
-  get tabWidth() {
+  get tabWidth () {
     const tabsContentWidth = this.tabContentEl.clientWidth
     const width = (tabsContentWidth / this.tabEls.length)
     return width
   }
 
-  get tabEffectiveWidth() {
+  get tabEffectiveWidth () {
     return this.tabWidth - this.options.tabOverlapDistance
   }
 
-  get tabPositions() {
+  get tabPositions () {
     const tabEffectiveWidth = this.tabWidth
     let left = 0
     const positions = []
@@ -93,7 +92,7 @@ class ChromeTabs {
     return positions
   }
 
-  layoutTabs() {
+  layoutTabs () {
     const tabWidth = this.tabWidth + 1 // adjust for borders
 
     this.cleanUpPreviouslyDraggedTabs()
@@ -102,8 +101,8 @@ class ChromeTabs {
       let styleHTML = ''
       this.tabPositions.forEach((left, i) => {
         styleHTML += `
-          .chrome-tabs[data-chrome-tabs-instance-id="${ this.instanceId }"] .chrome-tab:nth-child(${ i + 1 }) {
-            transform: translate3d(${ left }px, 0, 0)
+          .chrome-tabs[data-chrome-tabs-instance-id="${this.instanceId}"] .chrome-tab:nth-child(${i + 1}) {
+            transform: translate3d(${left}px, 0, 0)
           }
         `
       })
@@ -111,7 +110,7 @@ class ChromeTabs {
     })
   }
 
-  fixZIndexes() {
+  fixZIndexes () {
     const bottomBarEl = this.el.querySelector('.chrome-tabs-bottom-bar')
     const tabEls = this.tabEls
 
@@ -126,13 +125,13 @@ class ChromeTabs {
     })
   }
 
-  createNewTabEl() {
+  createNewTabEl () {
     const div = document.createElement('div')
     div.innerHTML = tabTemplate
     return div.firstElementChild
   }
 
-  createNewWebView(url) {
+  createNewWebView (url) {
     if (url) {
       $('#tabs-content').append('<webview plugins ' + 'src=' + url + ' preload="./js/inject.js"></webview>')
     } else {
@@ -141,10 +140,10 @@ class ChromeTabs {
     return document.querySelector('#tabs-content').lastElementChild
   }
 
-  addTab(tabProperties) {
+  addTab (tabProperties) {
     const tabEl = this.createNewTabEl()
     const webview = this.createNewWebView(tabProperties.url)
-    
+
     const templateWebview = document.querySelector('#tabs-content').firstElementChild
     webview.style.width = templateWebview.style.width
     webview.style.height = templateWebview.style.height
@@ -158,7 +157,7 @@ class ChromeTabs {
     webview.setAttribute('tab-id', tabId)
     // insert tab at index; if index not specified, append instead
     if (tabProperties.index != -1) {
-      $(".chrome-tabs-content > div:nth-child(" + (tabProperties.index + 1) + ")").after(tabEl)
+      $('.chrome-tabs-content > div:nth-child(' + (tabProperties.index + 1) + ')').after(tabEl)
     } else {
       this.tabContentEl.appendChild(tabEl)
     }
@@ -171,47 +170,46 @@ class ChromeTabs {
     this.setupDrag()
     tabId++
     // simulate omnibar focus
-    $("#location").trigger('click')
+    $('#location').trigger('click')
 
-    const tabEls = document.querySelectorAll(".chrome-tab")
+    const tabEls = document.querySelectorAll('.chrome-tab')
     if (tabEls.length == 0) {
       // close window if last tab closed
       this.emit('closeWindow', null)
     } else {
       // var element = $('#add-tab').detach().addClass("no-border")
       // $('.chrome-tabs').after(element)
-      document.querySelector("#tab-bar").style.display = ""
-      $(".ripple").css("margin-right", "-1px")
+      document.querySelector('#tab-bar').style.display = ''
+      $('.ripple').css('margin-right', '-1px')
       this.layoutTabs()
       this.fixZIndexes()
       this.setupDrag()
     }
   }
 
-  setCurrentTab(tabEl, coords) {
+  setCurrentTab (tabEl, coords) {
     const currentTab = this.el.querySelector('.chrome-tab-current')
-    if (!$(tabEl).hasClass("chrome-tab-current")) {
+    if (!$(tabEl).hasClass('chrome-tab-current')) {
       if (currentTab) currentTab.classList.remove('chrome-tab-current')
       tabEl.classList.add('chrome-tab-current')
-    } else if (remote.getGlobal('draggingTab').status !== "dragging") {
+    } else if (remote.getGlobal('draggingTab').status !== 'dragging') {
       // second click, trigger event to open omnibar
       this.emit('openOmnibar', { x: coords.x, y: coords.y })
     }
-    
 
     // hide all other webviews
-    document.querySelectorAll("webview").forEach(function(webview) {
-      if (webview.getAttribute("tab-id") == tabEl.getAttribute("tab-id")) {
-        webview.classList.remove("hidden")
-        
+    document.querySelectorAll('webview').forEach(function (webview) {
+      if (webview.getAttribute('tab-id') == tabEl.getAttribute('tab-id')) {
+        webview.classList.remove('hidden')
+
         // show or hide error page
-        if ($(webview).hasClass("error-active")) {
-          $("#webview-overlay").css("visibility", "visible")
+        if ($(webview).hasClass('error-active')) {
+          $('#webview-overlay').css('visibility', 'visible')
         } else {
-          $("#webview-overlay").css("visibility", "hidden")
+          $('#webview-overlay').css('visibility', 'hidden')
         }
       } else {
-        webview.classList.add("hidden")
+        webview.classList.add('hidden')
       }
     })
 
@@ -219,7 +217,7 @@ class ChromeTabs {
     this.emit('activeTabChange', { tabEl })
   }
 
-  removeTab(tabEl) {
+  removeTab (tabEl) {
     if (tabEl.classList.contains('chrome-tab-current')) {
       if (tabEl.previousElementSibling) {
         this.setCurrentTab(tabEl.previousElementSibling, { x: 0, y: 0 })
@@ -229,7 +227,7 @@ class ChromeTabs {
     }
     tabEl.parentNode.removeChild(tabEl)
     // remove associated webview
-    var id = tabEl.getAttribute("tab-id")
+    var id = tabEl.getAttribute('tab-id')
     var webview = document.querySelector('webview[tab-id="' + id + '"]')
     webview.remove()
 
@@ -238,8 +236,7 @@ class ChromeTabs {
     this.fixZIndexes()
     this.setupDrag()
 
-
-    const tabEls = document.querySelectorAll(".chrome-tab")
+    const tabEls = document.querySelectorAll('.chrome-tab')
     if (tabEls.length == 0) {
       // close window if last tab closed
       this.emit('closeWindow', null)
@@ -247,39 +244,39 @@ class ChromeTabs {
       // move add tab button to chrome-tabs
       // var element = $('#add-tab').detach().addClass("no-border")
       // $('.chrome-tabs').after(element)
-      document.querySelector("#tab-bar").style.display = ""
-      $(".ripple").css("margin-right", "-1px")
+      document.querySelector('#tab-bar').style.display = ''
+      $('.ripple').css('margin-right', '-1px')
       this.layoutTabs()
       this.fixZIndexes()
       this.setupDrag()
     }
   }
 
-  updateTab(tabEl, tabProperties) {
+  updateTab (tabEl, tabProperties) {
     tabEl.querySelector('.chrome-tab-title').textContent = tabProperties.title
     tabEl.querySelector('.chrome-tab-favicon').style.backgroundImage = `url('${tabProperties.favicon}')`
   }
 
-  getTabIcon(tabEl) {
-    var img = tabEl.querySelector(".chrome-tab-favicon")
+  getTabIcon (tabEl) {
+    var img = tabEl.querySelector('.chrome-tab-favicon')
     var style = img.currentStyle || window.getComputedStyle(img, false)
-    return style.backgroundImage.slice(4, -1).replace(/"/g, "")
+    return style.backgroundImage.slice(4, -1).replace(/"/g, '')
   }
 
-  cleanUpPreviouslyDraggedTabs() {
+  cleanUpPreviouslyDraggedTabs () {
     this.tabEls.forEach((tabEl) => tabEl.classList.remove('chrome-tab-just-dragged'))
   }
 
-  setupDrag() {
+  setupDrag () {
     const tabEls = this.tabEls
     const tabEffectiveWidth = this.tabEffectiveWidth
     const tabPositions = this.tabPositions
-    
+
     tabEls.forEach((tabEl, originalIndex) => {
-      $("body").unbind('mousemove')
-      $("body").unbind('mouseup')
+      $('body').unbind('mousemove')
+      $('body').unbind('mouseup')
       $(tabEl).unbind('dragstart')
-      const id = tabEl.getAttribute("tab-id")
+      const id = tabEl.getAttribute('tab-id')
       const webview = document.querySelector('webview[tab-id="' + id + '"]')
 
       const originalTabPositionX = tabPositions[originalIndex]
@@ -288,7 +285,7 @@ class ChromeTabs {
         if (e.originalEvent && e.originalEvent.dataTransfer) {
           e.originalEvent.dataTransfer.clearData()
 
-          remote.getGlobal('draggingTab').status = "dragging"
+          remote.getGlobal('draggingTab').status = 'dragging'
           remote.getGlobal('draggingTab').originWindowID = remote.getCurrentWindow().id
 
           var emptyImage = document.createElement('img')
@@ -309,15 +306,15 @@ class ChromeTabs {
         let deltaX
 
         $(window).on('dragover', (e) => {
-          $(tabEl).addClass("is-dragging")
+          $(tabEl).addClass('is-dragging')
           deltaX = e.clientX - mouseDownX
-          $(tabEl).css("left", mouseDownOffsetLeft + "px")
+          $(tabEl).css('left', mouseDownOffsetLeft + 'px')
           if (deltaX < -mouseDownOffsetLeft) {
             deltaX = -mouseDownOffsetLeft
           } else if ((deltaX + mouseDownOffsetLeft) > $(this.tabContentEl).width() / 2) {
             deltaX = 0
           }
-          $(tabEl).css("transform", "translate3d(" + deltaX + "px, 0, 0)")
+          $(tabEl).css('transform', 'translate3d(' + deltaX + 'px, 0, 0)')
           // Current index be computed within the event since it can change during the dragMove
           const tabEls = this.tabEls
           const currentIndex = tabEls.indexOf(tabEl)
@@ -338,12 +335,12 @@ class ChromeTabs {
           remote.getGlobal('draggingTab').originWindowID = -1
 
           // Animate tab back
-          $(tabEl).css("left", "0")
-          $(tabEl).css("transform", `translate3d(${mouseDownOffsetLeft + deltaX}px, 0, 0)`)
-          $(tabEl).removeClass("is-dragging")
+          $(tabEl).css('left', '0')
+          $(tabEl).css('transform', `translate3d(${mouseDownOffsetLeft + deltaX}px, 0, 0)`)
+          $(tabEl).removeClass('is-dragging')
           tabEl.classList.remove('chrome-tab-currently-dragged')
           this.el.classList.remove('chrome-tabs-sorting')
-  
+
           this.setCurrentTab(tabEl, { x: 0, y: 0 })
           tabEl.classList.add('chrome-tab-just-dragged')
 
@@ -351,18 +348,17 @@ class ChromeTabs {
             tabEl.style.transform = ''
             this.setupDrag()
           }, 10)
-
         })
 
-      this.cleanUpPreviouslyDraggedTabs()
-      tabEl.classList.add('chrome-tab-currently-dragged')
-      this.el.classList.add('chrome-tabs-sorting')
-      this.fixZIndexes()
+        this.cleanUpPreviouslyDraggedTabs()
+        tabEl.classList.add('chrome-tab-currently-dragged')
+        this.el.classList.add('chrome-tabs-sorting')
+        this.fixZIndexes()
       })
     })
   }
 
-  animateTabMove(tabEl, originIndex, destinationIndex) {
+  animateTabMove (tabEl, originIndex, destinationIndex) {
     if (destinationIndex < originIndex) {
       tabEl.parentNode.insertBefore(tabEl, this.tabEls[destinationIndex])
     } else {

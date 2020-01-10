@@ -1,12 +1,12 @@
-const {Menu} = require('electron');
-const electron = require('electron');
+const { Menu } = require('electron')
+const electron = require('electron')
 
-const app = electron.app;
-var mainWindow;
+const app = electron.app
+var mainWindow
 
-module.exports = function(window) {
-    // because app comes as a parameter, it's the very same you've created in app.js
-    mainWindow = window;
+module.exports = function (window) {
+  // because app comes as a parameter, it's the very same you've created in app.js
+  mainWindow = window
 }
 
 const template = [
@@ -16,12 +16,12 @@ const template = [
       {
         label: 'New Tab',
         accelerator: 'CmdOrCtrl+T',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut' , {action:'addTab'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'addTab' }) }
       },
       {
         label: 'New Window',
         accelerator: 'CmdOrCtrl+N',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut' , {action:'newWindow'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'newWindow' }) }
       },
       {
         type: 'separator'
@@ -34,7 +34,7 @@ const template = [
       {
         label: 'Close Tab',
         accelerator: 'CmdOrCtrl+W',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut' , {action:'closeTab'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'closeTab' }) }
       },
       {
         type: 'separator'
@@ -42,18 +42,18 @@ const template = [
       {
         label: 'Save As',
         accelerator: 'CmdOrCtrl+S',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', {action: 'savePage'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'savePage' }) }
       },
       {
         label: 'Print',
         accelerator: 'CmdOrCtrl+P',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', {action: 'printPage'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'printPage' }) }
       },
       {
         label: 'Settings',
         accelerator: 'CmdOrCtrl+,',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut' , {action:'viewSettings'}); }
-      },
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'viewSettings' }) }
+      }
     ]
   },
   {
@@ -101,17 +101,17 @@ const template = [
       {
         label: 'Reload Page',
         accelerator: 'CmdOrCtrl+R',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut' , {action:'reloadPage'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'reloadPage' }) }
       },
       {
         label: 'History',
         accelerator: 'CmdOrCtrl+H',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut' , {action:'viewHistory'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'viewHistory' }) }
       },
       {
         label: 'Toggle Developer Tools',
         accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
-        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut' , {action:'toggleDevTools'}); }
+        click: (item, focusedWindow) => { focusedWindow.webContents.send('shortcut', { action: 'toggleDevTools' }) }
         // click (item, focusedWindow) {
         //   if (focusedWindow) focusedWindow.webContents.toggleDevTools()
         // }
@@ -145,8 +145,8 @@ const template = [
       {
         label: 'Close Window',
         accelerator: 'CmdOrCtrl+Q',
-        role: "close"
-      },
+        role: 'close'
+      }
     ]
   },
   {
