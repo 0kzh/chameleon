@@ -29,7 +29,12 @@ Chameleon is a browser designed to provide you with a seamless browsing experien
 
 # Installing
 
-You can find prebuilt binaries for Chameleon [here](https://github.com/Polunom/chameleon/releases). Alternatively, you can skip to the section below to build Chameleon from source.
+|  [<img src="https://i.imgur.com/POJjnum.png" alt="Windows" width="24px" height="24px" />]()</br> Windows  |          [<img src="https://i.imgur.com/V0YkvU5.png" alt="Mac" width="24px" height="24px" />]()</br> Mac          |         [<img src="https://i.imgur.com/khCS5Ll.png" alt="Linux" width="24px" height="24px" />]()</br> Linux         |
+|:---------:|:---------------------:|:---------------------:|
+| [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon.Setup.exe) | [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon.dmg) | [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon-linux-x64.zip) |
+
+
+Alternatively, you can skip to the section below to build Chameleon from source.
 
 ### Installation on Linux
 * To install the .deb file, use `sudo dpkg -i /path/to/Chameleon_amd64.deb`
