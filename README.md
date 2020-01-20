@@ -8,6 +8,8 @@
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
+
+
 Chameleon is a browser designed to provide you with a seamless browsing experience by blending in with whatever site you are visiting. Built on top of `Electron`, it aims to be fast, private, beautiful, and functional all at the same time.
 
 
@@ -27,9 +29,12 @@ Chameleon is a browser designed to provide you with a seamless browsing experien
 
 # [Roadmap](https://github.com/Polunom/chameleon/projects/1)
 
-# Installing
+# Downloads
 
-You can find prebuilt binaries for Chameleon [here](https://github.com/Polunom/chameleon/releases). Alternatively, you can skip to the section below to build Chameleon from source.
+|  [<img src="https://i.imgur.com/POJjnum.png" alt="Windows" width="24px" height="24px" />]()</br> Windows  |          [<img src="https://i.imgur.com/V0YkvU5.png" alt="Mac" width="24px" height="24px" />]()</br> Mac          |         [<img src="https://i.imgur.com/khCS5Ll.png" alt="Linux" width="24px" height="24px" />]()</br> Linux         |
+|:---------:|:---------------------:|:---------------------:|
+| [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon.Setup.exe) | [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon.dmg) | [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon-linux-x64.zip) |
+Alternatively, you can skip to the section below to build Chameleon from source.
 
 ### Installation on Linux
 * To install the .deb file, use `sudo dpkg -i /path/to/Chameleon_amd64.deb`
