@@ -27,12 +27,32 @@ Chameleon is a browser designed to provide you with a seamless browsing experien
 
 # [Roadmap](https://github.com/Polunom/chameleon/projects/1)
 
+# Installing
+
+You can find prebuilt binaries for Chameleon [here](https://github.com/Polunom/chameleon/releases). Alternatively, you can skip to the section below to build Chameleon from source.
+
+### Installation on Linux
+* To install the .deb file, use `sudo dpkg -i /path/to/Chameleon_amd64.deb`
+
 # Developing
 * Install the latest version of [`Node.js`](https://nodejs.org/en/)
 * Run `npm install` to install dependencies
 * Start Chameleon by running `npm run start`
 * Make your changes
 * Press `cmd+shift+r` or `ctrl+shift+r` to restart the browser 
+
+### Building binaries
+
+To build Chameleon from source, follow the instructions above to get the app running, then execute the following commands to build binaries
+* Build for all platforms: `npm run build`
+* Build for macOS: `npm run build-mac`
+* Build for Windows: `npm run build-win`
+* Build for Linux: `npm run build-linux`
+
+It might be difficult to build for all platforms on one platform. Depending on the platform you're using, you may need to install additional dependencies:
+* If you're using macOS and building for Linux, install [Homebrew](http://brew.sh), and run `brew install fakeroot dpkg` first.
+* If you are using macOS/Linux and building a package for Windows, you will need to install [Mono](https://www.mono-project.com/) and [Wine](https://www.winehq.org/).
+
 
 # Contributing
 

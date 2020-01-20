@@ -52,7 +52,7 @@ ipcMain.on('set-save-image-path', (event, path) => {
 function createNewWindow(private) {
     let window;
     if (os === "win32") {
-        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true }, icon: __dirname + '/img/Icon.icns' });
+        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true }, icon: __dirname + '/img/icon.icns' });
     } else {
         window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
     }

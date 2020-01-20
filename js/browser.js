@@ -676,10 +676,12 @@ function setupWebview (webviewId) {
     } else if (e.channel == 'dom-loaded') {
       changeNavbarColor(true, false)
     } else if (e.channel == 'show-back-arrow') {
+      console.log("show back")
       const percent = e.args[0]
       $('#back-indicator').css('display', 'block')
       $('#back-indicator').css('transform', 'translateY(-50%) translateX(' + percent + '%)')
     } else if (e.channel == 'show-forward-arrow') {
+      console.log("show forward")
       const percent = e.args[0]
       $('#forward-indicator').css('display', 'block')
       $('#forward-indicator').css('transform', 'translateY(-50%) translateX(' + -(percent - 100) + '%)')
