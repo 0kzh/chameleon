@@ -478,7 +478,7 @@ function setupWebview (webviewId) {
   webview.addEventListener('page-title-updated', function (e) {
     handleTitleUpdate(e, webview)
   }) // this is when the DOM becomes visible
-  webview.addEventListener('enter-html-full-screen', handleEnterHTMLFullscreen)
+  // webview.addEventListener('enter-html-full-screen', handleEnterHTMLFullscreen)
   webview.addEventListener('leave-html-full-screen', handleLeaveHTMLFullscreen)
   webview.addEventListener('new-window', (e) => {
     // get current tab index

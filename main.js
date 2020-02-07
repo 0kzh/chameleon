@@ -77,9 +77,14 @@ function createNewWindow(private) {
         item.setSavePath(filePath);
     });
 
-    window.loadURL('file://' + __dirname + '/browser.html');
+    if (process.env.NODE_ENV === 'development') {
+        window.openDevTools({ mode: 'detach' });
+        window.loadURL('http://localhost:3000/index.html');
+    } else {
+        window.loadURL('file://' + __dirname + '/browser.html');
+    }
+
     require('./menu.js')(window);
-    window.openDevTools();
     window.show()
 }
 
