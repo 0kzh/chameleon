@@ -3,6 +3,7 @@ const unusedFilename = require('unused-filename');
 const { app, BrowserWindow, ipcMain, webContents, session } = require('electron');
 const { ElectronBlocker } = require('@cliqz/adblocker-electron');
 const fetch = require('cross-fetch');
+const isDev = require('electron-is-dev');
 
 let os = process.platform;
 global.draggingTab = { status: null,
@@ -79,7 +80,9 @@ function createNewWindow(private) {
 
     window.loadURL('file://' + __dirname + '/browser.html');
     require('./menu.js')(window);
-    window.openDevTools();
+	if (isDev) {
+		window.openDevTools();
+	}
     window.show()
 }
 

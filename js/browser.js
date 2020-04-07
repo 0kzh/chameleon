@@ -1077,6 +1077,7 @@ function handleKeyDown (event) {
         $('#location').css('transform', 'translateX(' + getNavbarOffset() + 'px)')
         $('#navbarIcon').css('opacity', '0')
       }
+	  $('#ripple-container').hide()
     }
   }
 
