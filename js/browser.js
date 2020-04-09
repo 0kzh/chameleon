@@ -1236,7 +1236,7 @@ function setColor (color) {
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
   const darker = pSCB(-0.07, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
   const evenDarker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  const superDark = pSCB(-0.4, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const superDark = pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
 
   const style = `
   <style id="chameleon">
@@ -1261,7 +1261,12 @@ function setColor (color) {
 
     #add-tab {
       background-color: ${evenDarker};
+	  transition: background-color 0.1s ease;
     }
+
+	#add-tab:hover{
+	  background-color: ${superDark};
+	}
 
     .chrome-tabs {
       background: ${evenDarker};
@@ -1302,10 +1307,6 @@ function setColor (color) {
 
     #add-tab-container {
       background: ${regular};
-    }
-
-    #add-tab:hover {
-      background-color: ${evenDarker};
     }
 
     #add-tab-container:hover:after {
