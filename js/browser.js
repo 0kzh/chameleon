@@ -1242,7 +1242,7 @@ function setColor (color) {
   <style id="chameleon">
     #controls, .titlebar, #back, #refresh {
       background: ${regular};
-      transition: all 0.2s linear;
+      transition: background 0.3s linear, border-bottom 0.3s linear;
     }
 
     #ripple-container.ripple {
@@ -1251,12 +1251,12 @@ function setColor (color) {
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
       fill: ${contrastLighter};
-      transition: all 0.2s linear;
+      transition: fill 0.3s linear;
     }
 
     #location {
       color: ${contrast};
-      transition: all 0.2s linear;
+      transition: color 0.3s linear;
     }
 
     #add-tab {
@@ -1265,32 +1265,31 @@ function setColor (color) {
 
     .chrome-tabs {
       background: ${evenDarker};
-      transition: all 0.2s linear;
+      transition: background 0.3s linear;
     }
 
     .chrome-tabs .chrome-tab {
       background: ${darker};
-      transition: all 0.2s linear;
+      transition: background 0.3s linear;
     }
 
     // .chrome-tab:before {
     //   background: ${superDark};
-    //   transition: all 0.2s linear;
+    //   transition: background 0.3s linear;
     // }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
       background: ${regular};
-      transition: all 0.2s linear;
+      transition: background 0.3s linear;
     }
 
     .chrome-tabs .chrome-tab-title {
       color: ${contrast};
-      transition: all 0.2s linear;
+      transition: color 0.3s linear;
     }
 
     #back, #refresh, .titlebar-windows .control, .titlebar-mac {
       border-bottom: ${'3px solid ' + darker};
-      transition: all 0.2s linear;
     }
 
     #refresh:hover, #back:not([disabled]):hover {
