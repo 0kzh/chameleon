@@ -654,6 +654,10 @@ function setupWebview (webviewId) {
     } else if (e.channel == 'href-mouseout') {
       $('#href-dest').html()
       $('#href-dest').hide()
+	} else if (e.channel == 'scroll'){
+		console.log('scroll')
+		changeNavbarColor(true, true);
+	
     } else if (e.channel == 'page-load-progress') {
       const progress = e.args[0]
       const tabId = $(e.target).attr('tab-id')
@@ -1238,7 +1242,7 @@ function setColor (color) {
   <style id="chameleon">
     #controls, .titlebar, #back, #refresh {
       background: ${regular};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     #ripple-container.ripple {
@@ -1247,12 +1251,12 @@ function setColor (color) {
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
       fill: ${contrastLighter};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     #location {
       color: ${contrast};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     #add-tab {
@@ -1261,32 +1265,32 @@ function setColor (color) {
 
     .chrome-tabs {
       background: ${evenDarker};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     .chrome-tabs .chrome-tab {
       background: ${darker};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     // .chrome-tab:before {
     //   background: ${superDark};
-    //   transition: none;
+    //   transition: all 0.2s linear;
     // }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
       background: ${regular};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     .chrome-tabs .chrome-tab-title {
       color: ${contrast};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     #back, #refresh, .titlebar-windows .control, .titlebar-mac {
       border-bottom: ${'3px solid ' + darker};
-      transition: none;
+      transition: all 0.2s linear;
     }
 
     #refresh:hover, #back:not([disabled]):hover {

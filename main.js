@@ -17,6 +17,8 @@ global.draggingTab = { status: null,
 
 global.dir = { downloads: app.getPath('downloads'), saveImagePath: '' }
 
+app.requestSingleInstanceLock()
+
 app.on('before-quit', function() {
     webContents.getAllWebContents().forEach(wc => {
         wc.send("savestate")

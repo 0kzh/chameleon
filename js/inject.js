@@ -48,6 +48,32 @@ pace.on('update', function (percent) {
 //   location.reload();
 // });
 
+var scrollStop = function (callback) {
+
+	// Make sure a valid callback was provided
+	if (!callback || typeof callback !== 'function') return;
+
+	// Setup scrolling variable
+	var isScrolling;
+
+	// Listen for scroll events
+	window.addEventListener('scroll', function (event) {
+
+		// Clear our timeout throughout the scroll
+		window.clearTimeout(isScrolling);
+
+		// Set a timeout to run after scrolling ends
+		isScrolling = setTimeout(function() {
+
+			// Run the callback
+			callback();
+
+		}, 66);
+
+	}, false);
+
+};
+
 function waitForElementToDisplay (selector, time, callback) {
   if (document.querySelector(selector) != null) {
     callback()
@@ -115,9 +141,14 @@ document.addEventListener('dragend', function (e) {
   ipcRenderer.sendToHost('dragend')
 })
 
+scrollStop(function() {
+  console.log('scroll')
+  ipcRenderer.sendToHost('scroll')
+});
+
 // custom event detection for two finger swipe to go back
 document.addEventListener('wheel', function (e) {
-  if (indicatorStatus == 'hidden' && Math.abs(e.wheelDeltaY) >= vertScrollThreshold) {
+    if (indicatorStatus == 'hidden' && Math.abs(e.wheelDeltaY) >= vertScrollThreshold) {
     scrollActive = true
   }
 
