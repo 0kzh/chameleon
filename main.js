@@ -4,8 +4,10 @@ const { app, BrowserWindow, ipcMain, webContents, session } = require('electron'
 const { ElectronBlocker } = require('@cliqz/adblocker-electron');
 const fetch = require('cross-fetch');
 const isDev = require('electron-is-dev');
+const Store = require('electron-store');
 
 let os = process.platform;
+const store = new Store();
 global.draggingTab = { status: null,
                        createdTab: null, // windowID where tab was created
                        originWindowID: -1,
@@ -26,7 +28,6 @@ app.on('before-quit', function() {
 });
 
 app.on('window-all-closed', function() {
-
     app.quit();
 });
 
@@ -55,11 +56,30 @@ ipcMain.on('set-save-image-path', (event, path) => {
 
 function createNewWindow(private) {
     let window;
-    if (os === "win32") {
-        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true, nodeIntegration: true, webviewTag: true }, icon: __dirname + '/img/icon.icns' });
-    } else {
-        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true, nodeIntegration: true, webviewTag: true } });
+    const win32 = os === "win32";
+
+    const bounds = store.get('window_pos')
+    const properties = {
+        titleBarStyle: 'hidden',
+        show: false,
+        frame: false,
+        autoHideMenuBar: win32 ? true : undefined,
+        useContentSize: true,
+        minWidth: 320,
+        minHeight: 38,
+        width: (bounds && bounds.width ? bounds.width : undefined),
+        height: (bounds && bounds.height ? bounds.height : undefined),
+        x: (bounds && bounds.x ? bounds.x : undefined),
+        y: (bounds && bounds.y ? bounds.y : undefined),
+        webPreferences: { 
+            plugins: true, 
+            nodeIntegration: true, 
+            webviewTag: true },
+        icon: win32 ? __dirname + '/img/icon.icns' : undefined 
     }
+
+    window = new BrowserWindow(properties);
+    
     // This method is only available after version 4.0.0
     if (os === "darwin" && compareVersion(process.versions.electron, "4.0.0")) {
         window.setWindowButtonVisibility(false);
@@ -79,6 +99,10 @@ function createNewWindow(private) {
         }
         saveImagePath = "";
         item.setSavePath(filePath);
+    });
+
+    window.on('close', () => {
+        store.set('window_pos', window.getBounds())
     });
 
     window.loadURL('file://' + __dirname + '/browser.html');
