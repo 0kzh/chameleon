@@ -1188,8 +1188,8 @@ function setColor (color, animate=true) {
   const highlight = `rgba(${c.r}, ${c.g}, ${c.b}, 0.1)`
 
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
-  const darker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  const evenDarker = pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const darker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const evenDarker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
   const superDark = pSCB(-0.5, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
 
   const style = `
