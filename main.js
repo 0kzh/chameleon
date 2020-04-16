@@ -26,6 +26,7 @@ app.on('before-quit', function() {
 });
 
 app.on('window-all-closed', function() {
+
     app.quit();
 });
 
@@ -55,9 +56,9 @@ ipcMain.on('set-save-image-path', (event, path) => {
 function createNewWindow(private) {
     let window;
     if (os === "win32") {
-        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true }, icon: __dirname + '/img/icon.icns' });
+        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, autoHideMenuBar: true, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true, nodeIntegration: true, webviewTag: true }, icon: __dirname + '/img/icon.icns' });
     } else {
-        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true } });
+        window = new BrowserWindow({ titleBarStyle: 'hidden', show: false, frame: false, useContentSize: true, minWidth: 320, minHeight: 38, webPreferences: { plugins: true, nodeIntegration: true, webviewTag: true } });
     }
     // This method is only available after version 4.0.0
     if (os === "darwin" && compareVersion(process.versions.electron, "4.0.0")) {

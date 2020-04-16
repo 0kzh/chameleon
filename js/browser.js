@@ -6,11 +6,11 @@ const config = new Config()
 const {
   ipcRenderer,
   shell,
-  screen,
   clipboard
 } = window.require('electron')
 const {
-  dialog
+  dialog,
+  screen
 } = window.require('electron').remote
 const app = window.require('electron').remote.app
 const searchInPage = require('electron-in-page-search').default
@@ -135,6 +135,7 @@ document.addEventListener('tabAdd', function (e) {
 
 document.addEventListener('activeTabChange', function (e) {
   var webview = document.querySelector('webview[tab-id="' + e.detail.tabEl.getAttribute('tab-id') + '"]')
+  $('#chameleon').remove()
   changeNavbarColor(false, false)
 
   try {
@@ -642,7 +643,7 @@ function setupWebview (webviewId) {
       }
     } else if (e.channel == 'href-mouseover') {
       var url = e.args[0]
-      var webviewURL = webview.getURL().replace(/\/+$/, '')
+      var webviewURL = getCurrentWebview().getURL().replace(/\/+$/, '')
       if (url.startsWith('/')) {
         url = webviewURL + url
       } else if (url.startsWith('#')) {
@@ -1143,21 +1144,22 @@ function handleLoadStart (event, webview) {
 
 function changeNavbarColor (pageLoaded, overwriteExisting) {
   var webview = getCurrentWebview()
-  console.log(webview.getAttribute('tab-id'))
-
+  console.log(webview.hasAttribute('color'))
   if (webview.hasAttribute('color') && !overwriteExisting) {
     // extract color array from rgb string
+    $('#chameleon').remove()
     var color = webview.getAttribute('color').match(/\d+/g)
-    setColor(color)
+    setColor(color, false)
   } else if (pageLoaded) {
     // capture page and extract first line of pixels
     // page contents start at navbar height
-    remote.getCurrentWebContents().capturePage({
+    const web = remote.webContents.fromId(webview.getWebContentsId()).webContents;
+    web.capturePage({
       x: 0,
-      y: $('#controls').height() + 1,
+      y: 0,
       width: $('#controls').width(),
       height: 1
-    }, (img) => {
+    }).then((img) => {
       var source = new Image()
       source.src = img.toDataURL()
       console.log(source.src)
@@ -1179,22 +1181,22 @@ function changeNavbarColor (pageLoaded, overwriteExisting) {
   }
 }
 
-function setColor (color) {
+function setColor (color, animate=true) {
   const contrast = getContrast(color[0], color[1], color[2])
   const contrastLighter = pSCB(0.2, getContrast(color[0], color[1], color[2]))
   const c = hexToRGB(getContrast(color[0], color[1], color[2]))
   const highlight = `rgba(${c.r}, ${c.g}, ${c.b}, 0.1)`
 
   const regular = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
-  const darker = pSCB(-0.07, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  const evenDarker = pSCB(-0.1, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
-  const superDark = pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const darker = pSCB(-0.2, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const evenDarker = pSCB(-0.3, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
+  const superDark = pSCB(-0.5, `rgb(${color[0]}, ${color[1]}, ${color[2]})`)
 
   const style = `
   <style id="chameleon">
     #controls, .titlebar, #back, #refresh {
       background: ${regular};
-      transition: background 0.3s linear, border-bottom 0.3s linear;
+      transition: background ${animate ? '0.3s' : '0'} linear, border-bottom ${animate ? '0.3s' : '0'} linear;
     }
 
     #ripple-container.ripple {
@@ -1203,46 +1205,46 @@ function setColor (color) {
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
       fill: ${contrastLighter};
-      transition: fill 0.3s linear;
+      transition: fill ${animate ? '0.3s' : '0'} linear;
     }
 
     #location {
       color: ${contrast};
-      transition: color 0.3s linear;
+      transition: color ${animate ? '0.3s' : '0'} linear;
     }
 
     #add-tab {
       background-color: ${evenDarker};
-	  transition: background-color 0.1s ease;
+	    transition: background-color ${animate ? '0.1s' : '0'} ease;
     }
 
-	#add-tab:hover{
-	  background-color: ${superDark};
-	}
+    #add-tab:hover{
+      background-color: ${superDark};
+    }
 
     .chrome-tabs {
       background: ${evenDarker};
-      transition: background 0.3s linear;
+      transition: background ${animate ? '0.3s' : '0'} linear;
     }
 
     .chrome-tabs .chrome-tab {
       background: ${darker};
-      transition: background 0.3s linear;
+      transition: background ${animate ? '0.3s' : '0'} linear;
     }
 
     // .chrome-tab:before {
     //   background: ${superDark};
-    //   transition: background 0.3s linear;
+    //   transition: background ${animate ? '0.3s' : '0'} linear;
     // }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
       background: ${regular};
-      transition: background 0.3s linear;
+      transition: background ${animate ? '0.3s' : '0'} linear;
     }
 
     .chrome-tabs .chrome-tab-title {
       color: ${contrast};
-      transition: color 0.3s linear;
+      transition: color ${animate ? '0.3s' : '0'} linear;
     }
 
     #back, #refresh, .titlebar-windows .control, .titlebar-mac {

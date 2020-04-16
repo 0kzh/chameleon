@@ -125,7 +125,6 @@ button,
 input[type="submit"],
 button[disabled]:hover {
   border: none;
-  background: transparent;
 }
 
 /* These glyphs are on the small side, make them look more natural when
