@@ -654,7 +654,39 @@ function setupWebview (webviewId) {
     } else if (e.channel == 'href-mouseout') {
       $('#href-dest').html()
       $('#href-dest').hide()
-	} else if (e.channel == 'scroll'){
+	} else if (e.channel == 'exit-fullscreen') {
+    if (win.isFullScreen()) {
+      win.setFullScreen(false)
+      // TODO: check if webContents ready; using empty catch is bad practice
+      try {
+        // inject javascript to exit fullscreen
+        var id = el.querySelector('.chrome-tab-current').getAttribute('tab-id')
+        var webview = document.querySelector('webview[tab-id="' + id + '"]')
+        webview.executeJavaScript('document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?document.webkitExitFullscreen():document.mozCancelFullScreen?document.mozCancelFullScreen():document.msExitFullscreen&&document.msExitFullscreen();')
+      } catch (err) {
+        // no page loaded
+      }
+      return
+    } else {
+      // if navbar selected, deselect
+      var selected = getCurrentWebview()
+      $('#ripple-container').css('clip-path', '')
+      // TODO: check if webContents ready; using empty catch is bad practice
+      try {
+        console.log('title update:' + stripURL(selected.getURL()))
+        document.querySelector('#location').value = stripURL(selected.getURL())
+      } catch (err) {
+        document.querySelector('#location').value = stripURL('about:blank')
+      }
+      // $("#location").css("-webkit-app-region", "drag");
+      $('#location').prop('disabled', true)
+      if (loadedSettings.navbarAlign === 'center') {
+        $('#location').css('transform', 'translateX(' + getNavbarOffset() + 'px)')
+        $('#navbarIcon').css('opacity', '0')
+      }
+	  $('#ripple-container').hide()
+    }
+  } else if (e.channel == 'scroll'){
 		console.log('scroll')
 		changeNavbarColor(true, true);
 	
@@ -711,8 +743,6 @@ function setupWebview (webviewId) {
       }
     }
   })
-
-  window.addEventListener('keydown', handleKeyDown)
 
   // Test for the presence of the experimental <webview> zoom and find APIs.
   if (typeof (webview.setZoom) === 'function' &&
@@ -811,19 +841,12 @@ function processURL (url) {
 
 function doLayout () {
   document.querySelectorAll('webview').forEach(function (webview) {
-    var controls = document.querySelector('#controls')
-    var controlsHeight = controls.offsetHeight
-    var windowWidth = document.documentElement.clientWidth
-    var windowHeight = document.documentElement.clientHeight
-    var webviewWidth = windowWidth
-    var webviewHeight = windowHeight - controlsHeight
-
-    webview.style.width = webviewWidth + 'px'
-    webview.style.height = webviewHeight + 'px'
+    webview.style.width = '100%'
+    webview.style.height = '100%'
 
     var overlayWebview = document.querySelector('#webview-overlay')
-    overlayWebview.style.width = webviewWidth + 'px'
-    overlayWebview.style.height = webviewHeight + 'px'
+    overlayWebview.style.width = '100%'
+    overlayWebview.style.height = '100%'
 
     // settings not loaded yet, use callback
     settings.get('navbarAlign', (value) => {
@@ -1049,77 +1072,6 @@ win.webContents.session.on('will-download', (event, item, webContents) => {
 $('.close-download').click(function () {
   $('#download-manager').hide()
 })
-
-function handleKeyDown (event) {
-  if (event.keyCode == 27) {
-    if (win.isFullScreen()) {
-      win.setFullScreen(false)
-      // TODO: check if webContents ready; using empty catch is bad practice
-      try {
-        // inject javascript to exit fullscreen
-        var id = el.querySelector('.chrome-tab-current').getAttribute('tab-id')
-        var webview = document.querySelector('webview[tab-id="' + id + '"]')
-        webview.executeJavaScript('document.exitFullscreen?document.exitFullscreen():document.webkitExitFullscreen?document.webkitExitFullscreen():document.mozCancelFullScreen?document.mozCancelFullScreen():document.msExitFullscreen&&document.msExitFullscreen();')
-      } catch (err) {
-        // no page loaded
-      }
-      return
-    } else {
-      // if navbar selected, deselect
-      var selected = getCurrentWebview()
-      $('#ripple-container').css('clip-path', '')
-      // TODO: check if webContents ready; using empty catch is bad practice
-      try {
-        console.log('title update:' + stripURL(selected.getURL()))
-        document.querySelector('#location').value = stripURL(selected.getURL())
-      } catch (err) {
-        document.querySelector('#location').value = stripURL('about:blank')
-      }
-      // $("#location").css("-webkit-app-region", "drag");
-      $('#location').prop('disabled', true)
-      if (loadedSettings.navbarAlign === 'center') {
-        $('#location').css('transform', 'translateX(' + getNavbarOffset() + 'px)')
-        $('#navbarIcon').css('opacity', '0')
-      }
-	  $('#ripple-container').hide()
-    }
-  }
-
-  if (event.ctrlKey || event.metaKey) {
-    switch (event.keyCode) {
-      // Ctrl+F.
-      case 70:
-        event.preventDefault()
-        const search = searchInPage(getCurrentWebview())
-        if ($('.electron-in-page-search-window').hasClass('search-active')) {
-          search.closeSearchWindow()
-          search.finalize()
-        } else {
-          search.openSearchWindow()
-        }
-        break
-
-        // Ctrl + Y
-      case 89: // 87 for W
-        event.preventDefault()
-        chromeTabs.removeTab(el.querySelector('.chrome-tab-current'))
-        break
-
-        // Ctrl++.
-      case 107:
-      case 187:
-        event.preventDefault()
-        increaseZoom()
-        break
-
-        // Ctrl+-.
-      case 109:
-      case 189:
-        event.preventDefault()
-        decreaseZoom()
-    }
-  }
-}
 
 function handleLoadCommit (webview) {
   changeNavbarColor(true, true)
@@ -1420,21 +1372,22 @@ function handleLoadRedirect (event) {
 
 function handleEnterHTMLFullscreen () {
   // hide toolbar
-  $('#controls').css('display', 'none')
-  $('#tab-bar').css('display', 'none')
-  $('#download-manager').css('display', 'none')
+  $('#controls').hide()
+  $('#download-manager').hide()
 }
 
 function handleLeaveHTMLFullscreen () {
-  $('#location').css('transition', 'none')
-  $('#controls').css('display', '')
-  console.log(chromeTabs.tabEls.length)
-  if (chromeTabs.tabEls.length > 1) {
-    $('#tab-bar').css('display', '')
+  $("#controls").show()
+  // $('#location').css('transition', 'none')
+  // $('#controls').css('display', '')
+  // console.log(chromeTabs.tabEls.length)
+  // if (chromeTabs.tabEls.length > 1) {
+  //   $('#tab-bar').css('display', '')
+  // }
+  chromeTabs.layoutTabs();
+  if ($('.download-item:not(.last)').length != 0) {
+    $('#download-manager').show()
   }
-
-  // todo: if not closed, show downloads
-  $('#download-manager').css('display', '')
 }
 
 function getNextPresetZoom (zoomFactor) {

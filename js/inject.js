@@ -238,8 +238,10 @@ const tagBlacklist = [
 ]
 
 document.addEventListener('keydown', function (event) {
-  // Check if key pressed was backspace.
-  if (event.key === 'Backspace' || event.keyCode == 8) {
+  if (event.key === "Escape") {
+    // esc key pressed, exit fullscreen
+    ipcRenderer.sendToHost('exit-fullscreen')
+  } else if (event.key === 'Backspace' || event.keyCode == 8) {
     // Get the active element.
     // Check to see if the user has focus on a blacklisted element.
     console.log(document.activeElement.nodeName)
