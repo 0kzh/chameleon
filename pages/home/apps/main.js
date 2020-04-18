@@ -63,7 +63,12 @@ $(".tod").text(greeting)
 
 db.sites.orderBy('numVisits').reverse().toArray(createQuickNav);
 settings.get('name', (value) => {
+  $('.name-input').hide();
   $('.name-input').val(value);
+  $('.width-dynamic').css({
+    width: $('.width-dynamic').textWidth()
+  })
+  $('.name-input').show();
 })
 
 function countSites(sites) {

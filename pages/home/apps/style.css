@@ -30,20 +30,43 @@ body {
 	margin: 0;
 }
 
+.name {
+	position: relative;
+}
+
 input[type="text"].name-input
 {
     background: transparent;
 	border: none;
 	height: 1.3em;
-	min-width: 80px;
+	min-width: 130px;
 	max-width: 500px;
 	transition: all 0.25s ease;
 	border-bottom: 0;
 }
 
-.name-input:focus {
+:focus {
 	outline: 0;
-	border-bottom: 2px solid #ccc;
+}
+
+.sweep-effect {
+	border: 0; 
+	padding: 8px 0; 
+	border-bottom: 1px solid #F5F9FC;
+}
+
+.sweep-effect ~ .focus-border {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background-color: #CECECE;
+	transition: 0.4s
+}
+.sweep-effect:focus ~ .focus-border {
+	width: 100%; 
+	transition: 0.4s;
 }
   
   #description, #error-code {
