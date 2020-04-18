@@ -470,7 +470,9 @@ function setupWebview (webviewId) {
   webview.addEventListener('did-start-loading', function (e) {
     handleLoadStart(e, webview)
   })
-  webview.addEventListener('did-stop-loading', handleLoadStop)
+  webview.addEventListener('did-stop-loading', (e) => {
+    handleLoadStop(e, webview)
+  })
   webview.addEventListener('did-fail-load', handleLoadError)
   webview.addEventListener('did-get-redirect-request', handleLoadRedirect)
   webview.addEventListener('did-finish-load', function () {
@@ -534,6 +536,7 @@ function setupWebview (webviewId) {
       var selection = e.args[2]
       var cutpaste = e.args[3]
       var point = e.args[4]
+      webview = getCurrentWebview()
 
       const hasText = selection != ''
 
@@ -804,6 +807,10 @@ function navigateTo (url) {
   }
 }
 
+function getHomePage() {
+  return "~home/apps"
+}
+
 function processURL (url) {
   var pattern = new RegExp(/[`\^\{}|\\"<> ]/)
   var ipAddress = new RegExp(/^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(:[0-9]{1,4})?$/)
@@ -816,9 +823,14 @@ function processURL (url) {
     }
   }
 
-  if (url.startsWith('about://')) {
-    var target = url.split('about://')[1]
-    console.log(target)
+  if (url.startsWith('~')) {
+    var target = url.split('~')[1]
+    if (target.startsWith('home')) {
+      var page = target.replace('home/', '')
+      page = page ? page : 'home'
+      processedURL = `${app.getAppPath()}\\pages\\home\\${page}\\index.html`
+      console.log(processedURL)
+    }
     switch (target) {
       case 'settings':
         processedURL = app.getAppPath() + '\\pages\\settings\\settings.html'
@@ -842,13 +854,6 @@ function processURL (url) {
 
 function doLayout () {
   document.querySelectorAll('webview').forEach(function (webview) {
-    webview.style.width = '100%'
-    webview.style.height = '100%'
-
-    var overlayWebview = document.querySelector('#webview-overlay')
-    overlayWebview.style.width = '100%'
-    overlayWebview.style.height = '100%'
-
     // settings not loaded yet, use callback
     settings.get('navbarAlign', (value) => {
       if (value === 'center' && $('#ripple-effect').css('clip-path') != null) {
@@ -1306,9 +1311,9 @@ function handleTitleUpdate (event, webview) {
   updateBackButton(webview)
 }
 
-function handleLoadStop (event) {
-  // We don't remove the loading class immediately, instead we let the animation
-  // finish, so that the spinner doesn't jerkily reset back to the 0 position.
+function handleLoadStop (event, webview) {
+  webview.blur();
+  webview.focus();
   isLoading = false
 }
 
@@ -1531,7 +1536,8 @@ function extractHostname (url) {
 }
 
 function stripURL (url) {
-  if (url.startsWith('about:blank')) {
+   if (url.startsWith('about:blank') || url.startsWith('file://') && url.includes(app.getAppPath()) && url.includes("home")) {
+    // filter homepage urls
     document.documentElement.classList.add('home')
     return ''
   } else {

@@ -107,9 +107,9 @@ function createNewWindow(private) {
 
     window.loadURL('file://' + __dirname + '/browser.html');
     require('./menu.js')(window);
-	if (isDev) {
+	// if (isDev) {
 		window.openDevTools();
-	}
+	// }
     window.show()
 }
 

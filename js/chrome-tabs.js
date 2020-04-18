@@ -135,7 +135,7 @@ class ChromeTabs {
     if (url) {
       $('#tabs-content').append('<webview plugins ' + 'src=' + url + ' preload="./js/inject.js" color="rgb(255,255,255)"></webview>')
     } else {
-      $('#tabs-content').append('<webview plugins src="about:blank" preload="./js/inject.js" color="rgb(255,255,255)"></webview>')
+      $('#tabs-content').append(`<webview plugins src="${processURL(getHomePage())}" preload="./js/inject.js" color="rgb(255,255,255)"></webview>`)
     }
     return document.querySelector('#tabs-content').lastElementChild
   }
