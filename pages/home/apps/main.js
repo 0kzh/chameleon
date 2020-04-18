@@ -45,16 +45,21 @@ const defaultSites = [
 var today = new Date()
 var curHr = today.getHours()
 let greeting;
+let emoji;
 
 if (curHr >= 5 && curHr < 12) {
+  emoji = "🌅"
   greeting = "Good Morning"
 } else if (curHr >= 12 && curHr < 18) {
+  emoji = "☀️"
   greeting = "Good Afternoon"
 } else {
+  emoji = "🌙"
   greeting = "Good Evening"
 }
 
-$(".tod").html(greeting)
+$("#emoji").text(emoji)
+$(".tod").text(greeting)
 
 db.sites.orderBy('numVisits').reverse().toArray(createQuickNav);
 settings.get('name', (value) => {
