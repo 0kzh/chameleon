@@ -49,14 +49,16 @@
           </div>
           <div id="add-tab-container">
               <button id="add-tab"></button>
-            </div>
+          </div>
         </div>
 
-        <div id="ripple-container" class="ripple" style="display: none">
-          <span id="navbarIcon"></span>
-          <form id="location-form">
-            <span id="input-span"><input id="location" type="text" placeholder="Search or enter address" disabled><span>
-          </form>
+        <div id="searchbar">
+          <div id="ripple-container" class="ripple" style="display: none">
+            <span id="navbarIcon"></span>
+            <form id="location-form">
+              <span id="input-span"><input id="location" type="text" placeholder="Search or enter address" disabled><span>
+            </form>
+          </div>
         </div>
       </div>
       <!-- <button id="bookmark" title="Bookmark"></button>
@@ -85,6 +87,7 @@
         </div>
       </div>
     </div>
+    <div id="autocomplete"></div>
   </div>
 
   <div id="tabs-content"></div>
@@ -113,8 +116,9 @@
   </script>
   <script src="vendor/jquery.min.js"></script>
   <script src="https://unpkg.com/draggabilly@2.1.1/dist/draggabilly.pkgd.min.js"></script>
-  <script src="js/history-db.js"></script>
-  <script src="js/settings-db.js"></script>
+  <script src="js/util/history-db.js"></script>
+  <script src="js/searchbar/autocomplete.js"></script>
+  <script src="js/util/settings-db.js"></script>
   <script src="js/svgs.js"></script>
   <script src="js/chrome-tabs.js"></script>
   <script src="js/browser.js"></script>

@@ -350,3 +350,39 @@ webview.hidden {
   white-space: nowrap;
   text-overflow: ellipsis;
 }
+
+#autocomplete {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ac-entry {
+  display: flex;
+  padding: 8px 0 8px 188px;
+  flex-direction: row;
+  align-items: center;
+  overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.favicon .logo {
+  height: 16px;
+  width: 16px;
+}
+
+.title, .separator, .link, .favicon {
+  padding-right: 10px;
+}
+
+.link {
+  overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.link {
+  color: rgb(0, 119, 204);
+}

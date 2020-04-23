@@ -51,14 +51,14 @@ if (curHr >= 5 && curHr < 12) {
   emoji = "🌅"
   greeting = "Good Morning"
 } else if (curHr >= 12 && curHr < 18) {
-  emoji = "☀️"
+  emoji = "🌤️"
   greeting = "Good Afternoon"
 } else {
   emoji = "🌙"
   greeting = "Good Evening"
 }
 
-$("#emoji").text(emoji)
+$("#emoji").html(emoji)
 $(".tod").text(greeting)
 
 db.sites.orderBy('numVisits').reverse().toArray(createQuickNav);

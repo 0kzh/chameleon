@@ -23,6 +23,9 @@
 }
 .chrome-tabs .chrome-tab {
   position: absolute;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
   height: 3.8em;
   left: -1px;
   bottom: 0;
@@ -73,7 +76,6 @@
   height: 1.6em;
   width: 1.6em;
   background-size: 1.6em;
-  margin-top: 1em;
   z-index: 3;
   display: inline-block;
   vertical-align: top;
@@ -81,14 +83,14 @@
 .chrome-tabs .chrome-tab-title {
   position: relative;
   display: inline-block;
-  vertical-align: top;
+  vertical-align: bottom;
   color: #222;
-  padding: 0 0.25em;
+  padding: 0 0.75em;
+  margin-bottom: 0.1em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-size: 1.4em;
-  margin-top: 0.6em;
   max-width: calc(100% - 5em);
 }
 .chrome-tabs .chrome-tab-close {

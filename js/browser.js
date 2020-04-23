@@ -393,7 +393,7 @@ $(document).on('dragleave', function (e) {
 
       remote.getGlobal('draggingTab').url = getCurrentWebview().getURL()
       remote.getGlobal('draggingTab').title = getCurrentWebview().getTitle()
-      remote.getGlobal('draggingTab').favicon = 'https://www.google.com/s2/favicons?domain=' + stripURL(getCurrentWebview().getURL())
+      remote.getGlobal('draggingTab').favicon = `https://api.faviconkit.com/${stripURL(getCurrentWebview().getURL())}/24`
       $(this).removeClass('in-bounds')
       $('.is-dragging').animate({
         top: -50
@@ -1102,7 +1102,7 @@ function handleLoadCommit (webview) {
   // check if exists; if true, get numVisits
   const protocol = require('url').parse(webview.getURL()).protocol
   if (protocol == 'https:' || protocol == 'http:') {
-    var fav = 'https://www.google.com/s2/favicons?domain=' + stripURL(webview.getURL())
+    var fav = `https://api.faviconkit.com/${stripURL(getCurrentWebview().getURL())}/24`
     db.sites.where('url').equalsIgnoreCase(webview.getURL()).first().then(function (site) {
       if (site == null) {
         // doesn't exist, so add
@@ -1201,7 +1201,7 @@ function setColor (color, animate=true) {
   <style id="chameleon">
     #controls, .titlebar, #back, #refresh {
       background: ${regular};
-      transition: background ${animate ? '0.3s' : '0'} linear, border-bottom ${animate ? '0.3s' : '0'} linear;
+      transition: background ${animate ? '0.25s' : '0'} ease, border-bottom ${animate ? '0.25s' : '0'} ease;
     }
 
     #ripple-container.ripple {
@@ -1210,12 +1210,12 @@ function setColor (color, animate=true) {
 
     #controls svg:not(.stoplight-buttons), #add-tab svg:not(.stoplight-buttons) {
       fill: ${contrastLighter};
-      transition: fill ${animate ? '0.3s' : '0'} linear;
+      transition: fill ${animate ? '0.25s' : '0'} ease;
     }
 
     #location {
       color: ${contrast};
-      transition: color ${animate ? '0.3s' : '0'} linear;
+      transition: color ${animate ? '0.25s' : '0'} ease;
     }
 
     #add-tab {
@@ -1229,27 +1229,37 @@ function setColor (color, animate=true) {
 
     .chrome-tabs {
       background: ${evenDarker};
-      transition: background ${animate ? '0.3s' : '0'} linear;
+      transition: background ${animate ? '0.25s' : '0'} ease;
+    }
+
+    .ac-entry {
+      background: ${evenDarker};
+      transition: background ${animate ? '0.25s' : '0'} ease;
+    }
+
+    .ac-entry:hover {
+      background: ${superDark};
+      transition: background ${animate ? '0.25s' : '0'} ease;
     }
 
     .chrome-tabs .chrome-tab {
       background: ${darker};
-      transition: background ${animate ? '0.3s' : '0'} linear;
+      transition: background ${animate ? '0.25s' : '0'} ease;
     }
 
     // .chrome-tab:before {
     //   background: ${superDark};
-    //   transition: background ${animate ? '0.3s' : '0'} linear;
+    //   transition: background ${animate ? '0.25s' : '0'} ease;
     // }
 
     .chrome-tabs .chrome-tab.chrome-tab-current {
       background: ${regular};
-      transition: background ${animate ? '0.3s' : '0'} linear;
+      transition: background ${animate ? '0.25s' : '0'} ease;
     }
 
     .chrome-tabs .chrome-tab-title {
       color: ${contrast};
-      transition: color ${animate ? '0.3s' : '0'} linear;
+      transition: color ${animate ? '0.25s' : '0'} ease;
     }
 
     #back, #refresh, .titlebar-windows .control, .titlebar-mac {
@@ -1299,7 +1309,7 @@ function handleTitleUpdate (event, webview) {
   // only update location if webview in focus
   if ($('#ripple-container').css('clip-path') != null && selected == webview) {
     console.log('title update:' + stripURL(webview.getURL()))
-    document.querySelector('#location').value = stripURL(webview.getURL())
+    $('#location').val(stripURL(webview.getURL()))
     // $("#location").css("-webkit-app-region", "drag");
     $('#location').prop('disabled', true)
     if (loadedSettings.navbarAlign === 'center') {
@@ -1504,7 +1514,7 @@ function setFavicon (webview, title, url) {
   let fav
   const protocol = require('url').parse(url).protocol
   if (protocol === 'http:' || protocol === 'https:') {
-    fav = 'https://www.google.com/s2/favicons?domain=' + stripURL(url)
+    fav = `https://api.faviconkit.com/${stripURL(getCurrentWebview().getURL())}/24`
   } else {
     fav = 'img/default-favicon.png'
   }
