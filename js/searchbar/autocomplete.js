@@ -58,7 +58,14 @@ $("#location").on("focus", () => {
     autocomplete.show();
 })
 
-$("#location").on("blur", () => {
+$("#location").on("blur", (e) => {
+    // we gotta set a timeout here since click triggers after blur
+    setTimeout(() => {
+        autocomplete.hide();
+    }, 100)
+})
+
+$(".ac-entry").on("click", () => {
     autocomplete.hide();
 })
 
@@ -91,7 +98,7 @@ function displaySites (sites) {
         div.querySelector('.title').innerHTML = site.title
         div.querySelector('.link').innerHTML = site.url
         div.querySelector('.ac-entry').addEventListener('click', () => {
-            window.location = site.url;
+            navigateTo(site.url);
         })
         document.querySelector('#autocomplete').appendChild(div.children[0]);
     }

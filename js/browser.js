@@ -805,6 +805,7 @@ function navigateTo (url) {
     $('#location').css('transform', 'translateX(' + getNavbarOffset() + 'px)')
     $('#navbarIcon').css('opacity', '0')
   }
+  $('#ripple-container').hide()
 }
 
 function getHomePage() {
