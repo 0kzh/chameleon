@@ -1,7 +1,10 @@
 var locationValue = $('#location').val();
 var autocomplete = $("#autocomplete");
 
-historyWrapper.onLoad(loadHistory)
+const googleQueryURL = 'http://suggestqueries.google.com/complete/search?q=';
+const postfix = '&client=toolbar';
+
+// historyWrapper.onLoad(loadHistory)
 
 const entryTemplate = `
     <div class="ac-entry">
@@ -14,13 +17,41 @@ const entryTemplate = `
     </div>
 `
 
-function updateAutocomplete(sites) {
-    console.log(sites)
-}
-
 $("#location").on('input propertychange paste', () => {
-    locationValue = $('#location').val();
-    loadHistory();
+    locationValue = $("#location").val();
+    if (locationValue) {
+        autocomplete.show();
+        const searchPromise = getSearchResults(locationValue);
+        const historyPromise = historyWrapper.search(locationValue);
+        Promise.all([searchPromise, historyPromise]).then(res => {
+            list = []
+            // push first website result first
+            searchResults = res[0]
+            historyResults = res[1]
+            if (history != undefined && historyResults[0] != undefined) {
+                list.push(historyResults[0]);
+            }
+
+            const searchResultCount = historyResults.length == 0 ? 8 : 3;
+            const truncated = searchResults.slice(0, searchResultCount);
+            
+            for (var entry of truncated[1]) {
+                o = {
+                    url: "https://google.com/search?q=" + entry,
+                    favicon: "https://api.faviconkit.com/google.com/24",
+                    title: entry,
+                    lastVisit: -1,
+                    numVisits: 1,
+                    id: -1,
+                }
+                list.push(o)
+            }
+            list.concat(historyResults.slice(0, 4));
+            displaySites(list);
+        }) 
+    } else {
+        autocomplete.hide();
+    }
 })
 
 $("#location").on("focus", () => {
@@ -31,9 +62,27 @@ $("#location").on("blur", () => {
     autocomplete.hide();
 })
 
+var suggestCallBack;
+function getSearchResults(query) {
+    return new Promise((resolve, reject) => {
+        $.getJSON("http://suggestqueries.google.com/complete/search?callback=?",
+            {
+                "hl": "en",
+                "jsonp": "suggestCallBack",
+                "q": query,
+                "client": "firefox"
+            }
+        );
+        
+        suggestCallBack = function (data) {
+            resolve(data);
+        };
+    });
+}
+
 function displaySites (sites) {
     document.querySelector('#autocomplete').innerHTML = ''
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 8; i++) {
         const site = sites[i]
         const div = document.createElement('div')
         div.innerHTML = entryTemplate
@@ -46,8 +95,4 @@ function displaySites (sites) {
         })
         document.querySelector('#autocomplete').appendChild(div.children[0]);
     }
-}
-
-function loadHistory() {
-    historyWrapper.search(locationValue, displaySites);
 }

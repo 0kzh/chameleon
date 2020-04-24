@@ -33,10 +33,10 @@ var historyWrapper = {
   set: function (key, value) {
     db.sites.put({ key: key, value: value })
   },
-  search: function(key, cb) {
-    db.sites.orderBy('numVisits').reverse().filter(site => {
+  search: function(key) {
+    return db.sites.orderBy('numVisits').reverse().filter(site => {
       return site.title.includes(key) || site.url.includes(key)
-    }).toArray(cb)
+    }).toArray()
   },
   load: function () {
     db.sites.each(() => {
