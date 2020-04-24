@@ -35,7 +35,8 @@ var historyWrapper = {
   },
   search: function(key) {
     return db.sites.orderBy('numVisits').reverse().filter(site => {
-      return site.title.includes(key) || site.url.includes(key)
+      console.log(stripURL(site.url))
+      return site.title.startsWith(key) || stripURL(site.url).startsWith(key) && !site.title.startsWith('http')
     }).toArray()
   },
   load: function () {

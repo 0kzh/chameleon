@@ -28,14 +28,15 @@ $("#location").on('input propertychange paste', () => {
             // push first website result first
             searchResults = res[0]
             historyResults = res[1]
+            console.log(historyResults)
             if (history != undefined && historyResults[0] != undefined) {
                 list.push(historyResults[0]);
             }
 
             const searchResultCount = historyResults.length == 0 ? 8 : 3;
-            const truncated = searchResults.slice(0, searchResultCount);
+            const truncated = searchResults[1].slice(0, searchResultCount);
             
-            for (var entry of truncated[1]) {
+            for (var entry of truncated) {
                 o = {
                     url: "https://google.com/search?q=" + entry,
                     favicon: "https://api.faviconkit.com/google.com/24",
@@ -46,7 +47,7 @@ $("#location").on('input propertychange paste', () => {
                 }
                 list.push(o)
             }
-            list.concat(historyResults.slice(0, 4));
+            list = list.concat(historyResults.slice(0, 4));
             displaySites(list);
         }) 
     } else {

@@ -355,6 +355,7 @@ webview.hidden {
   position: absolute;
   width: 100%;
   z-index: 1000;
+  user-select: none;
   display: flex;
   flex-direction: column;
   overflow: hidden;

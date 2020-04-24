@@ -1235,6 +1235,7 @@ function setColor (color, animate=true) {
 
     .ac-entry {
       background: ${evenDarker};
+      color: ${contrast};
       transition: background ${animate ? '0.25s' : '0'} ease;
     }
 
@@ -1528,12 +1529,16 @@ function setFavicon (webview, title, url) {
   chromeTabs.updateTab(el.querySelector('.chrome-tab[tab-id="' + id + '"]'), tabProperties)
 }
 
-function extractHostname (url) {
+function extractHostname (url, keepPaths=true) {
   var hostname
   // find & remove protocol (http, ftp, etc.) and get hostname
 
   if (url.indexOf('://') > -1) {
-    hostname = url.split('/')[2]
+    if (keepPaths) {
+      hostname = url.replace(/^https?\:\/\/(www.)?/, '')
+    } else {
+      hostname = url.split('/')[2]
+    }
   } else {
     hostname = url.split('/')[0]
   }
@@ -1546,7 +1551,7 @@ function extractHostname (url) {
   return hostname
 }
 
-function stripURL (url) {
+function stripURL (url, keepPaths=true) {
    if (url.startsWith('about:blank') || url.startsWith('file://') && url.includes(app.getAppPath()) && url.includes("home")) {
     // filter homepage urls
     document.documentElement.classList.add('home')
@@ -1569,7 +1574,7 @@ function stripURL (url) {
 
   // if search, leave search term
 
-  var domain = extractHostname(url)
+  var domain = extractHostname(url, keepPaths)
   var splitArr = domain.split('.')
   var arrLen = splitArr.length
 
