@@ -1,5 +1,4 @@
 const { remote } = window.require('electron')
-const { webContents } = require('electron').remote
 const $ = require('jquery')
 
 const tabTemplate = `
