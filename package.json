@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@getstation/repackage-chrome-extension-for-electron": "^0.1.1",
-    "electron": "^10.3.2",
+    "electron": "^15.5.5",
     "electron-builder": "^22.9.1",
     "electron-icon-maker": "0.0.5",
     "electron-rebuild": "^1.11.0",
