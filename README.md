@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="img/icon.png" width="256">
+  <img src="img/chameleon.png" width="256">
 </p>
 
 <div align="center">
