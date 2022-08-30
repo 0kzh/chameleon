@@ -74,7 +74,9 @@ function createNewWindow(private) {
         webPreferences: { 
             plugins: true, 
             nodeIntegration: true, 
-            webviewTag: true },
+            webviewTag: true,
+            enableRemoteModule: true,
+        },
         icon: win32 ? __dirname + '/img/icon.icns' : undefined 
     }
 
