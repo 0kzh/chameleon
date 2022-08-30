@@ -1,19 +1,19 @@
 <p align="center">
-  <img src="img/icon.png" width="256">
+  <img src="img/icon.png" width="180">
 </p>
 
 <div align="center">
-  <h1>Chameleon</h1>
+  <h1>Oxygen</h1>
 </div>
 
 [![js-standard-style](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)
 
-Chameleon is a browser designed to provide you with a seamless browsing experience by blending in with whatever site you are visiting. Built on top of `Electron`, it aims to be fast, private, beautiful, and functional all at the same time.
+Oxygen is a browser designed to provide you with a seamless browsing experience by blending in with whatever site you are visiting. Built on top of `Electron`, it aims to be fast, private, beautiful, and functional all at the same time.
 
 
 # Features
 
-- **AdBlock** - Browse the web without any ads or trackers. Due to the simplicity of Chameleon, websites load faster and consume less memory compared to modern browsers such as Chrome.
+- **AdBlock** - Browse the web without any ads or trackers. Due to the simplicity of Oxygen, websites load faster and consume less memory compared to modern browsers such as Chrome.
 - **Beautiful and minimalistic UI** - The address bar is condensed into a single line to maximize the amount of content on the screen. Everything else, from the download manager to the settings to the history page is designed to do everything you expect, while remaining as simple as possible.
 - **Cross-platform gestures** - Do you use Windows and wish you could navigate between pages with trackpad gestures like on Mac? Now you can!
 
@@ -25,30 +25,30 @@ Chameleon is a browser designed to provide you with a seamless browsing experien
 
 ![image](img/screenshots/dropbox.png)
 
-# [Roadmap](https://github.com/Polunom/chameleon/projects/1)
+# [Roadmap](https://github.com/Polunom/oxygen/projects/1)
 
 # Installing
 
 |  [<img src="https://i.imgur.com/POJjnum.png" alt="Windows" width="24px" height="24px" />]()</br> Windows  |          [<img src="https://i.imgur.com/V0YkvU5.png" alt="Mac" width="24px" height="24px" />]()</br> Mac          |         [<img src="https://i.imgur.com/khCS5Ll.png" alt="Linux" width="24px" height="24px" />]()</br> Linux         |
 |:---------:|:---------------------:|:---------------------:|
-| [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon.Setup.exe) | [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon.dmg) | [Download](https://github.com/Polunom/chameleon/releases/download/1.0/Chameleon-linux-x64.zip) |
+| [Download](https://github.com/Polunom/oxygen/releases/download/1.0/Oxygen.Setup.exe) | [Download](https://github.com/Polunom/oxygen/releases/download/1.0/Oxygen.dmg) | [Download](https://github.com/Polunom/oxygen/releases/download/1.0/Oxygen-linux-x64.zip) |
 
 
-Alternatively, you can skip to the section below to build Chameleon from source.
+Alternatively, you can skip to the section below to build Oxygen from source.
 
 ### Installation on Linux
-* To install the .deb file, use `sudo dpkg -i /path/to/Chameleon_amd64.deb`
+* To install the .deb file, use `sudo dpkg -i /path/to/Oxygen_amd64.deb`
 
 # Developing
 * Install the latest version of [`Node.js`](https://nodejs.org/en/)
 * Run `npm install` to install dependencies
-* Start Chameleon by running `npm run start`
+* Start Oxygen by running `npm run start`
 * Make your changes
 * Press `cmd+shift+r` or `ctrl+shift+r` to restart the browser 
 
 ### Building binaries
 
-To build Chameleon from source, follow the instructions above to get the app running, then execute the following commands to build binaries
+To build Oxygen from source, follow the instructions above to get the app running, then execute the following commands to build binaries
 * Build for all platforms: `npm run build`
 * Build for macOS: `npm run build-mac`
 * Build for Windows: `npm run build-win`
@@ -61,4 +61,4 @@ It might be difficult to build for all platforms on one platform. Depending on t
 
 # Contributing
 
-If you see any bugs with Chameleon or want to suggest a new feature, please feel free open an issue. Chameleon is an open-source project and is still in its early development stages - we have a lot of features planned and would appreciate any help we can get!
+If you see any bugs with Oxygen or want to suggest a new feature, please feel free open an issue. Oxygen is an open-source project and is still in its early development stages - we have a lot of features planned and would appreciate any help we can get!
